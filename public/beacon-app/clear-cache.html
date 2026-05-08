@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache & Reset - Beacon</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .success {
+            background: #4caf50;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+            color: white;
+            font-weight: 600;
+        }
+        .info {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #1976d2;
+            font-size: 14px;
+        }
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Reset Beacon App</h1>
+        <p>This will clear all cached data and reset the application to a fresh state.</p>
+
+        <div class="info">
+            <strong>What will be cleared:</strong><br>
+            • Language preferences<br>
+            • Tenant selection<br>
+            • Authentication tokens<br>
+            • All cached data
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> You will need to log in again after clearing the cache.
+        </div>
+
+        <button onclick="clearAllCache()">Clear Cache & Reset</button>
+        <button onclick="goToLogin()">Go to Login</button>
+
+        <div id="status"></div>
+        <div class="success" id="success">
+            ✓ Cache cleared successfully! Redirecting to login...
+        </div>
+    </div>
+
+    <script>
+        function clearAllCache() {
+            const status = document.getElementById('status');
+            const success = document.getElementById('success');
+
+            try {
+                status.innerHTML = 'Clearing localStorage...';
+
+                // Clear all localStorage
+                localStorage.clear();
+
+                status.innerHTML += '<br>Clearing sessionStorage...';
+
+                // Clear all sessionStorage
+                sessionStorage.clear();
+
+                status.innerHTML += '<br>Resetting language to English...';
+
+                // IMPORTANT: Set language to English AFTER clearing
+                localStorage.setItem('i18nextLng', 'en');
+
+                // Also set these just to be absolutely sure
+                localStorage.setItem('language', 'en');
+
+                // Remove any possible Arabic language keys
+                localStorage.removeItem('ar');
+                localStorage.removeItem('ar-EG');
+
+                status.innerHTML += '<br>Done!';
+
+                // Show success message
+                success.style.display = 'block';
+
+                // Redirect to login after 1 second (faster)
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+
+            } catch (error) {
+                status.innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+
+        function goToLogin() {
+            window.location.href = '/login';
+        }
+
+        // Auto-clear if URL has ?auto=1 parameter
+        if (window.location.search.includes('auto=1')) {
+            // Clear immediately
+            clearAllCache();
+        }
+
+        // ALSO auto-clear on page load (always!)
+        if (window.location.search.includes('force=1')) {
+            localStorage.clear();
+            sessionStorage.clear();
+            localStorage.setItem('i18nextLng', 'en');
+            alert('Cache cleared! Redirecting to login...');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

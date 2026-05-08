@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# BEAM-ENF-V2: PreToolUse Hook — PRIMARY enforcement point.
+# Called by Claude Code BEFORE every Write|Edit|Bash|Agent|Skill tool.
+# Exit 2 = BLOCK tool execution (hard enforcement)
+# Exit 0 = ALLOW tool execution
+#
+# Per 16-MULTI-LANGUAGE-HOOK-DESIGN §6.1, this hook is a thin bash
+# dispatcher. It performs NO language-specific work (no test runners,
+# no protected-path globbing — those live in `codewitness` / the Go
+# engine). It only POSTs to /api/v1/beam/enforce/pre-tool and converts
+# the API decision into an exit code Claude Code understands.
+#
+# KILL SWITCH: echo "passphrase" > .cwt/enforcement-off
+# HUMAN-ONLY: AI cannot create this file.
+set -euo pipefail
+
+# ── Kill switch (human-only: echo "passphrase" > .cwt/enforcement-off) ──
+_PROJ_ROOT="$(cd "$(dirname "$0")/.." 2>/dev/null && pwd)"
+_KILL_FILE="${CWT_DIR:-${_PROJ_ROOT}/.cwt}/enforcement-off"
+if [ -f "$_KILL_FILE" ]; then
+    _PHRASE=$(cat "$_KILL_FILE" 2>/dev/null | tr -d '[:space:]')
+    if [ ${#_PHRASE} -ge 8 ]; then exit 0; fi
+fi
+
+INPUT=$(cat)
+
+# ── Extract tool details ──
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // ""')
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // ""')
+
+[ -z "$TOOL_NAME" ] && exit 0
+
+# ── Hub URL + auth discovery (same pattern as nsm-hooks.sh) ──
+CW_DIR="${CODEWITNESS_DATA_DIR:-${NEXUS_DATA_DIR:-.nexus}}"
+HUB_URL=""
+API_TOKEN=""
+for cfg in "$CW_DIR/hub.json" "${HOME}/.nexus/hub.json"; do
+    if [ -f "$cfg" ] && command -v jq &>/dev/null; then
+        HUB_URL=$(jq -r '.hub_url // .url // ""' "$cfg" 2>/dev/null)
+        API_TOKEN=$(jq -r '.token // ""' "$cfg" 2>/dev/null)
+        [ -n "$HUB_URL" ] && break
+    fi
+done
+[ -z "$HUB_URL" ] && HUB_URL="http://localhost:9142"
+[ -z "$API_TOKEN" ] && API_TOKEN=$(cat ~/.nexus/api-token 2>/dev/null | tr -d '[:space:]' || true)
+
+# Auth header in temp file (avoid ps aux exposure)
+_HDR=$(mktemp 2>/dev/null || echo "/tmp/.beam-enforce-$$")
+chmod 600 "$_HDR" 2>/dev/null || true
+echo "Authorization: Bearer $API_TOKEN" > "$_HDR"
+trap 'rm -f "$_HDR"' EXIT
+
+# ── Local cache: skip API if no active BEAM run ──
+CACHE_FILE="$CW_DIR/beam-enforcement-cache.json"
+if [ -f "$CACHE_FILE" ]; then
+    CACHED_STATUS=$(jq -r '.beam_status // "unknown"' "$CACHE_FILE" 2>/dev/null || echo "unknown")
+    CACHED_AT=$(jq -r '.cached_at // 0' "$CACHE_FILE" 2>/dev/null || echo "0")
+    NOW=$(date +%s)
+    AGE=$(( NOW - CACHED_AT ))
+
+    if [ "$CACHED_STATUS" = "no_active_run" ] && [ "$AGE" -lt 60 ]; then
+        exit 0
+    fi
+fi
+
+# ── Call backend ──
+RESULT=$(timeout 3 curl -s \
+    -X POST \
+    -H @"$_HDR" \
+    -H "Content-Type: application/json" \
+    -d "$(jq -n \
+        --arg tool "$TOOL_NAME" \
+        --arg file "$FILE_PATH" \
+        --arg cmd "$COMMAND" \
+        --arg sess "$SESSION_ID" \
+        '{tool_name:$tool, file_path:$file, command:$cmd, session_id:$sess}')" \
+    "$HUB_URL/api/v1/beam/enforce/pre-tool" 2>/dev/null) || true
+
+# ── FAIL-OPEN: backend unreachable → allow + log gap ──
+if [ -z "$RESULT" ]; then
+    mkdir -p "$CW_DIR" 2>/dev/null || true
+    echo "{\"ts\":\"$(date -Iseconds)\",\"gap\":\"api_unreachable\",\"tool\":\"$TOOL_NAME\"}" \
+        >> "$CW_DIR/enforcement-gaps.jsonl" 2>/dev/null || true
+    exit 0
+fi
+
+# ── Parse response ──
+ALLOWED=$(echo "$RESULT" | jq -r '.allowed // true')
+REASON=$(echo "$RESULT" | jq -r '.reason // ""')
+BEAM_STATUS=$(echo "$RESULT" | jq -r '.beam_status // "unknown"')
+
+# Update cache
+mkdir -p "$CW_DIR" 2>/dev/null || true
+jq -n --arg s "$BEAM_STATUS" --argjson t "$(date +%s)" \
+    '{beam_status:$s, cached_at:$t}' > "$CACHE_FILE" 2>/dev/null || true
+
+# ── Decision ──
+if [ "$ALLOWED" = "true" ]; then
+    # ADR-001: per-step OperationScope check. If the active BEAM step declared
+    # a non-empty operation_scope list, TOOL_NAME must be a member. The hook
+    # is the fast path; the operation_scope_respected gate check is the
+    # system of record at step-advance time.
+    SCOPE_JSON=$(timeout 3 curl -s --max-time 3 \
+        -H @"$_HDR" \
+        "$HUB_URL/api/v1/beam/current-step/operation-scope" 2>/dev/null) || true
+
+    if [ -n "$SCOPE_JSON" ]; then
+        SCOPE=$(echo "$SCOPE_JSON" | jq -r '.operation_scope // [] | join(" ")' 2>/dev/null)
+        ACTIVE_STEP=$(echo "$SCOPE_JSON" | jq -r '.step_id // ""' 2>/dev/null)
+        if [ -n "$SCOPE" ]; then
+            # Non-empty scope — membership check.
+            FOUND=0
+            for op in $SCOPE; do
+                if [ "$op" = "$TOOL_NAME" ]; then
+                    FOUND=1
+                    break
+                fi
+            done
+            if [ "$FOUND" = "0" ]; then
+                echo "[BEAM-ENFORCE] operation_scope violation: step '$ACTIVE_STEP' permits [$SCOPE], not '$TOOL_NAME'"
+                exit 2
+            fi
+        fi
+    fi
+    exit 0
+fi
+
+echo "[BEAM-ENFORCE] $REASON"
+exit 2

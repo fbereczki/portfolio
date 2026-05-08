@@ -1,0 +1,1 @@
+import{d as e}from"./vendor-flow-Cp5Fj48q.js";import{i as t}from"./index-CIScRkE1.js";var n=e(),r={accepted:`ok`,findings_present:`warn`,violations:`error`,no_evidence:`error`},i={accepted:`Accepted`,findings_present:`Findings Present`,violations:`Violations`,no_evidence:`NO HUMAN ACCEPTANCE`};function a({status:e}){return(0,n.jsx)(t,{label:i[e],variant:r[e]})}export{a as t};

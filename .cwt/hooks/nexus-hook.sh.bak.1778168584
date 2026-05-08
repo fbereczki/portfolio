@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# nexus-hook.sh — CodeWitness universal hook dispatcher (thin shim).
+#
+# Per 16-MULTI-LANGUAGE-HOOK-DESIGN.md §6.1 and §8, this file is the
+# Tier-1 bash shim. All real logic lives in Go under the `codewitness`
+# binary; this script simply:
+#
+#   1. Dispatches to the `go` engine (default) or the preserved legacy
+#      bash path via CW_HOOK_ENGINE=legacy.
+#
+# NOTE: this shim used to short-circuit on the .cwt/enforcement-off
+# kill switch, which silenced *all* capture events for the duration
+# of the switch. That violated CLAUDE.md PROC-004 ("Capture Always
+# Active") — the switch is meant to disable BEAM enforcement only.
+# Capture runs unconditionally; the enforcement gate is in
+# beam-enforce.sh where the kill switch remains honoured.
+#   3. In `go` mode, resolves the `codewitness` binary (falls back to
+#      `nexus` for backward compat) and forwards:
+#        event name (argv[1])  →  `codewitness hook <event>`
+#        stdin payload         →  forwarded verbatim
+#      If the binary is missing, prints a loud stderr banner and exits
+#      0 so commits are never blocked by a dark capture path.
+#
+# Exit codes are chosen to keep Claude Code / git commits unblocked:
+#   - 0 = allow (default, even on soft failure)
+#   - non-zero = hard block (only when a downstream engine requests it)
+#
+# POSIX-compatible where practical; bash features used deliberately.
+set -uo pipefail
+
+# ── Kill switch intentionally NOT honoured here ────────────────────────
+# Per CLAUDE.md PROC-004 ("Capture Always Active") the capture pipeline
+# MUST run regardless of the .cwt/enforcement-off kill switch. The
+# switch is the escape hatch for BEAM *enforcement* (blocking writes
+# when workflow state is wrong); it was never meant to silence the
+# compliance audit trail. The gate now lives in beam-enforce.sh only.
+
+# ── Engine selection ──────────────────────────────────────────────────
+# CW_HOOK_ENGINE=legacy pins the old bash path for one release cycle.
+# Any other value (including unset) uses the new Go dispatcher.
+CW_HOOK_ENGINE="${CW_HOOK_ENGINE:-go}"
+
+if [ "$CW_HOOK_ENGINE" = "legacy" ]; then
+    _legacy="$(dirname "$0")/nexus-hook.legacy.sh"
+    if [ ! -x "$_legacy" ]; then
+        echo "nexus-hook: CW_HOOK_ENGINE=legacy but $_legacy is missing or not executable" >&2
+        exit 0
+    fi
+    exec "$_legacy" "$@"
+fi
+
+# ── go engine dispatch ────────────────────────────────────────────────
+# Event name: argv[1]. Claude Code supplies values like:
+#   pre-tool | post-tool | post-commit | session-start | ...
+# Fall back to "capture" so an un-argumented invocation does not crash;
+# matches the long-standing default in the legacy shim.
+EVENT="${1:-capture}"
+
+# ── PreToolUse: hard block for kill switch + enforcement infra ────────
+# The backend (POST /api/v1/beam/enforce/pre-tool) is the canonical
+# block, but we also bash-pre-check here so the tamper attempt fails
+# in <10 ms even if the backend is offline or the 5s timeout fires.
+# Defense in depth. Human-only — AI agents cannot bypass.
+if [ "$EVENT" = "validate" ] || [ "$EVENT" = "pre-tool" ]; then
+    _stdin_cache="$(mktemp 2>/dev/null || echo "/tmp/.nexus-hook-stdin-$$")"
+    cat > "$_stdin_cache" 2>/dev/null || true
+    trap 'rm -f "$_stdin_cache"' EXIT
+
+    _tool_name="$(grep -oE '"tool_name"[[:space:]]*:[[:space:]]*"[^"]+"' "$_stdin_cache" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+    _file_path="$(grep -oE '"file_path"[[:space:]]*:[[:space:]]*"[^"]+"' "$_stdin_cache" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+    _bash_cmd="$(grep -oE '"command"[[:space:]]*:[[:space:]]*"[^"]+"' "$_stdin_cache" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+
+    case "$_tool_name" in
+        Write|Edit|NotebookEdit)
+            case "$_file_path" in
+                *enforcement-off|*/.cwt/enforcement-off)
+                    echo '{"rule_id":"KILL-SWITCH-PROTECTED","violation":"enforcement-off is human-only","fix_hint":"Ask a human to run: echo PASSPHRASE > .cwt/enforcement-off"}' >&2
+                    echo "$(date -Iseconds) BLOCKED: AI Write enforcement-off target=$_file_path" >> "${LOGFILE:-/tmp/codewitness-hook.log}" 2>/dev/null || true
+                    exit 2
+                    ;;
+                *.claude/settings.json|*hooks/beam-enforce.sh|*hooks/beam-capture.sh|*hooks/nsm-hooks.sh|*hooks/nexus-hook.sh|*hooks/nexus-hook.legacy.sh|*.frame/rules.yaml)
+                    echo "{\"rule_id\":\"ENFORCE-INFRA-PROTECTED\",\"violation\":\"Cannot modify enforcement infrastructure: $_file_path\",\"fix_hint\":\"Enforcement files are human-only. Ask a human to make changes.\"}" >&2
+                    echo "$(date -Iseconds) BLOCKED: AI Write enforcement-infra target=$_file_path" >> "${LOGFILE:-/tmp/codewitness-hook.log}" 2>/dev/null || true
+                    exit 2
+                    ;;
+            esac
+            ;;
+        Bash)
+            case "$_bash_cmd" in
+                *enforcement-off*)
+                    echo '{"rule_id":"KILL-SWITCH-PROTECTED","violation":"Bash cannot touch enforcement-off","fix_hint":"Ask a human."}' >&2
+                    echo "$(date -Iseconds) BLOCKED: AI Bash targets enforcement-off cmd=$_bash_cmd" >> "${LOGFILE:-/tmp/codewitness-hook.log}" 2>/dev/null || true
+                    exit 2
+                    ;;
+                *beam-enforce.sh*|*beam-capture.sh*|*nsm-hooks.sh*|*nexus-hook.sh*|*settings.json*)
+                    case "$_bash_cmd" in
+                        *'>'*|*'rm '*|*'mv '*|*'sed '*|*'tee '*|*'chmod '*)
+                            echo "{\"rule_id\":\"ENFORCE-INFRA-PROTECTED\",\"violation\":\"Bash cannot modify enforcement infrastructure\",\"fix_hint\":\"Ask a human.\"}" >&2
+                            echo "$(date -Iseconds) BLOCKED: AI Bash targets enforcement-infra cmd=$_bash_cmd" >> "${LOGFILE:-/tmp/codewitness-hook.log}" 2>/dev/null || true
+                            exit 2
+                            ;;
+                    esac
+                    ;;
+            esac
+            ;;
+    esac
+
+    # stdin has been consumed; replay it for the Go engine below.
+    exec < "$_stdin_cache"
+fi
+
+# Log sink. Size-capped below; /tmp overflow has burned us before.
+TMPBASE="${TMPDIR:-/tmp}"
+LOGFILE="$TMPBASE/codewitness-hook.log"
+
+rotate_hook_log() {
+    local max_bytes=10485760   # 10 MiB
+    [ -f "$LOGFILE" ] || return 0
+    local size
+    size="$(stat -c %s "$LOGFILE" 2>/dev/null || stat -f %z "$LOGFILE" 2>/dev/null || echo 0)"
+    if [ "${size:-0}" -gt "$max_bytes" ]; then
+        mv -f "$LOGFILE" "${LOGFILE}.1" 2>/dev/null || true
+        : > "$LOGFILE"
+    fi
+}
+rotate_hook_log
+
+# Binary resolution: explicit override first, then `codewitness` on PATH,
+# then `nexus` (pre-rename legacy name). We deliberately do NOT fall
+# back to running arbitrary commands from CWD.
+resolve_binary() {
+    if [ -n "${CODEWITNESS_BINARY:-}" ] && [ -x "$CODEWITNESS_BINARY" ]; then
+        printf '%s\n' "$CODEWITNESS_BINARY"
+        return 0
+    fi
+    if [ -n "${NEXUS_BINARY:-}" ] && [ -x "$NEXUS_BINARY" ]; then
+        printf '%s\n' "$NEXUS_BINARY"
+        return 0
+    fi
+    local path
+    if path="$(command -v codewitness 2>/dev/null)" && [ -n "$path" ]; then
+        printf '%s\n' "$path"
+        return 0
+    fi
+    if path="$(command -v nexus 2>/dev/null)" && [ -n "$path" ]; then
+        printf '%s\n' "$path"
+        return 0
+    fi
+    return 1
+}
+
+BINARY=""
+if ! BINARY="$(resolve_binary)"; then
+    cat >&2 <<'EOF'
+codewitness binary not on PATH; capture is dark — run `codewitness onboard`
+(or set CODEWITNESS_BINARY / NEXUS_BINARY to an executable path).
+EOF
+    echo "$(date -Iseconds) nexus-hook: binary missing for event=$EVENT" >> "$LOGFILE"
+    # Fail-open: never block commits on a missing binary.
+    exit 0
+fi
+
+# Wait briefly for an in-flight `go build` to replace the binary. Bound
+# the wait so a stuck build never holds the hook forever.
+BUILD_LOCK="$TMPBASE/codewitness-build.lock"
+WAITED=0
+while [ -f "$BUILD_LOCK" ] && [ "$WAITED" -lt 5 ]; do
+    sleep 1
+    WAITED=$((WAITED + 1))
+done
+
+# Forward the event + stdin to the Go engine. `hook <event>` is the
+# subcommand Agent D wires through; the binary owns all downstream logic
+# (FRAME validation, PRISM checks, BEAM enforcement, capture, test-run
+# parsing). This shim MUST stay dumb.
+#
+# We pass the remaining argv through so callers can extend the contract
+# without touching this file.
+shift || true
+set +e
+"$BINARY" hook "$EVENT" "$@"
+RC=$?
+set -e
+
+# Record non-zero exits for audit gap detection; the legacy script used
+# to do this inline, we preserve the behaviour so dashboards stay warm.
+if [ "$RC" -ne 0 ]; then
+    echo "$(date -Iseconds) nexus-hook: binary rc=$RC event=$EVENT" >> "$LOGFILE"
+fi
+
+exit "$RC"

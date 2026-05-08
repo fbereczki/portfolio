@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="cwBg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b101e"/>
+      <stop offset="1" stop-color="#1f1340"/>
+    </linearGradient>
+    <linearGradient id="cwAccent" x1="0" x2="1">
+      <stop offset="0" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#39e6c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#cwBg)"/>
+  <path d="M32 12 L48 18 V34 Q48 46 32 52 Q16 46 16 34 V18 Z" fill="none" stroke="url(#cwAccent)" stroke-width="2"/>
+  <path d="M24 32 L30 38 L42 26" fill="none" stroke="url(#cwAccent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="32" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="5.5" font-weight="700" fill="#a892ff">CODEWITNESS</text>
+</svg>

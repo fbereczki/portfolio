@@ -1,0 +1,3396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BEACON WP Effort Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Spectral:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* paper main */
+  --paper:        #F4EFE3;
+  --paper-deep:   #EAE2CF;
+  --paper-rule:   #C9BFA4;
+  --paper-card:   #FBF7EC;
+  --ink:          #1A1B22;
+  --ink-soft:     #3A3B43;
+  --ink-mute:     #6B6A63;
+  /* dark sidebar */
+  --side:         #1A1B22;
+  --side-deep:    #0E0F14;
+  --side-text:    #E8E2CC;
+  --side-mute:    #8A8676;
+  --side-rule:    #2A2B33;
+  /* accents */
+  --oxblood:      #7E1E1B;
+  --oxblood-soft: #A85049;
+  --amber:        #9C6F1A;
+  --amber-soft:   #C99A3F;
+  --sage:         #3F6B47;
+  --sage-soft:    #5C8A65;
+  --teal:         #1F5566;
+  /* status pill colors */
+  --st-initial:   #9C6F1A;
+  --st-released:  #3F6B47;
+  --st-updated:   #1F5566;
+  --shadow:       0 2px 0 rgba(26,27,34,.04), 0 14px 40px -22px rgba(26,27,34,.18);
+  --shadow-lift:  0 4px 0 rgba(26,27,34,.04), 0 20px 50px -20px rgba(26,27,34,.22);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Spectral", Georgia, serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "onum" 1;
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(126,30,27,.035) 0, transparent 38%),
+    radial-gradient(circle at 86% 88%, rgba(31,85,102,.04) 0, transparent 42%),
+    repeating-linear-gradient(0deg, rgba(26,27,34,.015) 0 1px, transparent 1px 4px);
+}
+
+/* ==================== APP LAYOUT ==================== */
+.app {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  grid-template-rows: 56px 1fr;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+.topbar {
+  grid-column: 1 / 3; grid-row: 1;
+  background: var(--side);
+  color: var(--side-text);
+  display: flex; align-items: center;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--side-deep);
+  z-index: 50;
+  gap: 18px;
+}
+.topbar .brand {
+  font-family: "Fraunces", serif;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  font-weight: 700; font-size: 19px; line-height: 1;
+  letter-spacing: -.01em;
+  color: var(--side-text);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.topbar .brand em {
+  font-style: italic; color: var(--oxblood-soft);
+  font-variation-settings: "opsz" 144, "SOFT" 60, "WONK" 1;
+}
+.topbar .brand .ver {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .12em;
+  color: var(--side-mute); font-weight: 500;
+  text-transform: uppercase;
+}
+
+.proj-info {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-left: 8px; padding-left: 18px;
+  border-left: 1px solid var(--side-rule);
+}
+.proj-info .code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px; letter-spacing: .08em;
+  color: var(--oxblood-soft); font-weight: 600;
+}
+.proj-info .name {
+  font-family: "Spectral", serif;
+  font-size: 14px; color: var(--side-text);
+  font-style: italic; font-weight: 400;
+}
+.proj-info .complexity {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  padding: 3px 8px; border: 1px solid var(--side-rule);
+  color: var(--side-mute);
+}
+.proj-info .complexity.Simple   { color: var(--sage-soft); border-color: rgba(92,138,101,.4); }
+.proj-info .complexity.Normal   { color: var(--side-text); }
+.proj-info .complexity.Complex  { color: var(--oxblood-soft); border-color: rgba(168,80,73,.4); }
+
+.topbar .spacer { flex: 1 1 auto; }
+
+.topbar .db-status {
+  display: flex; align-items: center; gap: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .04em;
+  color: var(--side-mute);
+}
+.topbar .db-status .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber-soft);
+}
+.topbar .db-status.connected .dot { background: var(--sage-soft); }
+.topbar .db-status .path {
+  color: var(--side-text);
+  max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.btn {
+  background: transparent; color: var(--side-text);
+  border: 1px solid var(--side-rule);
+  padding: 6px 12px; cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 500;
+  transition: all .15s ease;
+}
+.btn:hover { background: var(--side-rule); border-color: var(--side-mute); color: #fff; }
+.btn.primary { background: var(--oxblood); border-color: var(--oxblood); color: #fff; }
+.btn.primary:hover { background: var(--oxblood-soft); border-color: var(--oxblood-soft); }
+.btn.ghost { border-color: transparent; }
+.btn.danger { color: var(--oxblood-soft); border-color: rgba(168,80,73,.3); }
+.btn.danger:hover { background: var(--oxblood); border-color: var(--oxblood); color: #fff; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* paper buttons (in main panel) */
+.btn-p {
+  background: var(--paper-card);
+  color: var(--ink-soft);
+  border: 1px solid var(--paper-rule);
+  padding: 6px 12px; cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 500;
+  transition: all .12s ease;
+}
+.btn-p:hover { background: var(--paper-deep); border-color: var(--ink-mute); color: var(--ink); }
+.btn-p.primary { background: var(--oxblood); color: var(--paper); border-color: var(--oxblood); }
+.btn-p.primary:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+  grid-column: 1; grid-row: 2;
+  background: linear-gradient(180deg, var(--side), var(--side-deep) 100%);
+  color: var(--side-text);
+  border-right: 1px solid var(--side-deep);
+  overflow-y: auto;
+  padding: 22px 0 28px;
+}
+.sidebar h4 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--side-mute);
+  margin: 22px 22px 8px; font-weight: 600;
+}
+.sidebar h4:first-child { margin-top: 0; }
+.sidebar nav a {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: var(--side-text);
+  font-family: "Spectral", serif; font-size: 14px;
+  padding: 7px 22px 7px 18px;
+  border-left: 3px solid transparent;
+  transition: all .12s ease;
+  cursor: pointer;
+}
+.sidebar nav a:hover {
+  background: rgba(168,80,73,.08);
+  color: #fff;
+}
+.sidebar nav a.active {
+  background: rgba(168,80,73,.12);
+  border-left-color: var(--oxblood-soft);
+  color: var(--oxblood-soft);
+  font-weight: 500;
+}
+.sidebar nav a .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .08em;
+  color: var(--side-mute);
+  width: 22px; flex-shrink: 0;
+}
+.sidebar nav a.active .num { color: var(--oxblood-soft); }
+.sidebar nav a .badge {
+  margin-left: auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; padding: 1px 6px;
+  background: var(--side-rule); color: var(--side-mute);
+  letter-spacing: .04em;
+}
+.sidebar nav a.active .badge { background: var(--oxblood); color: #fff; }
+
+.sidebar .stamp {
+  margin: 24px 22px 0; padding: 14px;
+  border: 1.5px dashed var(--oxblood-soft);
+  color: var(--oxblood-soft);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+  line-height: 1.6;
+  transform: rotate(-1deg);
+  background: rgba(168,80,73,.04);
+}
+.sidebar .stamp b {
+  font-size: 13px; letter-spacing: .04em;
+  display: block; margin-bottom: 4px;
+}
+.sidebar .stamp .micro {
+  font-size: 8.5px; color: var(--side-mute);
+  letter-spacing: .12em; margin-top: 6px;
+}
+
+/* ==================== MAIN PANEL ==================== */
+.main {
+  grid-column: 2; grid-row: 2;
+  overflow-y: auto;
+  background: var(--paper);
+  position: relative;
+}
+.view {
+  display: none;
+  padding: 36px 44px 80px;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+.view.active { display: block; }
+
+.view-head {
+  display: flex; align-items: baseline; gap: 18px;
+  margin-bottom: 6px;
+  padding-bottom: 14px;
+  border-bottom: 3px double var(--ink);
+}
+.view-head .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px; letter-spacing: .14em;
+  color: var(--oxblood); font-weight: 600;
+}
+.view-head h1 {
+  font-family: "Fraunces", serif;
+  font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 1;
+  font-weight: 600;
+  font-size: 42px; line-height: 1;
+  letter-spacing: -.025em;
+  margin: 0;
+  color: var(--ink);
+}
+.view-head h1 em {
+  font-style: italic; color: var(--oxblood);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.view-head .actions {
+  margin-left: auto; display: flex; gap: 8px; align-items: center;
+}
+.view-lead {
+  font-family: "Spectral", serif; font-style: italic;
+  font-size: 16px; color: var(--ink-soft);
+  max-width: 820px; margin: 14px 0 28px;
+  line-height: 1.55;
+}
+
+h3.sub {
+  font-family: "Fraunces", serif;
+  font-size: 21px; font-weight: 600;
+  margin: 28px 0 12px;
+  letter-spacing: -.012em;
+}
+h3.sub .hint {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .14em;
+  color: var(--ink-mute); font-weight: 500;
+  margin-left: 12px;
+}
+
+/* ==================== KPI GRID ==================== */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--ink);
+  background: var(--paper-card);
+  margin-bottom: 28px;
+}
+.kpi {
+  padding: 18px 22px;
+  border-right: 1px solid var(--paper-rule);
+  border-bottom: 1px solid var(--paper-rule);
+}
+.kpi:nth-child(4n) { border-right: 0; }
+.kpi:nth-last-child(-n+4) { border-bottom: 0; }
+.kpi .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 8px;
+}
+.kpi .val {
+  font-family: "Fraunces", serif;
+  font-variation-settings: "opsz" 144;
+  font-weight: 600; font-size: 38px; line-height: 1;
+  letter-spacing: -.02em; color: var(--ink);
+  font-feature-settings: "onum" 1;
+}
+.kpi .val.crit { color: var(--oxblood); }
+.kpi .val.warn { color: var(--amber); }
+.kpi .val.ok { color: var(--sage); }
+.kpi .delta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; color: var(--ink-mute);
+  margin-top: 6px; letter-spacing: .04em;
+}
+.kpi .delta.crit { color: var(--oxblood); }
+.kpi .delta.ok { color: var(--sage); }
+.kpi .unit {
+  font-family: "Spectral", serif;
+  font-size: 14px; color: var(--ink-mute);
+  font-style: italic; font-weight: 400;
+  margin-left: 4px;
+}
+
+/* ==================== GATE ROADMAP ==================== */
+.gate-roadmap {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper-card);
+  margin-bottom: 28px;
+}
+.gate-cell {
+  padding: 16px 18px;
+  border-right: 1px solid var(--paper-rule);
+  position: relative;
+}
+.gate-cell:last-child { border-right: 0; }
+.gate-cell .gate-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 4px;
+}
+.gate-cell .gate-num {
+  font-family: "Fraunces", serif;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  font-weight: 600; font-size: 32px; line-height: 1;
+  color: var(--ink); margin-bottom: 12px;
+}
+.gate-cell .gate-md {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px; font-weight: 500;
+  color: var(--ink); letter-spacing: -.01em;
+}
+.gate-cell .gate-md .unit {
+  font-size: 12px; color: var(--ink-mute);
+  margin-left: 4px; letter-spacing: 0;
+}
+.gate-cell .gate-quarters {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; color: var(--ink-mute);
+  letter-spacing: .08em; margin-top: 6px;
+}
+.gate-cell.achievable {
+  background: rgba(63,107,71,.05);
+}
+.gate-cell.closest {
+  background: rgba(126,30,27,.06);
+}
+.gate-cell.closest::after {
+  content: "← CLOSEST";
+  position: absolute; top: 12px; right: 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: .18em;
+  color: var(--oxblood); font-weight: 600;
+}
+.gate-cell.unreachable .gate-num,
+.gate-cell.unreachable .gate-md { color: var(--ink-mute); opacity: .5; }
+.gate-cell.unreachable::after {
+  content: "OUT OF SCOPE";
+  position: absolute; top: 12px; right: 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: .18em;
+  color: var(--ink-mute);
+}
+
+/* ==================== TABLES ==================== */
+.tbl-wrap {
+  background: var(--paper-card);
+  border: 1px solid var(--paper-rule);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.tbl-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--paper-rule);
+  background: var(--paper-deep);
+  flex-wrap: wrap;
+}
+.tbl-toolbar input.search,
+.tbl-toolbar select {
+  font-family: "Spectral", serif;
+  font-size: 13.5px;
+  padding: 6px 10px;
+  background: var(--paper);
+  border: 1px solid var(--paper-rule);
+  color: var(--ink);
+  outline: none;
+  min-width: 180px;
+}
+.tbl-toolbar input.search:focus,
+.tbl-toolbar select:focus {
+  border-color: var(--ink); background: #fff;
+}
+.tbl-toolbar .grow { flex: 1 1 auto; }
+.tbl-toolbar .meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .08em;
+  color: var(--ink-mute);
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--paper-card);
+}
+table.data thead th {
+  position: sticky; top: 0;
+  background: var(--paper-deep);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 600;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ink);
+  user-select: none;
+  white-space: nowrap;
+}
+table.data thead th.sortable { cursor: pointer; }
+table.data thead th.sortable:hover { background: var(--paper-rule); }
+table.data thead th .sort-arrow {
+  display: inline-block; margin-left: 4px; opacity: .35;
+}
+table.data thead th.sorted .sort-arrow { opacity: 1; color: var(--oxblood); }
+
+table.data tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--paper-rule);
+  vertical-align: top;
+  font-family: "Spectral", serif;
+  color: var(--ink);
+}
+table.data tbody tr:hover { background: var(--paper); }
+table.data tbody tr.inactive { opacity: .45; }
+table.data tbody tr.inactive td { background: repeating-linear-gradient(45deg, transparent 0 4px, rgba(126,30,27,.04) 4px 8px); }
+table.data tbody tr.expanded { background: var(--paper); }
+table.data tbody tr.expanded + tr.detail-row td {
+  padding: 0;
+  background: var(--paper);
+  border-top: 1px solid var(--paper-rule);
+  border-bottom: 2px solid var(--ink);
+}
+
+td.code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--oxblood); letter-spacing: .04em;
+  white-space: nowrap;
+}
+td.iso {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; color: var(--ink-mute);
+  letter-spacing: .04em;
+}
+td.md, td.num {
+  font-family: "JetBrains Mono", monospace;
+  text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+td.md.bold { font-weight: 600; color: var(--ink); }
+td.md.changed { color: var(--oxblood); font-weight: 600; }
+td.md.zero { color: var(--ink-mute); opacity: .5; }
+td.md .delta-mark {
+  font-size: 10px; color: var(--oxblood); margin-left: 2px;
+}
+
+/* gate status pills */
+.gates-cell {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.gpill {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .04em;
+  padding: 2px 6px;
+  border: 1px solid;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.gpill.initial   { color: var(--st-initial);  border-color: var(--st-initial);  background: rgba(156,111,26,.06); }
+.gpill.released  { color: var(--st-released); border-color: var(--st-released); background: rgba(63,107,71,.06); }
+.gpill.updated   { color: var(--st-updated);  border-color: var(--st-updated);  background: rgba(31,85,102,.06); }
+.gpill .g { font-weight: 500; opacity: .6; margin-right: 2px; }
+
+/* type pills */
+.tpill {
+  display: inline-block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .06em; font-weight: 600;
+  padding: 1px 5px;
+  border: 1px solid;
+}
+.tpill.MW { color: var(--ink); border-color: var(--ink); }
+.tpill.VR { color: var(--teal); border-color: var(--teal); background: rgba(31,85,102,.06); }
+.tpill.CR { color: var(--oxblood); border-color: var(--oxblood); background: rgba(126,30,27,.05); }
+
+.phase-pill {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ==================== INLINE EDITS ==================== */
+input.inline {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px; font-variant-numeric: tabular-nums;
+  width: 60px; padding: 3px 6px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--ink);
+  text-align: right;
+  transition: all .12s ease;
+}
+input.inline:hover { border-color: var(--paper-rule); background: var(--paper); }
+input.inline:focus {
+  border-color: var(--ink); background: #fff;
+  outline: none;
+}
+input.inline.changed { color: var(--oxblood); font-weight: 600; }
+
+input.inline-text {
+  font-family: "Spectral", serif;
+  font-size: 14px;
+  width: 100%; padding: 4px 8px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--ink);
+}
+input.inline-text:hover { border-color: var(--paper-rule); background: var(--paper); }
+input.inline-text:focus { border-color: var(--ink); background: #fff; outline: none; }
+
+select.inline {
+  font-family: "Spectral", serif;
+  font-size: 13px;
+  padding: 3px 6px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+select.inline:hover { border-color: var(--paper-rule); background: var(--paper); }
+select.inline:focus { border-color: var(--ink); background: #fff; outline: none; }
+
+/* ==================== TOGGLES ==================== */
+.toggle {
+  position: relative;
+  display: inline-flex; align-items: center;
+  width: 36px; height: 20px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.toggle input { display: none; }
+.toggle .slider {
+  position: absolute; inset: 0;
+  background: var(--paper-rule);
+  border: 1px solid var(--ink-mute);
+  transition: all .15s ease;
+}
+.toggle .slider::before {
+  content: "";
+  position: absolute;
+  width: 14px; height: 14px;
+  left: 2px; top: 2px;
+  background: var(--ink);
+  transition: transform .15s ease;
+}
+.toggle input:checked + .slider {
+  background: var(--sage);
+  border-color: var(--sage);
+}
+.toggle input:checked + .slider::before {
+  background: var(--paper);
+  transform: translateX(16px);
+}
+
+/* ==================== EXPANDED TASK DETAIL ==================== */
+.task-detail {
+  padding: 16px 24px;
+  background: var(--paper);
+  border-top: 1px dashed var(--paper-rule);
+}
+.task-detail h5 {
+  font-family: "Fraunces", serif;
+  font-size: 16px; font-weight: 600;
+  margin: 0 0 10px; letter-spacing: -.01em;
+}
+.task-detail h5 .hint {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .12em;
+  color: var(--ink-mute); margin-left: 10px; font-weight: 500;
+}
+table.tasks {
+  width: 100%; border-collapse: collapse;
+  font-size: 12.5px;
+}
+table.tasks th {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 600;
+  text-align: left; padding: 6px 10px;
+  border-bottom: 1px solid var(--paper-rule);
+}
+table.tasks td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--paper-rule);
+  vertical-align: top;
+}
+table.tasks td.idx {
+  padding-right: 20px;
+  padding-left: 14px;
+  color: var(--ink-mute);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-align: right;
+  width: 56px;
+}
+table.tasks th.idx {
+  padding-right: 20px;
+  padding-left: 14px;
+  text-align: right;
+  width: 56px;
+}
+table.tasks td.tcol-type, table.tasks th.tcol-type {
+  padding-left: 16px;
+}
+table.tasks tr.custom-task td.idx {
+  color: var(--teal);
+  font-weight: 600;
+}
+table.tasks tr.custom-task {
+  background: rgba(31,85,102,.025);
+}
+table.tasks .task-actions {
+  display: flex; gap: 4px; opacity: .55;
+}
+table.tasks tr:hover .task-actions { opacity: 1; }
+table.tasks .ico-btn {
+  background: transparent; border: 1px solid transparent;
+  cursor: pointer; padding: 3px 6px;
+  font-size: 12px; line-height: 1;
+  border-radius: 3px;
+  color: var(--ink-soft);
+  transition: all .12s;
+}
+table.tasks .ico-btn:hover {
+  background: var(--paper); border-color: var(--paper-rule);
+  color: var(--ink);
+}
+table.tasks .ico-btn.danger:hover {
+  background: rgba(126,30,27,.06); color: var(--oxblood);
+  border-color: var(--oxblood-soft);
+}
+.task-detail .add-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px dashed var(--paper-rule);
+}
+.task-detail .meta-row {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .04em;
+  color: var(--ink-mute); margin-bottom: 8px;
+  display: flex; gap: 18px; flex-wrap: wrap;
+}
+.task-detail .meta-row b { color: var(--ink); font-weight: 600; }
+.task-detail .meta-row .deps { color: var(--oxblood); font-weight: 500; }
+.task-detail .add-task-btn {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px dashed var(--paper-rule);
+  color: var(--ink-soft);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all .15s;
+  width: 100%;
+}
+.task-detail .add-task-btn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(31,85,102,.03);
+}
+
+/* ==================== TASK TYPE LEGEND ==================== */
+.task-types-legend {
+  background: var(--paper);
+  border-left: 3px solid var(--teal);
+  padding: 12px 16px; margin-bottom: 16px;
+  font-family: "Spectral", serif; font-size: 13px;
+}
+.task-types-legend summary {
+  cursor: pointer; list-style: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 500;
+}
+.task-types-legend summary::-webkit-details-marker { display: none; }
+.task-types-legend summary::before {
+  content: "▸ "; color: var(--ink-mute); display: inline-block;
+  width: 14px; transition: transform .15s;
+}
+.task-types-legend[open] summary::before { content: "▾ "; }
+.task-types-legend dl { margin: 12px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; }
+.task-types-legend dt { font-family: "JetBrains Mono", monospace; font-weight: 600; color: var(--ink); }
+.task-types-legend dd { margin: 0; color: var(--ink-soft); font-style: italic; }
+.task-types-legend dd em { color: var(--ink-mute); font-size: 11px; }
+
+/* ==================== TAILORING LOG ==================== */
+.tailoring-log {
+  background: var(--paper-card);
+  border: 1px solid var(--paper-rule);
+  border-left: 3px solid var(--oxblood);
+  padding: 18px 22px; margin-bottom: 14px;
+}
+.tailoring-log .meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 10px;
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline;
+}
+.tailoring-log .meta .wp {
+  color: var(--oxblood); font-weight: 600;
+}
+.tailoring-log .tl-items {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-bottom: 10px;
+}
+.tailoring-log .tl-item {
+  font-family: "Spectral", serif; font-size: 14px; line-height: 1.5;
+  padding: 6px 12px; border-left: 2px solid;
+  background: var(--paper);
+}
+.tailoring-log .tl-item-inactive { border-color: var(--oxblood); color: var(--oxblood); }
+.tailoring-log .tl-item-reduced  { border-color: var(--amber); }
+.tailoring-log .tl-item-increased{ border-color: var(--ink-mute); }
+.tailoring-log .tl-item-custom   { border-color: var(--teal); }
+.tailoring-log .tl-just {
+  font-family: "Spectral", serif; font-style: italic;
+  font-size: 13px; line-height: 1.5;
+  color: var(--ink-soft);
+  padding: 8px 14px; margin-top: 6px;
+  background: var(--paper);
+  border-left: 2px solid var(--paper-rule);
+}
+.tailoring-log .tl-just-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-mute); font-style: normal;
+  margin-right: 6px;
+}
+.tailoring-log .tl-history {
+  margin-top: 12px;
+}
+.tailoring-log .tl-history summary {
+  cursor: pointer; list-style: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-mute); padding: 6px 0;
+  border-top: 1px dashed var(--paper-rule);
+}
+.tailoring-log .tl-history summary::-webkit-details-marker { display: none; }
+.tailoring-log .tl-history summary::before { content: "▸ "; color: var(--ink-mute); }
+.tailoring-log .tl-history[open] summary::before { content: "▾ "; }
+.tailoring-log .tl-history-list { padding: 8px 0 0 14px; }
+.tailoring-log .tl-history-entry {
+  border-left: 1px solid var(--paper-rule);
+  padding: 8px 14px; margin-bottom: 8px;
+}
+.tailoring-log .tl-history-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .1em; color: var(--ink-mute);
+  margin-bottom: 4px; display: flex; gap: 12px;
+}
+.tailoring-log .tl-history-meta .tl-change { color: var(--ink-soft); }
+.tailoring-log .tl-summary {
+  font-family: "Spectral", serif; font-size: 13px; line-height: 1.5;
+}
+.tailoring-log .tl-just-line {
+  font-family: "Spectral", serif; font-style: italic; font-size: 12px;
+  color: var(--ink-mute); margin-top: 4px;
+}
+
+/* ==================== SETTINGS PANEL ==================== */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.settings-card {
+  background: var(--paper-card);
+  border: 1px solid var(--paper-rule);
+  padding: 22px 24px;
+}
+.settings-card h3 {
+  font-family: "Fraunces", serif;
+  font-size: 19px; font-weight: 600;
+  margin: 0 0 14px; letter-spacing: -.01em;
+}
+.settings-card .row {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--paper-rule);
+}
+.settings-card .row:last-child { border-bottom: 0; }
+.settings-card .row label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 600;
+  min-width: 160px;
+}
+.settings-card .row .val {
+  flex: 1 1 auto;
+}
+.settings-card .row input[type="text"],
+.settings-card .row input[type="number"],
+.settings-card .row select {
+  font-family: "Spectral", serif;
+  font-size: 14.5px;
+  padding: 5px 10px;
+  background: var(--paper);
+  border: 1px solid var(--paper-rule);
+  color: var(--ink); outline: none;
+  width: 100%;
+}
+.settings-card .row input:focus,
+.settings-card .row select:focus { border-color: var(--ink); background: #fff; }
+
+/* ==================== MODAL ==================== */
+.modal-bd {
+  position: fixed; inset: 0;
+  background: rgba(26,27,34,.6);
+  z-index: 200;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+.modal-bd.open { display: flex; }
+.modal {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-lift);
+  max-width: 640px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-head {
+  background: var(--ink); color: var(--paper);
+  padding: 18px 24px;
+  display: flex; align-items: baseline; gap: 14px;
+}
+.modal-head .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--paper-rule);
+}
+.modal-head h3 {
+  font-family: "Fraunces", serif; font-size: 22px;
+  font-weight: 600; margin: 0; letter-spacing: -.012em;
+}
+.modal-body { padding: 22px 26px; }
+.modal-body p { margin: 0 0 14px; color: var(--ink-soft); }
+.modal-body label.field {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 600;
+  margin: 16px 0 6px;
+}
+.modal-body textarea {
+  width: 100%;
+  min-height: 100px;
+  font-family: "Spectral", serif;
+  font-size: 14.5px; line-height: 1.55;
+  padding: 10px 12px;
+  background: var(--paper-card);
+  border: 1px solid var(--paper-rule);
+  color: var(--ink); outline: none;
+  resize: vertical;
+}
+.modal-body textarea:focus { border-color: var(--ink); background: #fff; }
+.modal-body .change-summary {
+  background: var(--paper-card);
+  border-left: 3px solid var(--oxblood);
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px; line-height: 1.6;
+  color: var(--ink);
+}
+.modal-foot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--paper-rule);
+  background: var(--paper-card);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+.modal-foot .err {
+  margin-right: auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; color: var(--oxblood);
+  letter-spacing: .04em;
+}
+
+/* ==================== UTILS ==================== */
+.empty-state {
+  padding: 60px 30px;
+  text-align: center;
+  color: var(--ink-mute);
+  font-style: italic;
+  background: var(--paper-card);
+  border: 1px dashed var(--paper-rule);
+  font-family: "Spectral", serif; font-size: 16px;
+}
+.role-bar {
+  display: grid;
+  grid-template-columns: 240px 1fr 80px;
+  gap: 14px; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--paper-rule);
+  font-size: 13.5px;
+}
+.role-bar:last-child { border-bottom: 0; }
+.role-bar .name { font-family: "Spectral", serif; }
+.role-bar .bar {
+  height: 14px; background: var(--paper-deep);
+  position: relative; overflow: hidden;
+}
+.role-bar .bar .fill {
+  height: 100%; background: var(--oxblood);
+  transition: width .25s ease;
+}
+.role-bar .bar.over .fill { background: var(--amber); }
+.role-bar .num {
+  font-family: "JetBrains Mono", monospace;
+  text-align: right; font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--ink); color: var(--paper);
+  padding: 12px 18px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+  box-shadow: var(--shadow-lift);
+  z-index: 300;
+  opacity: 0; transform: translateY(8px);
+  transition: all .25s ease;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--sage); }
+.toast.error { background: var(--oxblood); }
+
+.divider-rule {
+  border-top: 3px double var(--ink); margin: 36px 0 24px;
+}
+
+@media (max-width: 1100px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpis .kpi:nth-child(2n) { border-right: 0; }
+  .kpis .kpi:nth-last-child(-n+2) { border-bottom: 0; }
+  .gate-roadmap { grid-template-columns: repeat(3, 1fr); }
+  .settings-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== APP STRUCTURE ==================== -->
+<div class="app">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <div class="brand">
+      BEACON <em>Planner</em>
+      <span class="ver">v1.0</span>
+    </div>
+    <div class="proj-info">
+      <span class="code" id="topProjCode">Pxxxx</span>
+      <span class="name" id="topProjName">unsaved project</span>
+      <span class="complexity Normal" id="topComplexity">NORMAL</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="db-status" id="dbStatus">
+      <span class="dot"></span>
+      <span class="path" id="dbPath">Auto-saving to browser</span>
+    </div>
+    <button class="btn" id="btnOpenFile" title="Load an existing wp-planner-data.json file (also enables auto-save to that file)">Open file…</button>
+    <button class="btn" id="btnSaveFile" title="Save to a new file (also enables auto-save to that file)">Save to file…</button>
+    <button class="btn ghost" id="btnExport" title="Download a one-shot JSON backup">Export</button>
+    <button class="btn ghost" id="btnImport" title="Load a JSON backup (one-shot, no file binding)">Import</button>
+  </header>
+
+  <!-- sidebar -->
+  <aside class="sidebar">
+    <h4>Planning</h4>
+    <nav>
+      <a data-view="dashboard" class="active"><span class="num">01</span>Dashboard</a>
+      <a data-view="catalog"><span class="num">02</span>WP Catalog<span class="badge" id="navCatalogCount">0</span></a>
+      <a data-view="gates"><span class="num">03</span>GATE Calculator</a>
+    </nav>
+    <h4>Audit</h4>
+    <nav>
+      <a data-view="tailoring"><span class="num">04</span>Tailoring Log<span class="badge" id="navTailoringCount">0</span></a>
+    </nav>
+    <h4>Configuration</h4>
+    <nav>
+      <a data-view="capacity"><span class="num">05</span>Roles &amp; Capacity</a>
+      <a data-view="settings"><span class="num">06</span>Settings</a>
+      <a data-view="help"><span class="num">07</span>Help &amp; About</a>
+    </nav>
+    <div class="stamp">
+      <b>BEACON</b>
+      Catalog v1<br>
+      <span class="micro">66 WP · 172 task</span>
+    </div>
+  </aside>
+
+  <!-- main panel -->
+  <main class="main">
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="view active" id="view-dashboard">
+      <div class="view-head">
+        <span class="num">§ 01</span>
+        <h1>Effort <em>Dashboard</em></h1>
+        <div class="actions">
+          <button class="btn-p" id="btnRecompute">Recompute</button>
+        </div>
+      </div>
+      <div class="view-lead">
+        Live computation across the full BEACON catalog with current complexity multiplier and tailoring decisions applied.
+        Modifier changes propagate to every figure on this page.
+      </div>
+
+      <div class="kpis" id="dashKpis">
+        <!-- populated by JS -->
+      </div>
+
+      <h3 class="sub">GATE roadmap <span class="hint">cumulative effort to reach each gate</span></h3>
+      <div class="gate-roadmap" id="dashGates">
+        <!-- populated by JS -->
+      </div>
+
+      <h3 class="sub">Effort by role <span class="hint">post-tailoring, post-modifier</span></h3>
+      <div class="tbl-wrap" style="padding:18px 22px;">
+        <div id="dashRoles"></div>
+      </div>
+
+      <h3 class="sub">Top 10 heaviest WPs <span class="hint">in current configuration</span></h3>
+      <div class="tbl-wrap">
+        <table class="data" id="dashTopWps"></table>
+      </div>
+    </section>
+
+    <!-- ============ CATALOG ============ -->
+    <section class="view" id="view-catalog">
+      <div class="view-head">
+        <span class="num">§ 02</span>
+        <h1>WP <em>Catalog</em></h1>
+        <div class="actions">
+          <button class="btn-p" id="btnAddWp">+ Add custom WP</button>
+        </div>
+      </div>
+      <div class="view-lead">
+        Full BEACON Work Package catalog (66 WPs, 172 tasks). Click a row to expand task list.
+        Toggle <b>Active</b> to tailor a WP out — a justification will be requested.
+        Edit task MD inline; modifier multiplier applies automatically.
+      </div>
+
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar">
+          <input type="text" class="search" id="catSearch" placeholder="Search code, name, ISO ref…">
+          <select id="catPhase"><option value="">All phases</option></select>
+          <select id="catStatus">
+            <option value="all">All</option>
+            <option value="active">Active only</option>
+            <option value="inactive">Tailored out only</option>
+          </select>
+          <span class="grow"></span>
+          <span class="meta" id="catMeta">—</span>
+        </div>
+        <div style="max-height:calc(100vh - 260px); overflow:auto;">
+          <table class="data" id="tblCatalog">
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th class="sortable" data-sort="code">Code <span class="sort-arrow">↕</span></th>
+                <th class="sortable" data-sort="name">Name <span class="sort-arrow">↕</span></th>
+                <th class="sortable" data-sort="phase">Phase <span class="sort-arrow">↕</span></th>
+                <th>ISO ref</th>
+                <th>Owner role</th>
+                <th>GATE reqs</th>
+                <th class="sortable" data-sort="taskCount" style="text-align:right">Tasks <span class="sort-arrow">↕</span></th>
+                <th class="sortable" data-sort="md" style="text-align:right">MD <span class="sort-arrow">↕</span></th>
+                <th style="width:60px;text-align:center">Active</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GATE CALCULATOR ============ -->
+    <section class="view" id="view-gates">
+      <div class="view-head">
+        <span class="num">§ 03</span>
+        <h1>GATE <em>Calculator</em></h1>
+      </div>
+      <div class="view-lead">
+        For each gate, the cumulative MD that must be invested by the time the gate is reached
+        (sum of WPs whose <code>gate_reqs</code> entry is at or below that gate). Quarters are computed
+        from the total team capacity in <a data-view="capacity" style="color:var(--oxblood)">Roles &amp; Capacity</a>.
+      </div>
+
+      <div class="kpis" id="gateKpis"></div>
+
+      <h3 class="sub">Per-gate breakdown</h3>
+      <div class="tbl-wrap">
+        <table class="data" id="tblGateBreakdown">
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th style="text-align:right">WPs touching this gate</th>
+              <th style="text-align:right">Cumulative MD</th>
+              <th style="text-align:right">Δ from previous</th>
+              <th style="text-align:right">Quarters at capacity</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">Closest possible GATE <span class="hint">heuristic</span></h3>
+      <div class="tbl-wrap" style="padding:22px 26px;">
+        <p style="margin:0 0 12px; font-family:'Spectral',serif; font-size:14.5px; line-height:1.6;">
+          The closest possible GATE is the latest gate whose cumulative MD fits within the
+          available timeline at current team capacity. Adjust the target end date in
+          <a data-view="settings" style="color:var(--oxblood)">Settings</a> or the team capacity in
+          <a data-view="capacity" style="color:var(--oxblood)">Roles &amp; Capacity</a> to see the result update.
+        </p>
+        <div id="gateClosestSummary"></div>
+      </div>
+    </section>
+
+    <!-- ============ TAILORING LOG ============ -->
+    <section class="view" id="view-tailoring">
+      <div class="view-head">
+        <span class="num">§ 04</span>
+        <h1>Tailoring <em>Log</em></h1>
+      </div>
+      <div class="view-lead">
+        Audit trail of all tailoring decisions made on this project. Every change to <em>Active</em>
+        flag or task MD value (downward) requires a written justification per AC-6.
+      </div>
+      <div id="tailoringList"></div>
+    </section>
+
+    <!-- ============ ROLES & CAPACITY ============ -->
+    <section class="view" id="view-capacity">
+      <div class="view-head">
+        <span class="num">§ 05</span>
+        <h1>Roles &amp; <em>Capacity</em></h1>
+      </div>
+      <div class="view-lead">
+        Configure team capacity per role in <em>MD per quarter</em>. The GATE calculator uses
+        the sum of these values as total team capacity. Set capacity to 0 if a role is unstaffed.
+      </div>
+      <div class="tbl-wrap" style="padding:18px 24px;">
+        <div id="capacityList"></div>
+        <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--paper-rule); display:flex; justify-content:space-between; align-items:baseline;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-mute);">Total team capacity per quarter</span>
+          <span id="capacityTotal" style="font-family:'Fraunces',serif; font-size:24px; font-weight:600;">0 MD/Q</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="view" id="view-settings">
+      <div class="view-head">
+        <span class="num">§ 06</span>
+        <h1><em>Settings</em></h1>
+        <div class="actions">
+          <button class="btn-p danger" id="btnReset">Reset to BEACON defaults</button>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Project</h3>
+          <div class="row">
+            <label>Project code</label>
+            <div class="val"><input type="text" id="setProjCode" placeholder="P10226"></div>
+          </div>
+          <div class="row">
+            <label>Project name</label>
+            <div class="val"><input type="text" id="setProjName" placeholder="GSBC GEN Global rev.2"></div>
+          </div>
+          <div class="row">
+            <label>Complexity</label>
+            <div class="val">
+              <select id="setComplexity">
+                <option value="Simple">Simple</option>
+                <option value="Normal" selected>Normal</option>
+                <option value="Complex">Complex</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <label>Project start</label>
+            <div class="val"><input type="date" id="setStartDate"></div>
+          </div>
+          <div class="row">
+            <label>Target end date</label>
+            <div class="val"><input type="date" id="setEndDate"></div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Complexity multipliers</h3>
+          <div class="row">
+            <label>Simple ×</label>
+            <div class="val"><input type="number" step="0.05" min="0" id="setMulSimple"></div>
+          </div>
+          <div class="row">
+            <label>Normal ×</label>
+            <div class="val"><input type="number" step="0.05" min="0" id="setMulNormal"></div>
+          </div>
+          <div class="row">
+            <label>Complex ×</label>
+            <div class="val"><input type="number" step="0.05" min="0" id="setMulComplex"></div>
+          </div>
+          <div class="row" style="border-bottom:0">
+            <label style="min-width:auto">&nbsp;</label>
+            <div class="val" style="font-family:'Spectral',serif; font-style:italic; font-size:13px; color:var(--ink-mute); line-height:1.5;">
+              Multipliers apply to every task baseline MD. Changes propagate immediately to all views.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card" style="margin-bottom:24px;">
+        <h3>Capacity overhead <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--ink-mute); font-weight:500; margin-left:10px;">applied to effort, not capacity</span></h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:18px;">
+          <div class="row" style="border-bottom:0; padding:0; flex-direction:column; align-items:stretch;">
+            <label style="min-width:auto;">Efficiency</label>
+            <div class="val" style="display:flex; align-items:center; gap:6px;">
+              <input type="number" step="1" min="1" max="100" id="setEfficiency" style="flex:1;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute);">%</span>
+            </div>
+            <div style="font-family:'Spectral',serif; font-style:italic; font-size:12px; color:var(--ink-mute); margin-top:6px; line-height:1.4;">
+              Productive fraction of nominal time (default 80%)
+            </div>
+          </div>
+          <div class="row" style="border-bottom:0; padding:0; flex-direction:column; align-items:stretch;">
+            <label style="min-width:auto;">Meeting load</label>
+            <div class="val" style="display:flex; align-items:center; gap:6px;">
+              <input type="number" step="1" min="0" max="99" id="setMeetingLoad" style="flex:1;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute);">%</span>
+            </div>
+            <div style="font-family:'Spectral',serif; font-style:italic; font-size:12px; color:var(--ink-mute); margin-top:6px; line-height:1.4;">
+              Share of time eaten by meetings (default 10%)
+            </div>
+          </div>
+          <div class="row" style="border-bottom:0; padding:0; flex-direction:column; align-items:stretch;">
+            <label style="min-width:auto;">Buffer time</label>
+            <div class="val" style="display:flex; align-items:center; gap:6px;">
+              <input type="number" step="1" min="0" max="99" id="setBufferTime" style="flex:1;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute);">%</span>
+            </div>
+            <div style="font-family:'Spectral',serif; font-style:italic; font-size:12px; color:var(--ink-mute); margin-top:6px; line-height:1.4;">
+              Contingency reserve (default 15%)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Database</h3>
+        <div class="row">
+          <label>Persistence mode</label>
+          <div class="val" id="setDbMode" style="font-family:'JetBrains Mono',monospace; font-size:13px;">—</div>
+        </div>
+        <div class="row">
+          <label>Database file</label>
+          <div class="val" id="setDbFile" style="font-family:'JetBrains Mono',monospace; font-size:12.5px; word-break:break-all;">—</div>
+        </div>
+        <div class="row" style="border-bottom:0">
+          <label>Auto-save</label>
+          <div class="val">
+            <label class="toggle"><input type="checkbox" id="setAutoSave" checked><span class="slider"></span></label>
+            <span style="font-family:'Spectral',serif; font-style:italic; font-size:13px; color:var(--ink-mute); margin-left:10px;">
+              Auto-persist after every change (1s debounce)
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HELP ============ -->
+    <section class="view" id="view-help">
+      <div class="view-head">
+        <span class="num">§ 07</span>
+        <h1>Help &amp; <em>About</em></h1>
+      </div>
+
+      <h3 class="sub">What this tool does</h3>
+      <p>
+        The BEACON WP Effort Planner is a single-file standalone tool for project-level
+        cybersecurity effort planning under ISO/SAE 21434 and UN R155. It uses the full BEACON
+        catalog (66 Work Packages, 172 tasks, 468 MD baseline effort) as its default dataset
+        and produces a closest-possible-GATE estimate based on tailoring decisions and team capacity.
+      </p>
+
+      <h3 class="sub">How the calculation works</h3>
+      <p><b>Effective MD per task</b> = baseline MD × complexity multiplier × overhead inflation.</p>
+      <p><b>Complexity multiplier</b> = Simple 0.75×, Normal 1.0×, Complex 1.25× by default. Configurable in Settings.</p>
+      <p><b>Overhead inflation</b> = 1 / (efficiency × (1 − meeting load) × (1 − buffer time)). With defaults (80% / 10% / 15%) this is ≈ 1.63×, meaning every 1 MD of pure work content is planned as ~1.63 MD of calendar effort. Configurable in Settings.</p>
+      <p><b>WP MD</b> = sum of effective MDs of all tasks. If a WP is tailored out, its MD contribution is zero.</p>
+      <p><b>Cumulative gate MD</b> = for gate <code>G</code>, the sum of MD across all WPs whose <code>gate_reqs</code> contains an entry at or below <code>G</code>. By the time gate G is reached, this work must be done.</p>
+      <p><b>Quarters at capacity</b> = cumulative MD / total team capacity per quarter (sum across all roles, nominal — the overhead is already baked into the effort).</p>
+      <p><b>Closest possible GATE</b> = the latest gate whose required quarters fit between the project start and target end date.</p>
+
+      <h3 class="sub">Why overhead applies to effort, not capacity</h3>
+      <p>
+        The same end-result schedule comes out either way (effort × inflation / capacity = effort / (capacity × factor)).
+        Applying the inflation to effort means you see a single MD number end-to-end — the dashboard, gate breakdown,
+        role bars, and per-task figures all show the planning value with overhead included. The pure BEACON baseline
+        remains visible in the catalog row's <em>Baseline</em> column for traceability.
+      </p>
+
+      <h3 class="sub">Tailoring &amp; audit</h3>
+      <p>
+        Every change to a task MD value is logged to the <a data-view="tailoring" style="color:var(--oxblood)">Tailoring Log</a>:
+        reductions require a written justification (≥ 20 chars), increases and restorations to baseline are logged automatically.
+        Toggling <em>Active</em> off also requires justification.
+      </p>
+
+      <h3 class="sub">Persistence</h3>
+      <p>
+        <b>Default:</b> the planner auto-saves to the browser's localStorage every second (debounced) — there is nothing to set up,
+        your work is preserved across reloads.
+      </p>
+      <p>
+        <b>For a portable file:</b> click <em>Save to file…</em> in the top bar to pick a location and create a sidecar JSON.
+        Once saved, every subsequent change is automatically written to that file (Chrome/Edge ≥ 122). Use <em>Open file…</em>
+        to resume work from a saved file on another machine.
+      </p>
+      <p>
+        <b>For backups:</b> <em>Export</em> downloads a one-shot JSON snapshot at any time; <em>Import</em> reads one back.
+        These are independent of the auto-save target.
+      </p>
+
+      <h3 class="sub">JSON schema</h3>
+      <p>
+        The database file is human-readable JSON with these top-level keys: <code>project</code>,
+        <code>wps</code>, <code>capacity</code>, <code>tailoringHistory</code>. You can edit it
+        directly in any text editor; reload the page to see changes.
+      </p>
+
+      <h3 class="sub">Source</h3>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7;">
+        BEACON migrations 084 (scorecard process config) + 089 (extended WPs) + 057 (dependencies).<br>
+        Catalog totals: 66 WPs · 172 tasks · 468 MD task-derived baseline (~22 MD additional placeholder MD on tenant-specific WPs).
+      </p>
+    </section>
+
+  </main>
+
+</div>
+
+<!-- ==================== TASK EDIT/ADD MODAL ==================== -->
+<div class="modal-bd" id="taskModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="label" id="tmLabel">Task · Edit</span>
+      <h3 id="tmTitle">Edit task</h3>
+    </div>
+    <div class="modal-body">
+      <p id="tmHint" style="font-family:'Spectral',serif; font-style:italic; color:var(--ink-soft); margin-bottom:14px;">
+        Custom tasks are added on top of the BEACON catalog and persist in your project file.
+      </p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px 18px;">
+        <label class="field" style="grid-column: 1 / -1;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:4px;">Task name</span>
+          <input type="text" id="tmName" style="width:100%; padding:8px 10px; border:1px solid var(--paper-rule); border-radius:3px; font-family:'Spectral',serif; font-size:14px;">
+        </label>
+        <label class="field">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:4px;">Type</span>
+          <select id="tmType" style="width:100%; padding:8px 10px; border:1px solid var(--paper-rule); border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:13px;">
+            <option value="MW">MW — Main Work</option>
+            <option value="VR">VR — Verification Review</option>
+            <option value="CR">CR — Confirmation Review</option>
+          </select>
+        </label>
+        <label class="field">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:4px;">Baseline MD</span>
+          <input type="number" step="0.5" min="0" id="tmMd" style="width:100%; padding:8px 10px; border:1px solid var(--paper-rule); border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:14px;">
+        </label>
+        <label class="field" style="grid-column: 1 / -1;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:4px;">Role</span>
+          <select id="tmRole" style="width:100%; padding:8px 10px; border:1px solid var(--paper-rule); border-radius:3px; font-family:'Spectral',serif; font-size:14px;"></select>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="err" id="tmErr"></span>
+      <button class="btn-p" id="tmCancel">Cancel</button>
+      <button class="btn-p primary" id="tmConfirm">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JUSTIFICATION MODAL ==================== -->
+<div class="modal-bd" id="justifyModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="label">Tailoring · Audit Required</span>
+      <h3 id="jmTitle">Justification</h3>
+    </div>
+    <div class="modal-body">
+      <p>This change reduces planned effort or removes a required Work Product. Per ISO/SAE 21434
+        clause 5.4 and project audit policy, a written justification is required.</p>
+      <div class="change-summary" id="jmSummary">—</div>
+      <label class="field" for="jmText">Justification (min. 20 characters)</label>
+      <textarea id="jmText" placeholder="Explain why this tailoring decision is acceptable for the project context (e.g. WP not applicable to this scope; effort reduced because shared with another project; …)"></textarea>
+    </div>
+    <div class="modal-foot">
+      <span class="err" id="jmErr"></span>
+      <button class="btn-p" id="jmCancel">Cancel</button>
+      <button class="btn-p primary" id="jmConfirm">Confirm change</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- catalog data + main app code injected here -->
+<script>
+// BEACON WP Catalog — 66 WPs, 172 tasks, 490 MD baseline
+// Source: BEACON migrations 084 + 089 + 057
+// Phases: project_start, concept, risk, dev_system, dev_hardware, dev_software,
+//         design, development, operations, post_development, management, security
+// Task types: MW = main_work, VR = verification_review, CR = confirmation_review
+
+const ROLES = [
+  "Cybersecurity Engineering Management",
+  "Engineer for cybersecurity management",
+  "Cybersecurity Architect N2",
+  "Cybersecurity Architect N3",
+  "Cybersecurity Analyst - Monitoring N2",
+  "Cybersecurity Analyst - Validation N2",
+  "Cybersecurity Analyst - Validation N3",
+  "Cybersecurity Analyst - Validation N4",
+  "Cybersecurity Assessor",
+  "Hardware Engineer",
+  "Software Engineer"
+];
+
+const PHASES = {
+  project_start:    { label: "Project Start",          order: 1 },
+  concept:          { label: "Concept Phase",          order: 2 },
+  risk:             { label: "Risk Management",        order: 3 },
+  design:           { label: "Design Phase",           order: 4 },
+  development:      { label: "Development Phase",      order: 5 },
+  dev_system:       { label: "Dev — System",           order: 6 },
+  dev_hardware:     { label: "Dev — Hardware",         order: 7 },
+  dev_software:     { label: "Dev — Software",         order: 8 },
+  security:         { label: "Security Engineering",   order: 9 },
+  post_development: { label: "Post Development",       order: 10 },
+  operations:       { label: "Operations",             order: 11 },
+  management:       { label: "Management & Org.",      order: 12 }
+};
+
+// gateReqs format: { 10: "initial"|"released"|"updated", 20: ..., ... }
+// task: { type, name, role, md }
+const CATALOG = [
+  // ===== PROJECT START =====
+  { code: "SC_WP01", name: "CS Development Interface Agreement (Customer)", phase: "project_start", isoRef: "WP-07-01", ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [
+    { type: "MW", name: "Cybersecurity interface agreement", role: "Engineer for cybersecurity management", md: 1.0 },
+    { type: "MW", name: "Cybersecurity RFQ", role: "Engineer for cybersecurity management", md: 6.0 },
+    { type: "MW", name: "Cybersecurity RFQ - Architecture", role: "Cybersecurity Architect N2", md: 15.0 },
+    { type: "MW", name: "Cybersecurity RFQ - Review", role: "Cybersecurity Architect N3", md: 5.0 },
+    { type: "MW", name: "Cybersecurity commercial offer - Mgmt", role: "Cybersecurity Engineering Management", md: 2.0 },
+    { type: "MW", name: "Cybersecurity commercial offer", role: "Engineer for cybersecurity management", md: 2.0 },
+    { type: "CR", name: "CR - CS-DIA Assessor review", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "CR", name: "CR - CS-DIA interview", role: "Engineer for cybersecurity management", md: 0.5 }
+  ]},
+  { code: "SC_WP02", name: "CS Development Interface Agreement (Supplier)", phase: "project_start", isoRef: "WP-07-01", ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [] },
+
+  // ===== CONCEPT =====
+  { code: "SC_WP03", name: "Item Definition", phase: "concept", isoRef: "WP-09-01", ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Item definition", role: "Cybersecurity Architect N2", md: 12.0 },
+    { type: "VR", name: "VR - CS Management", role: "Engineer for cybersecurity management", md: 1.0 },
+    { type: "VR", name: "VR - Cybersecurity Architect N2", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "VR - Cybersecurity Architect N3", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "CR - Item Definition Assessor", role: "Cybersecurity Assessor", md: 2.0 },
+    { type: "CR", name: "CR - Item Definition interview", role: "Engineer for cybersecurity management", md: 0.5 }
+  ]},
+  { code: "SC_WP04", name: "Cybersecurity Relevance Check", phase: "concept", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 10: "released" }, tasks: [
+    { type: "MW", name: "Pre-Concept analysis", role: "Cybersecurity Architect N2", md: 5.0 },
+    { type: "VR", name: "VR - Pre-Concept N3", role: "Cybersecurity Architect N3", md: 0.5 },
+    { type: "VR", name: "VR - Pre-Concept CS Mgmt", role: "Engineer for cybersecurity management", md: 0.5 }
+  ]},
+  { code: "SC_WP05", name: "Cybersecurity Plan & Case", phase: "concept", isoRef: "WP-06-01", ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Cybersecurity plan&case - GATE 10", role: "Engineer for cybersecurity management", md: 3.0 },
+    { type: "MW", name: "Cybersecurity plan&case - GATE 20", role: "Engineer for cybersecurity management", md: 2.0 },
+    { type: "MW", name: "Cybersecurity plan&case - GATE 30", role: "Engineer for cybersecurity management", md: 2.0 },
+    { type: "MW", name: "Cybersecurity plan&case - GATE 40", role: "Engineer for cybersecurity management", md: 4.0 },
+    { type: "MW", name: "Triggers (BOM, sBOM)", role: "Engineer for cybersecurity management", md: 1.0 },
+    { type: "MW", name: "Cybersecurity monitoring pack", role: "Cybersecurity Analyst - Monitoring N2", md: 1.0 },
+    { type: "MW", name: "Cybersecurity monitoring pack - support", role: "Engineer for cybersecurity management", md: 1.0 },
+    { type: "CR", name: "CR - Plan&Case Assessor", role: "Cybersecurity Assessor", md: 2.0 },
+    { type: "CR", name: "CR - Plan&Case interview", role: "Engineer for cybersecurity management", md: 0.5 }
+  ]},
+  { code: "SC_WP06", name: "Cybersecurity Scorecard", phase: "concept", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "released", 20: "updated", 30: "updated", 40: "updated" }, tasks: [] },
+  { code: "SC_WP07", name: "TARA (incl. WP-15-01 to WP-15-07)", phase: "concept", isoRef: "WP-09-02", ownerRole: "Cybersecurity Architect N2", deps: ["SC_WP03"], gateReqs: { 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "TARA (Threat Analysis and Risk Assessment)", role: "Cybersecurity Architect N2", md: 35.0 },
+    { type: "VR", name: "VR TARA - CS Management", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "VR", name: "VR TARA - Architect N2", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "VR TARA - Architect N3", role: "Cybersecurity Architect N3", md: 3.0 },
+    { type: "CR", name: "CR - TARA Assessor", role: "Cybersecurity Assessor", md: 0.5 },
+    { type: "CR", name: "CR - TARA interview", role: "Cybersecurity Architect N2", md: 0.5 }
+  ]},
+  { code: "SC_WP08", name: "Cybersecurity Goals & Claims", phase: "concept", isoRef: "WP-09-03", ownerRole: "Cybersecurity Architect N2", deps: ["SC_WP07"], gateReqs: { 20: "released", 30: "updated" }, tasks: [
+    { type: "MW", name: "Cybersecurity Goals & Claims", role: "Cybersecurity Architect N2", md: 4.0 },
+    { type: "VR", name: "VR Goals - Architect N2", role: "Cybersecurity Architect N2", md: 1.0 },
+    { type: "VR", name: "VR Goals - Architect N3", role: "Cybersecurity Architect N3", md: 0.5 },
+    { type: "VR", name: "VR Goals - Validation N2", role: "Cybersecurity Analyst - Validation N2", md: 0.5 },
+    { type: "VR", name: "VR Goals - CS Management", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "CR", name: "CR - Goals Assessor", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "CR", name: "CR - Goals interview", role: "Cybersecurity Architect N2", md: 0.5 }
+  ]},
+  { code: "SC_WP09", name: "Risk Treatment Decision", phase: "concept", isoRef: "WP-15-08", ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Risk treatment decisions", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "VR Risk - Engineering Mgmt", role: "Cybersecurity Engineering Management", md: 0.5 },
+    { type: "VR", name: "VR Risk - CS Management", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "VR", name: "VR Risk - CS Management (detail)", role: "Engineer for cybersecurity management", md: 1.0 },
+    { type: "VR", name: "VR Risk - Architect N3", role: "Cybersecurity Architect N3", md: 0.5 },
+    { type: "CR", name: "CR - Risk Treatment Assessor", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "CR", name: "CR - Risk Treatment interview", role: "Cybersecurity Architect N2", md: 0.5 }
+  ]},
+  { code: "SC_WP10", name: "Cybersecurity Architecture Design", phase: "concept", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "released", 30: "updated" }, tasks: [
+    { type: "MW", name: "System Cybersecurity Concept", role: "Cybersecurity Architect N2", md: 2.0 },
+    { type: "VR", name: "VR Sys CS Concept - CS Mgmt", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "VR", name: "VR Sys CS Concept - Architect N2", role: "Cybersecurity Architect N2", md: 0.5 },
+    { type: "VR", name: "VR Sys CS Concept - Architect N3", role: "Cybersecurity Architect N3", md: 0.5 }
+  ]},
+  { code: "SC_WP11", name: "Cybersecurity Concept / Specification", phase: "concept", isoRef: "WP-09-06", ownerRole: "Cybersecurity Architect N2", deps: ["SC_WP08"], gateReqs: { 20: "released", 30: "updated" }, tasks: [
+    { type: "MW", name: "Cybersecurity concept", role: "Cybersecurity Architect N2", md: 15.0 },
+    { type: "VR", name: "VR Concept - Architect N2", role: "Cybersecurity Architect N2", md: 4.0 },
+    { type: "VR", name: "VR Concept - Architect N3", role: "Cybersecurity Architect N3", md: 2.0 },
+    { type: "VR", name: "VR Concept - CS Management", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "CR", name: "CR - Concept Assessor", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "CR", name: "CR - Concept interview", role: "Cybersecurity Architect N2", md: 0.5 }
+  ]},
+  { code: "WP-CONCEPT-001", name: "CS Claims & Assumptions", phase: "concept", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [
+    { type: "MW", name: "Document cybersecurity claims and assumptions", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "Review claims and assumptions", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Confirm claims baseline", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+
+  // ===== RISK MANAGEMENT =====
+  { code: "WP-RISK-008", name: "TARA Method Definition", phase: "risk", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: ["SC_WP03"], gateReqs: { 10: "initial", 20: "released", 30: "updated" }, tasks: [
+    { type: "MW", name: "Define TARA methodology and tooling", role: "Cybersecurity Architect N2", md: 2.5 },
+    { type: "VR", name: "Review TARA methodology", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve TARA method", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+
+  // ===== DEV - SYSTEM =====
+  { code: "SC_WP12", name: "V&V Test Strategy", phase: "dev_system", isoRef: null, ownerRole: "Cybersecurity Analyst - Validation N2", deps: [], gateReqs: { 20: "released", 30: "updated" }, tasks: [
+    { type: "MW", name: "V&V Test Strategy", role: "Cybersecurity Analyst - Validation N2", md: 2.0 },
+    { type: "VR", name: "VR V&V Strategy - Validation N2", role: "Cybersecurity Analyst - Validation N2", md: 0.5 },
+    { type: "VR", name: "VR V&V Strategy - CS Mgmt", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "VR", name: "VR V&V Strategy - Validation N3", role: "Cybersecurity Analyst - Validation N3", md: 0.5 },
+    { type: "CR", name: "CR - V&V Strategy Assessor", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+  { code: "SC_WP13", name: "Weaknesses / Vulnerability Scanning", phase: "dev_system", isoRef: "WP-10-05", ownerRole: "Cybersecurity Analyst - Monitoring N2", deps: [], gateReqs: { 20: "initial", 30: "updated", 40: "released" }, tasks: [
+    { type: "MW", name: "Weaknesses found during product development", role: "Cybersecurity Analyst - Monitoring N2", md: 3.0 }
+  ]},
+  { code: "SC_WP14", name: "Validation Test Plan", phase: "dev_system", isoRef: null, ownerRole: "Cybersecurity Analyst - Validation N2", deps: [], gateReqs: { 30: "initial", 40: "released" }, tasks: [
+    { type: "MW", name: "Validation Testing Plan", role: "Cybersecurity Analyst - Validation N2", md: 5.0 },
+    { type: "MW", name: "Validation Testing Plan - Support N3", role: "Cybersecurity Analyst - Validation N3", md: 3.0 },
+    { type: "MW", name: "Validation Testing Plan - Support Mgmt", role: "Engineer for cybersecurity management", md: 3.0 },
+    { type: "VR", name: "VR Val Plan - Validation N2", role: "Cybersecurity Analyst - Validation N2", md: 0.5 },
+    { type: "VR", name: "VR Val Plan - Validation N3", role: "Cybersecurity Analyst - Validation N3", md: 0.5 },
+    { type: "VR", name: "VR Val Plan - Architect N2", role: "Cybersecurity Architect N2", md: 0.5 },
+    { type: "VR", name: "VR Val Plan - CS Mgmt", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "CR", name: "CR - Val Plan Assessor", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "CR", name: "CR - Val Plan interview", role: "Cybersecurity Analyst - Validation N2", md: 0.5 }
+  ]},
+  { code: "SC_WP15", name: "Validation Test Specification", phase: "dev_system", isoRef: null, ownerRole: "Cybersecurity Analyst - Validation N2", deps: [], gateReqs: { 30: "initial", 40: "released" }, tasks: [
+    { type: "MW", name: "Validation test specification", role: "Cybersecurity Analyst - Validation N2", md: 5.0 },
+    { type: "VR", name: "VR Val Spec - Architect N2", role: "Cybersecurity Architect N2", md: 0.5 },
+    { type: "VR", name: "VR Val Spec - Validation N3", role: "Cybersecurity Analyst - Validation N3", md: 0.5 },
+    { type: "VR", name: "VR Val Spec - CS Mgmt", role: "Engineer for cybersecurity management", md: 0.5 }
+  ]},
+  { code: "SC_WP16", name: "Validation Test Report", phase: "dev_system", isoRef: "WP-11-01", ownerRole: "Cybersecurity Analyst - Validation N3", deps: [], gateReqs: { 40: "released" }, tasks: [
+    { type: "MW", name: "Validation report", role: "Cybersecurity Analyst - Validation N2", md: 4.0 },
+    { type: "VR", name: "VR Validation - Validation N3", role: "Cybersecurity Analyst - Validation N3", md: 2.0 },
+    { type: "VR", name: "VR Validation - CS Management", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "MW", name: "Validation execution - N3", role: "Cybersecurity Analyst - Validation N3", md: 40.0 },
+    { type: "MW", name: "Validation execution - N4", role: "Cybersecurity Analyst - Validation N4", md: 40.0 },
+    { type: "MW", name: "Validation support", role: "Cybersecurity Analyst - Validation N2", md: 15.0 }
+  ]},
+  { code: "SC_WP17", name: "System Qualification Test", phase: "dev_system", isoRef: "WP-10-06", ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 30: "initial", 40: "released" }, tasks: [
+    { type: "MW", name: "Integration and verification specification", role: "Engineer for cybersecurity management", md: 1.0 }
+  ]},
+  { code: "SC_WP18", name: "System Qualification Test Report", phase: "dev_system", isoRef: "WP-10-07", ownerRole: "Engineer for cybersecurity management", deps: ["SC_WP09"], gateReqs: { 30: "initial", 40: "released" }, tasks: [
+    { type: "MW", name: "Integration and verification report", role: "Engineer for cybersecurity management", md: 1.0 }
+  ]},
+  { code: "SC_WP19", name: "Cybersecurity Case", phase: "dev_system", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 30: "initial", 40: "released" }, tasks: [] },
+  { code: "SC_WP20", name: "Cybersecurity Assessment Report", phase: "dev_system", isoRef: "WP-06-03", ownerRole: "Cybersecurity Assessor", deps: [], gateReqs: { 40: "released" }, tasks: [
+    { type: "MW", name: "Cybersecurity assessment report", role: "Cybersecurity Assessor", md: 1.0 },
+    { type: "MW", name: "Cybersecurity assessment", role: "Cybersecurity Assessor", md: 12.0 },
+    { type: "MW", name: "Assessment prep - CS Management", role: "Engineer for cybersecurity management", md: 5.0 },
+    { type: "MW", name: "Assessment prep - Engineering Mgmt", role: "Cybersecurity Engineering Management", md: 0.5 },
+    { type: "MW", name: "Assessment prep - Architect N2", role: "Cybersecurity Architect N2", md: 2.0 },
+    { type: "MW", name: "Assessment prep - Validation N2", role: "Cybersecurity Analyst - Validation N2", md: 2.0 },
+    { type: "MW", name: "Assessment prep - Monitoring N2", role: "Cybersecurity Analyst - Monitoring N2", md: 1.0 }
+  ]},
+
+  // ===== DEV - HARDWARE (no tasks, tenant-specific) =====
+  { code: "SC_WP21", name: "CS Requirements - Hardware", phase: "dev_hardware", isoRef: null, ownerRole: "Hardware Engineer", deps: [], gateReqs: { 20: "released", 30: "updated", 40: "updated" }, tasks: [] },
+  { code: "SC_WP22", name: "HW-SW Interface Spec / Port Assignment", phase: "dev_hardware", isoRef: null, ownerRole: "Hardware Engineer", deps: [], gateReqs: { 20: "released", 30: "updated", 40: "updated" }, tasks: [] },
+  { code: "SC_WP23", name: "Hardware Architectural Design", phase: "dev_hardware", isoRef: null, ownerRole: "Hardware Engineer", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [] },
+  { code: "SC_WP24", name: "HW Test Specification (CS Requirements)", phase: "dev_hardware", isoRef: null, ownerRole: "Hardware Engineer", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [] },
+  { code: "SC_WP25", name: "HW Test Report (CS Requirements)", phase: "dev_hardware", isoRef: null, ownerRole: "Hardware Engineer", deps: [], gateReqs: { 30: "released" }, tasks: [] },
+
+  // ===== DEV - SOFTWARE (no tasks, tenant-specific) =====
+  { code: "SC_WP26", name: "CS Requirements - Software", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 20: "released", 30: "updated", 40: "updated" }, tasks: [] },
+  { code: "SC_WP27", name: "SW Code, Review and Analysis Report", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 30: "released" }, tasks: [] },
+  { code: "SC_WP28", name: "SW Function Implementation Tracker", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 20: "initial", 30: "released", 40: "updated" }, tasks: [] },
+  { code: "SC_WP29", name: "SW Unit Test Specifications (CS Units)", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 30: "released", 40: "updated" }, tasks: [] },
+  { code: "SC_WP30", name: "SW Unit Test Reports (CS Units)", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 30: "released", 40: "updated" }, tasks: [] },
+  { code: "SC_WP31", name: "SW Test Specification (CS Requirements)", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 20: "initial", 30: "released", 40: "updated" }, tasks: [] },
+  { code: "SC_WP32", name: "SW Test Report (CS Requirements)", phase: "dev_software", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 30: "released", 40: "updated" }, tasks: [] },
+
+  // ===== DESIGN =====
+  { code: "WP-DESIGN-001", name: "Secure Boot & Key Mgmt Playbook", phase: "design", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [
+    { type: "MW", name: "Design secure boot chain and key management", role: "Cybersecurity Architect N2", md: 5.0 },
+    { type: "VR", name: "Review secure boot design", role: "Cybersecurity Architect N3", md: 2.0 },
+    { type: "CR", name: "Approve key management playbook", role: "Cybersecurity Assessor", md: 1.0 }
+  ]},
+
+  // ===== DEVELOPMENT =====
+  { code: "WP-DEV-002", name: "Bidirectional Traceability", phase: "development", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [
+    { type: "MW", name: "Establish traceability matrix", role: "Engineer for cybersecurity management", md: 2.5 },
+    { type: "VR", name: "Review traceability completeness", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Confirm traceability baseline", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+  { code: "WP-DEV-005", name: "CS Requirements System", phase: "development", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [
+    { type: "MW", name: "Derive system-level cybersecurity requirements", role: "Cybersecurity Architect N2", md: 5.0 },
+    { type: "VR", name: "Review system CS requirements", role: "Cybersecurity Architect N3", md: 2.0 },
+    { type: "CR", name: "Confirm system requirements baseline", role: "Cybersecurity Assessor", md: 1.0 }
+  ]},
+  { code: "WP-DEV-015", name: "SW Security Arch Detailed", phase: "development", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [
+    { type: "MW", name: "Design SW security architecture", role: "Software Engineer", md: 6.0 },
+    { type: "VR", name: "Review SW security architecture", role: "Cybersecurity Architect N3", md: 2.5 },
+    { type: "CR", name: "Confirm SW security design", role: "Cybersecurity Assessor", md: 1.5 }
+  ]},
+  { code: "WP-DEV-018", name: "Secure Coding Rules & Checklists", phase: "development", isoRef: null, ownerRole: "Software Engineer", deps: [], gateReqs: { 20: "initial", 30: "released" }, tasks: [
+    { type: "MW", name: "Define secure coding rules and checklists", role: "Software Engineer", md: 2.5 },
+    { type: "VR", name: "Review secure coding rules", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve coding standards", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+
+  // ===== OPERATIONS =====
+  { code: "WP-OPS-005", name: "PSIRT Charter & Runbook", phase: "operations", isoRef: null, ownerRole: "Cybersecurity Analyst - Monitoring N2", deps: [], gateReqs: { 40: "initial", 50: "released" }, tasks: [
+    { type: "MW", name: "Establish PSIRT charter and procedures", role: "Cybersecurity Analyst - Monitoring N2", md: 3.0 },
+    { type: "VR", name: "Review PSIRT runbook", role: "Engineer for cybersecurity management", md: 1.5 },
+    { type: "CR", name: "Approve PSIRT charter", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-OPS-008", name: "Telemetry & Security Analytics Spec", phase: "operations", isoRef: null, ownerRole: "Cybersecurity Analyst - Monitoring N2", deps: [], gateReqs: { 40: "initial", 50: "released" }, tasks: [
+    { type: "MW", name: "Define telemetry and security analytics requirements", role: "Cybersecurity Analyst - Monitoring N2", md: 2.5 },
+    { type: "VR", name: "Review telemetry specification", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve analytics spec", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+  { code: "WP-OPS-009", name: "VEX Advisories", phase: "operations", isoRef: null, ownerRole: "Cybersecurity Analyst - Monitoring N2", deps: [], gateReqs: { 40: "initial", 50: "released" }, tasks: [
+    { type: "MW", name: "Create VEX advisory template and process", role: "Cybersecurity Analyst - Monitoring N2", md: 2.0 },
+    { type: "VR", name: "Review VEX process", role: "Engineer for cybersecurity management", md: 0.5 },
+    { type: "CR", name: "Approve VEX process", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+
+  // ===== POST DEVELOPMENT =====
+  { code: "SC_WP33", name: "CS Service Mgmt Agreement (Customer)", phase: "post_development", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [] },
+  { code: "SC_WP34", name: "CS Service Mgmt Agreement (Suppliers)", phase: "post_development", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released" }, tasks: [] },
+  { code: "SC_WP35", name: "CS Requirements for Post Development", phase: "post_development", isoRef: "WP-10-02", ownerRole: "Cybersecurity Architect N2", deps: ["SC_WP03"], gateReqs: { 20: "initial", 30: "released", 40: "updated" }, tasks: [
+    { type: "MW", name: "Cybersecurity requirements for post-development", role: "Cybersecurity Architect N2", md: 5.0 }
+  ]},
+  { code: "SC_WP36", name: "Production Control Plan", phase: "post_development", isoRef: "WP-12-01", ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "initial", 30: "updated", 40: "released", 50: "updated" }, tasks: [
+    { type: "MW", name: "Production control plan", role: "Cybersecurity Architect N2", md: 5.0 },
+    { type: "MW", name: "Production control plan - Support", role: "Engineer for cybersecurity management", md: 1.0 }
+  ]},
+  { code: "SC_WP37", name: "Release for Post-Development Report", phase: "post_development", isoRef: "WP-06-04", ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 40: "released" }, tasks: [
+    { type: "MW", name: "Release for post-development report", role: "Cybersecurity Architect N2", md: 1.0 }
+  ]},
+  { code: "SC_WP38", name: "Process FMEA Review Evidence", phase: "post_development", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 30: "initial", 40: "released" }, tasks: [] },
+
+  // ===== MANAGEMENT =====
+  { code: "WP-MGMT-001", name: "AIS-190 SUMS/OTA Evidence", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Collect SUMS/OTA implementation evidence", role: "Engineer for cybersecurity management", md: 3.0 },
+    { type: "VR", name: "Review SUMS evidence package", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Sign-off SUMS evidence", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-002", name: "Configuration & Change Mgmt Records", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Establish CM plan and tooling", role: "Engineer for cybersecurity management", md: 2.5 },
+    { type: "VR", name: "Review CM procedures", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve CM plan", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-003", name: "CS Culture & Competence Plan", phase: "management", isoRef: null, ownerRole: "Cybersecurity Engineering Management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Define competence requirements and training plan", role: "Cybersecurity Engineering Management", md: 3.0 },
+    { type: "VR", name: "Review competence plan", role: "Engineer for cybersecurity management", md: 1.5 },
+    { type: "CR", name: "Approve culture & competence plan", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-006", name: "Information Sharing & VDP", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Define VDP/CVD disclosure procedures", role: "Engineer for cybersecurity management", md: 3.0 },
+    { type: "VR", name: "Review disclosure procedures", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Approve VDP policy", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-007", name: "Lessons Learned", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Collect and analyze lessons learned", role: "Engineer for cybersecurity management", md: 1.5 },
+    { type: "VR", name: "Review and document improvements", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve improvement actions", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-008", name: "MIIT/SAMR OTA Compliance", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Prepare MIIT/SAMR compliance package", role: "Engineer for cybersecurity management", md: 3.0 },
+    { type: "VR", name: "Review compliance package", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Sign-off compliance package", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-010", name: "Organizational CS Policy", phase: "management", isoRef: null, ownerRole: "Cybersecurity Engineering Management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Draft organizational cybersecurity policy", role: "Cybersecurity Engineering Management", md: 4.0 },
+    { type: "VR", name: "Stakeholder review of policy", role: "Engineer for cybersecurity management", md: 2.5 },
+    { type: "CR", name: "Executive approval and communication", role: "Cybersecurity Engineering Management", md: 1.5 }
+  ]},
+  { code: "WP-MGMT-013", name: "Project CS Management Plan", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [] },
+  { code: "WP-MGMT-014", name: "Release Notes / Update Package Evidence", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Compile release notes and update evidence", role: "Engineer for cybersecurity management", md: 2.0 },
+    { type: "VR", name: "Review release documentation", role: "Cybersecurity Architect N3", md: 0.5 },
+    { type: "CR", name: "Approve release package", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-015", name: "RxSWIN / Config Identification", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Define RxSWIN identification scheme", role: "Engineer for cybersecurity management", md: 2.0 },
+    { type: "VR", name: "Review RxSWIN records", role: "Cybersecurity Architect N3", md: 0.5 },
+    { type: "CR", name: "Approve RxSWIN scheme", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-016", name: "SUMS Policy & Procedures", phase: "management", isoRef: null, ownerRole: "Cybersecurity Engineering Management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Draft SUMS organizational policy", role: "Cybersecurity Engineering Management", md: 3.0 },
+    { type: "VR", name: "Review SUMS policy", role: "Engineer for cybersecurity management", md: 1.5 },
+    { type: "CR", name: "Approve SUMS policy", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-017", name: "SW Update Readiness Review", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [
+    { type: "MW", name: "Prepare SW update readiness checklist", role: "Engineer for cybersecurity management", md: 2.5 },
+    { type: "VR", name: "Review readiness evidence", role: "Cybersecurity Architect N3", md: 1.0 },
+    { type: "CR", name: "Approve update release", role: "Cybersecurity Engineering Management", md: 0.5 }
+  ]},
+  { code: "WP-MGMT-018", name: "Supplier CS Management", phase: "management", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 10: "initial", 20: "released", 30: "updated", 40: "updated" }, tasks: [] },
+
+  // ===== SECURITY ENGINEERING =====
+  { code: "WP-SEC-001", name: "AIS-189 R155 Conformity Evidence", phase: "security", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Compile R155 conformity evidence", role: "Engineer for cybersecurity management", md: 5.0 },
+    { type: "VR", name: "Gap analysis and review", role: "Cybersecurity Architect N3", md: 3.0 },
+    { type: "CR", name: "Submit conformity evidence", role: "Cybersecurity Assessor", md: 2.0 }
+  ]},
+  { code: "WP-SEC-002", name: "CAC Data Mapping & Assessment", phase: "security", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Map automotive data per CAC requirements", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "Review data mapping", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Approve data assessment", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+  { code: "WP-SEC-003", name: "GB 44495 Conformance Dossier", phase: "security", isoRef: null, ownerRole: "Engineer for cybersecurity management", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Compile GB 44495 test evidence", role: "Engineer for cybersecurity management", md: 6.0 },
+    { type: "VR", name: "Review conformance dossier", role: "Cybersecurity Architect N3", md: 3.5 },
+    { type: "CR", name: "Submit for China type approval", role: "Cybersecurity Assessor", md: 2.5 }
+  ]},
+  { code: "WP-SEC-004", name: "SBOM per Release", phase: "security", isoRef: null, ownerRole: "Cybersecurity Analyst - Monitoring N2", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Generate and validate SBOM", role: "Cybersecurity Analyst - Monitoring N2", md: 3.0 },
+    { type: "VR", name: "Review SBOM for vulnerabilities", role: "Cybersecurity Analyst - Monitoring N2", md: 1.5 },
+    { type: "CR", name: "Approve SBOM for release", role: "Cybersecurity Assessor", md: 0.5 }
+  ]},
+  { code: "WP-SEC-005", name: "V2X Security Conformance", phase: "security", isoRef: null, ownerRole: "Cybersecurity Architect N2", deps: [], gateReqs: { 20: "released" }, tasks: [
+    { type: "MW", name: "Assess V2X security conformance", role: "Cybersecurity Architect N2", md: 3.0 },
+    { type: "VR", name: "Review V2X conformance evidence", role: "Cybersecurity Architect N3", md: 1.5 },
+    { type: "CR", name: "Approve V2X conformance", role: "Cybersecurity Assessor", md: 0.5 }
+  ]}
+];
+
+// Quick verification
+const _BASELINE_TOTAL = CATALOG.reduce((s, wp) =>
+  s + wp.tasks.reduce((t, k) => t + k.md, 0), 0);
+const _TASK_COUNT = CATALOG.reduce((s, wp) => s + wp.tasks.length, 0);
+const _WP_COUNT = CATALOG.length;
+console.log(`[catalog] ${_WP_COUNT} WPs, ${_TASK_COUNT} tasks, ${_BASELINE_TOTAL.toFixed(1)} MD baseline`);
+
+</script>
+<script>
+/* ==========================================================================
+ * BEACON WP Effort Planner — main application
+ * ========================================================================== */
+
+// --------------- 1. STATE MODEL ---------------
+const DEFAULT_CAPACITY = {
+  // sensible defaults: 60 MD/quarter ≈ 1 FTE (60 working days)
+  "Cybersecurity Engineering Management": 30,
+  "Engineer for cybersecurity management": 60,
+  "Cybersecurity Architect N2": 60,
+  "Cybersecurity Architect N3": 30,
+  "Cybersecurity Analyst - Monitoring N2": 30,
+  "Cybersecurity Analyst - Validation N2": 60,
+  "Cybersecurity Analyst - Validation N3": 30,
+  "Cybersecurity Analyst - Validation N4": 60,
+  "Cybersecurity Assessor": 15,
+  "Hardware Engineer": 0,
+  "Software Engineer": 0
+};
+
+function initialState() {
+  const today = new Date();
+  const end = new Date(today);
+  end.setMonth(end.getMonth() + 24);   // default 2-year project window
+  return {
+    project: {
+      code: "Pxxxx",
+      name: "Unsaved project",
+      complexity: "Normal",
+      multipliers: { Simple: 0.75, Normal: 1.0, Complex: 1.25 },
+      efficiency: 0.80,
+      meetingLoad: 0.10,
+      bufferTime: 0.15,
+      startDate: today.toISOString().slice(0,10),
+      endDate: end.toISOString().slice(0,10)
+    },
+    capacity: { ...DEFAULT_CAPACITY },
+    wps: Object.fromEntries(CATALOG.map(wp => [wp.code, {
+      active: true,
+      taskOverrides: {},
+      customTasks: []
+    }])),
+    tailoringHistory: [],
+    autoSave: true,
+    schemaVersion: 3
+  };
+}
+
+let STATE = initialState();
+
+// catalog lookup
+const CAT_BY_CODE = Object.fromEntries(CATALOG.map(wp => [wp.code, wp]));
+
+// --------------- 2. COMPUTATIONS ---------------
+
+// effective MD for a single task (catalog index `idx` of wpCode)
+// includes complexity multiplier AND overhead inflation (efficiency/meeting/buffer)
+// Custom task IDs are strings like 'c0', 'c1'... BEACON tasks use integer indices.
+// All public task helpers below accept either form via taskKey.
+function isCustomTaskKey(k) { return typeof k === "string" && k.startsWith("c"); }
+
+function getCustomTask(wpCode, customId) {
+  const tail = STATE.wps[wpCode];
+  if (!tail || !tail.customTasks) return null;
+  return tail.customTasks.find(t => t.id === customId) || null;
+}
+
+// Returns the effective list of tasks for a WP — BEACON tasks first, then custom tasks.
+// Each item is { key, name, type, role, md, isCustom }.
+function tasksOf(wpCode) {
+  const wp = CAT_BY_CODE[wpCode];
+  const tail = STATE.wps[wpCode];
+  const out = [];
+  if (wp) {
+    wp.tasks.forEach((t, i) => out.push({
+      key: i, name: t.name, type: t.type, role: t.role, md: t.md, isCustom: false
+    }));
+  }
+  if (tail && tail.customTasks) {
+    tail.customTasks.forEach(c => out.push({
+      key: c.id, name: c.name, type: c.type, role: c.role, md: c.md, isCustom: true
+    }));
+  }
+  return out;
+}
+
+function taskEffectiveMd(wpCode, taskKey) {
+  const tail = STATE.wps[wpCode];
+  let base;
+  if (isCustomTaskKey(taskKey)) {
+    const c = getCustomTask(wpCode, taskKey);
+    if (!c) return 0;
+    base = c.md;
+  } else {
+    const wp = CAT_BY_CODE[wpCode];
+    const t = wp?.tasks[taskKey];
+    if (!t) return 0;
+    const ovr = tail?.taskOverrides[taskKey];
+    base = ovr !== undefined ? ovr : t.md;
+  }
+  const complexityMult = STATE.project.multipliers[STATE.project.complexity] ?? 1.0;
+  const factor = capacityFactor();
+  const inflate = factor > 0 ? 1 / factor : 1.0;
+  return Math.round(base * complexityMult * inflate * 2) / 2;
+}
+
+function taskBaselineMd(wpCode, taskKey) {
+  if (isCustomTaskKey(taskKey)) {
+    return getCustomTask(wpCode, taskKey)?.md ?? 0;
+  }
+  return CAT_BY_CODE[wpCode]?.tasks[taskKey]?.md ?? 0;
+}
+
+function taskCurrentMd(wpCode, taskKey) {
+  if (isCustomTaskKey(taskKey)) {
+    return getCustomTask(wpCode, taskKey)?.md ?? 0;
+  }
+  const ovr = STATE.wps[wpCode]?.taskOverrides[taskKey];
+  return ovr !== undefined ? ovr : taskBaselineMd(wpCode, taskKey);
+}
+
+function taskName(wpCode, taskKey) {
+  if (isCustomTaskKey(taskKey)) return getCustomTask(wpCode, taskKey)?.name ?? "—";
+  return CAT_BY_CODE[wpCode]?.tasks[taskKey]?.name ?? "—";
+}
+
+// effective MD for a WP (sum of all tasks incl. custom; 0 if inactive)
+function wpEffectiveMd(wpCode) {
+  const tail = STATE.wps[wpCode];
+  if (!tail || !tail.active) return 0;
+  return tasksOf(wpCode).reduce((sum, t) => sum + taskEffectiveMd(wpCode, t.key), 0);
+}
+
+function wpBaselineSum(wpCode) {
+  // BEACON baseline ONLY — custom tasks are user-added on top, not part of catalog baseline
+  const wp = CAT_BY_CODE[wpCode];
+  if (!wp) return 0;
+  return wp.tasks.reduce((s, t) => s + t.md, 0);
+}
+
+// total effort breakdown
+function totalEffort() {
+  let baseline = 0, effective = 0;
+  for (const wp of CATALOG) {
+    const wpBase = wpBaselineSum(wp.code);
+    baseline += wpBase;
+    effective += wpEffectiveMd(wp.code);
+  }
+  return { baseline, effective };
+}
+
+// effort by role (post-tailoring, post-modifier; includes custom tasks)
+function effortByRole() {
+  const out = {};
+  for (const wp of CATALOG) {
+    const tail = STATE.wps[wp.code];
+    if (!tail || !tail.active) continue;
+    for (const t of tasksOf(wp.code)) {
+      const md = taskEffectiveMd(wp.code, t.key);
+      out[t.role] = (out[t.role] || 0) + md;
+    }
+  }
+  return out;
+}
+
+// effort by phase
+function effortByPhase() {
+  const out = {};
+  for (const wp of CATALOG) {
+    const md = wpEffectiveMd(wp.code);
+    out[wp.phase] = (out[wp.phase] || 0) + md;
+  }
+  return out;
+}
+
+// effort by gate (cumulative)
+// For gate G, sum effective MDs of all WPs whose gateReqs has any entry with key <= G.
+// Semantics: "by the time we reach gate G, all these WPs must have at least started/released
+// their work, so cumulative effort up to G is required".
+const GATES = [10, 20, 30, 40, 50];
+
+function gateCumulative() {
+  const out = {};
+  for (const g of GATES) {
+    let md = 0;
+    let touchedWps = 0;
+    for (const wp of CATALOG) {
+      const reqs = Object.keys(wp.gateReqs).map(Number);
+      if (reqs.length === 0) continue;
+      // Touches gate g if any req key <= g
+      if (reqs.some(r => r <= g)) {
+        md += wpEffectiveMd(wp.code);
+        touchedWps++;
+      }
+    }
+    out[g] = { md, wps: touchedWps };
+  }
+  return out;
+}
+
+// total team capacity per quarter (nominal — overhead is applied on the effort side)
+function totalCapacityPerQuarter() {
+  return Object.values(STATE.capacity).reduce((s, v) => s + (Number(v) || 0), 0);
+}
+
+// composite overhead factor: efficiency × (1 - meetingLoad) × (1 - bufferTime)
+// this INFLATES the effort (1/factor) so capacity stays nominal in the UI
+function capacityFactor() {
+  const eff = STATE.project.efficiency;
+  const meet = STATE.project.meetingLoad;
+  const buf = STATE.project.bufferTime;
+  const e = (typeof eff === "number" && eff > 0) ? eff : 0.80;
+  const m = (typeof meet === "number" && meet >= 0 && meet < 1) ? meet : 0.10;
+  const b = (typeof buf === "number" && buf >= 0 && buf < 1) ? buf : 0.15;
+  return e * (1 - m) * (1 - b);
+}
+
+// available quarters from start to end date
+function availableQuarters() {
+  const s = STATE.project.startDate ? new Date(STATE.project.startDate) : null;
+  const e = STATE.project.endDate ? new Date(STATE.project.endDate) : null;
+  if (!s || !e || isNaN(s) || isNaN(e) || e <= s) return null;
+  const months = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+  return months / 3;
+}
+
+function quartersForGate(g) {
+  const cap = totalCapacityPerQuarter();
+  if (cap <= 0) return Infinity;
+  return gateCumulative()[g].md / cap;
+}
+
+// concrete date when each gate is reached given current capacity (quarters → days from start)
+function dateAtGate(g) {
+  const start = STATE.project.startDate;
+  if (!start) return null;
+  const q = quartersForGate(g);
+  if (!isFinite(q)) return null;
+  const d = new Date(start);
+  d.setDate(d.getDate() + Math.ceil(q * 91.25));   // 91.25 days per quarter
+  return d.toISOString().slice(0, 10);
+}
+
+function quarterLabelOf(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d)) return null;
+  const q = Math.floor(d.getMonth() / 3) + 1;
+  return `${d.getFullYear()}-Q${q}`;
+}
+
+function closestPossibleGate() {
+  const avail = availableQuarters();
+  if (!avail) {
+    // No timeline given — cannot determine reachability
+    return { gate: null, reason: "no-timeline" };
+  }
+  // Find the LATEST gate that fits in the available time
+  const gates = gateCumulative();
+  let latestReachable = null;
+  for (const g of GATES) {
+    const q = quartersForGate(g);
+    if (q <= avail) latestReachable = g;
+  }
+  if (latestReachable == null) {
+    return { gate: null, reason: "insufficient-capacity", available: avail };
+  }
+  // If the latest reachable gate has the same cumulative MD as an earlier gate
+  // (i.e. no new WPs are added between them — common when BEACON catalog has no
+  // post-SOP work products), prefer the earliest equivalent gate. This avoids
+  // misleadingly suggesting a later gate when no extra effort is required.
+  const targetMd = gates[latestReachable].md;
+  let canonical = latestReachable;
+  for (const g of GATES) {
+    if (gates[g].md === targetMd) { canonical = g; break; }
+  }
+  return {
+    gate: canonical,
+    reason: "ok",
+    available: avail,
+    equivalentTo: canonical !== latestReachable ? latestReachable : null
+  };
+}
+
+// top heaviest WPs
+function topHeaviestWps(n = 10) {
+  return CATALOG
+    .map(wp => ({ wp, md: wpEffectiveMd(wp.code) }))
+    .filter(x => x.md > 0)
+    .sort((a, b) => b.md - a.md)
+    .slice(0, n);
+}
+
+// tailoring savings (baseline - effective excluding inactive WPs)
+function tailoringImpact() {
+  let savedFromInactive = 0;
+  let savedFromOverrides = 0;
+  const complexityMult = STATE.project.multipliers[STATE.project.complexity] ?? 1.0;
+  const factor = capacityFactor();
+  const combined = complexityMult * (factor > 0 ? 1 / factor : 1);
+  for (const wp of CATALOG) {
+    const tail = STATE.wps[wp.code];
+    if (!tail) continue;
+    const baselineWp = wpBaselineSum(wp.code);
+    if (!tail.active) {
+      savedFromInactive += baselineWp * combined;
+      continue;
+    }
+    wp.tasks.forEach((t, i) => {
+      const ovr = tail.taskOverrides[i];
+      if (ovr !== undefined && ovr < t.md) {
+        savedFromOverrides += (t.md - ovr) * combined;
+      }
+    });
+  }
+  return { savedFromInactive, savedFromOverrides, total: savedFromInactive + savedFromOverrides };
+}
+
+// --------------- 3. PERSISTENCE ---------------
+let DB_HANDLE = null;       // FileSystemFileHandle when FSA used
+let DB_MODE = "none";       // "fsa" | "localstorage" | "none"
+let DB_FILENAME = "wp-planner-data.json";
+let SAVE_DEBOUNCE = null;
+
+const HAS_FSA = !!window.showSaveFilePicker && !!window.showOpenFilePicker;
+
+const LS_KEY = "beacon-wp-planner-v1";
+const LS_HANDLE_REF_KEY = "beacon-wp-planner-handle-ref"; // marker that a file was previously chosen
+
+async function saveNow() {
+  const json = JSON.stringify(serializeState(), null, 2);
+  if (DB_MODE === "fsa" && DB_HANDLE) {
+    try {
+      const w = await DB_HANDLE.createWritable();
+      await w.write(json); await w.close();
+      flashSaved();
+      return true;
+    } catch (e) {
+      toast("Save failed: " + e.message, "error");
+      return false;
+    }
+  } else if (DB_MODE === "localstorage") {
+    try {
+      localStorage.setItem(LS_KEY, json);
+      flashSaved();
+      return true;
+    } catch (e) {
+      toast("localStorage save failed: " + e.message, "error");
+      return false;
+    }
+  } else {
+    // No DB connected — store in localStorage transiently
+    try {
+      localStorage.setItem(LS_KEY, json);
+    } catch {}
+    return false;
+  }
+}
+
+function debouncedSave() {
+  if (!STATE.autoSave) return;
+  clearTimeout(SAVE_DEBOUNCE);
+  SAVE_DEBOUNCE = setTimeout(saveNow, 1000);
+}
+
+function serializeState() {
+  return {
+    schemaVersion: STATE.schemaVersion,
+    savedAt: new Date().toISOString(),
+    project: STATE.project,
+    capacity: STATE.capacity,
+    wps: STATE.wps,
+    tailoringHistory: STATE.tailoringHistory
+  };
+}
+
+function deserializeState(json) {
+  // be defensive — keep defaults for anything missing
+  const fresh = initialState();
+  if (json.project) Object.assign(fresh.project, json.project);
+  if (json.capacity) Object.assign(fresh.capacity, json.capacity);
+  if (json.wps) {
+    for (const code of Object.keys(json.wps)) {
+      if (fresh.wps[code]) {
+        fresh.wps[code] = {
+          active: json.wps[code].active !== false,
+          taskOverrides: json.wps[code].taskOverrides || {}
+        };
+      }
+    }
+  }
+  if (Array.isArray(json.tailoringHistory)) fresh.tailoringHistory = json.tailoringHistory;
+  if (typeof json.autoSave === "boolean") fresh.autoSave = json.autoSave;
+  return fresh;
+}
+
+async function openFromFile() {
+  if (!HAS_FSA) {
+    toast("File System API not supported — use Import instead", "error");
+    return;
+  }
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+      excludeAcceptAllOption: false
+    });
+    DB_HANDLE = handle;
+    const file = await handle.getFile();
+    const text = await file.text();
+    STATE = deserializeState(JSON.parse(text));
+    DB_MODE = "fsa";
+    DB_FILENAME = handle.name;
+    updateDbStatus();
+    recompute();
+    toast("Loaded " + DB_FILENAME, "success");
+  } catch (e) {
+    if (e.name !== "AbortError") toast("Open failed: " + e.message, "error");
+  }
+}
+
+async function saveToFile() {
+  if (!HAS_FSA) {
+    // Fallback: behave like Export
+    exportJson();
+    return;
+  }
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: STATE.project.code + "-wp-planner.json",
+      types: [{ description: "JSON", accept: { "application/json": [".json"] } }]
+    });
+    DB_HANDLE = handle;
+    DB_MODE = "fsa";
+    DB_FILENAME = handle.name;
+    await saveNow();
+    updateDbStatus();
+    toast("Saving to " + DB_FILENAME, "success");
+  } catch (e) {
+    if (e.name !== "AbortError") toast("Save failed: " + e.message, "error");
+  }
+}
+
+function exportJson() {
+  const json = JSON.stringify(serializeState(), null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = STATE.project.code + "-" + DB_FILENAME;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Exported", "success");
+}
+
+async function importJson() {
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".json,application/json";
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    try {
+      const text = await f.text();
+      STATE = deserializeState(JSON.parse(text));
+      recompute(); renderAll();
+      toast("Imported " + f.name, "success");
+      debouncedSave();
+    } catch (e) {
+      toast("Import failed: " + e.message, "error");
+    }
+  };
+  inp.click();
+}
+
+function updateDbStatus() {
+  const el = document.getElementById("dbStatus");
+  const path = document.getElementById("dbPath");
+  el.classList.remove("connected");
+  if (DB_MODE === "fsa") {
+    el.classList.add("connected");
+    path.textContent = "./" + DB_FILENAME;
+    path.title = "Auto-saving to file: " + DB_FILENAME;
+  } else if (DB_MODE === "localstorage") {
+    el.classList.add("connected");
+    path.textContent = "Auto-saving to browser";
+    path.title = "Saved in browser localStorage. Use Save to file… for a portable JSON.";
+  } else {
+    path.textContent = "No persistence";
+  }
+  document.getElementById("setDbMode").textContent = DB_MODE.toUpperCase();
+  document.getElementById("setDbFile").textContent = DB_FILENAME;
+}
+
+function flashSaved() {
+  toast("Saved", "success");
+}
+
+// --------------- 4. RENDERERS ---------------
+
+function renderAll() {
+  renderTopbar();
+  renderDashboard();
+  renderCatalog();
+  renderGates();
+  renderTailoringLog();
+  renderCapacity();
+  renderSettings();
+  // sidebar counters
+  document.getElementById("navCatalogCount").textContent = CATALOG.length;
+  // count WPs with current deviations (not historical events)
+  let devCount = 0;
+  for (const wp of CATALOG) {
+    const tail = STATE.wps[wp.code];
+    if (!tail) continue;
+    if (!tail.active) { devCount++; continue; }
+    const hasOverride = Object.entries(tail.taskOverrides || {}).some(([i, v]) => v !== undefined && v !== taskBaselineMd(wp.code, parseInt(i,10)));
+    const hasCustom = (tail.customTasks || []).length > 0;
+    if (hasOverride || hasCustom) devCount++;
+  }
+  document.getElementById("navTailoringCount").textContent = devCount;
+}
+
+function renderTopbar() {
+  document.getElementById("topProjCode").textContent = STATE.project.code || "Pxxxx";
+  document.getElementById("topProjName").textContent = STATE.project.name || "Unsaved project";
+  const c = document.getElementById("topComplexity");
+  c.textContent = STATE.project.complexity.toUpperCase();
+  c.className = "complexity " + STATE.project.complexity;
+}
+
+// ------ Dashboard ------
+function renderDashboard() {
+  const totals = totalEffort();
+  const gates = gateCumulative();
+  const closest = closestPossibleGate();
+  const cap = totalCapacityPerQuarter();
+  const factor = capacityFactor();
+  const inflate = factor > 0 ? 1 / factor : 1.0;
+  const impact = tailoringImpact();
+  const activeWps = CATALOG.filter(wp => STATE.wps[wp.code]?.active).length;
+
+  // KPIs
+  const k = document.getElementById("dashKpis");
+  k.innerHTML = `
+    <div class="kpi">
+      <div class="label">Total effort</div>
+      <div class="val">${fmtMd(totals.effective)}<span class="unit">MD</span></div>
+      <div class="delta">baseline ${fmtMd(totals.baseline)} MD · combined ${(STATE.project.multipliers[STATE.project.complexity] * inflate).toFixed(2)}× (cplx ${STATE.project.multipliers[STATE.project.complexity].toFixed(2)} × overhead ${inflate.toFixed(2)})</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Active WPs</div>
+      <div class="val ${activeWps < CATALOG.length ? 'warn' : ''}">${activeWps}<span class="unit">/ ${CATALOG.length}</span></div>
+      <div class="delta">${CATALOG.length - activeWps} tailored out</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Tailoring saved</div>
+      <div class="val ${impact.total > 0 ? 'ok' : ''}">${fmtMd(impact.total)}<span class="unit">MD</span></div>
+      <div class="delta">${impact.savedFromInactive ? fmtMd(impact.savedFromInactive)+' from disabled WPs · ' : ''}${impact.savedFromOverrides ? fmtMd(impact.savedFromOverrides)+' from MD reductions' : ''}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Closest possible GATE</div>
+      <div class="val ${closest.gate == null ? 'crit' : 'ok'}">${closest.gate ? 'GATE ' + closest.gate : '—'}</div>
+      <div class="delta ${closest.reason === 'insufficient-capacity' ? 'crit' : ''}">${
+        closest.reason === 'no-timeline' ? 'set timeline in Settings' :
+        closest.reason === 'insufficient-capacity' ? 'insufficient capacity for any gate' :
+        'cap. ' + fmtMd(cap) + ' MD/Q · avail. ' + closest.available?.toFixed(1) + ' Q'
+      }</div>
+    </div>
+  `;
+
+  // gate roadmap
+  const gr = document.getElementById("dashGates");
+  const closestGate = closest.gate;
+  gr.innerHTML = GATES.map(g => {
+    const c = gates[g];
+    const q = quartersForGate(g);
+    const reachable = (closest.available != null) ? q <= closest.available : true;
+    const isClosest = closestGate === g;
+    let cls = "";
+    if (isClosest) cls = "closest";
+    else if (reachable && c.md > 0) cls = "achievable";
+    else if (closest.available != null && !reachable) cls = "unreachable";
+    const dateAt = dateAtGate(g);
+    let dateLine;
+    if (cap === 0 || !isFinite(q)) dateLine = "no capacity";
+    else if (dateAt) dateLine = `by ${dateAt}<br><span style="opacity:.7">${quarterLabelOf(dateAt)} · ~${q.toFixed(1)}Q</span>`;
+    else dateLine = `~${q.toFixed(1)} quarters`;
+    return `
+      <div class="gate-cell ${cls}">
+        <div class="gate-label">Gate</div>
+        <div class="gate-num">${g}</div>
+        <div class="gate-md">${fmtMd(c.md)}<span class="unit">MD · ${c.wps} WP</span></div>
+        <div class="gate-quarters">${dateLine}</div>
+      </div>
+    `;
+  }).join("");
+
+  // by role
+  const roles = effortByRole();
+  const roleEntries = Object.entries(roles).sort((a, b) => b[1] - a[1]);
+  const maxRole = Math.max(1, ...roleEntries.map(r => r[1]));
+  const dashRoles = document.getElementById("dashRoles");
+  if (roleEntries.length === 0) {
+    dashRoles.innerHTML = '<div class="empty-state">No active tasks</div>';
+  } else {
+    dashRoles.innerHTML = roleEntries.map(([r, md]) => {
+      const capR = STATE.capacity[r] || 0;
+      const over = capR > 0 ? md > capR * (availableQuarters() || 1) : false;
+      const pct = (md / maxRole) * 100;
+      return `
+        <div class="role-bar">
+          <div class="name">${r}</div>
+          <div class="bar ${over ? 'over' : ''}"><div class="fill" style="width:${pct}%"></div></div>
+          <div class="num">${fmtMd(md)} MD</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // top WPs
+  const top = topHeaviestWps(10);
+  const tw = document.getElementById("dashTopWps");
+  tw.innerHTML = `
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Phase</th>
+      <th style="text-align:right">MD</th>
+      <th style="text-align:right">% of total</th>
+    </tr></thead>
+    <tbody>
+      ${top.map((x, i) => `
+        <tr>
+          <td class="num" style="color:var(--ink-mute);font-weight:500;">${i+1}</td>
+          <td class="code">${x.wp.code}</td>
+          <td>${x.wp.name}</td>
+          <td><span class="phase-pill">${PHASES[x.wp.phase]?.label || x.wp.phase}</span></td>
+          <td class="md bold">${fmtMd(x.md)}</td>
+          <td class="num" style="color:var(--ink-mute);">${(x.md / totals.effective * 100).toFixed(1)}%</td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+}
+
+// ------ Catalog table ------
+let CAT_SORT = { field: "code", dir: "asc" };
+let CAT_FILTERS = { search: "", phase: "", status: "all" };
+let CAT_EXPANDED = new Set();
+
+function renderCatalog() {
+  // populate phase select if not yet
+  const phaseSel = document.getElementById("catPhase");
+  if (phaseSel.options.length <= 1) {
+    Object.entries(PHASES).sort((a, b) => a[1].order - b[1].order).forEach(([k, v]) => {
+      const o = document.createElement("option");
+      o.value = k; o.textContent = v.label;
+      phaseSel.appendChild(o);
+    });
+  }
+
+  const rows = CATALOG
+    .map(wp => ({
+      wp,
+      md: wpEffectiveMd(wp.code),
+      taskCount: wp.tasks.length,
+      active: STATE.wps[wp.code]?.active !== false
+    }))
+    .filter(r => {
+      const q = CAT_FILTERS.search.toLowerCase();
+      if (q && !(r.wp.code.toLowerCase().includes(q) || r.wp.name.toLowerCase().includes(q) || (r.wp.isoRef || "").toLowerCase().includes(q))) return false;
+      if (CAT_FILTERS.phase && r.wp.phase !== CAT_FILTERS.phase) return false;
+      if (CAT_FILTERS.status === "active" && !r.active) return false;
+      if (CAT_FILTERS.status === "inactive" && r.active) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const f = CAT_SORT.field;
+      const dir = CAT_SORT.dir === "asc" ? 1 : -1;
+      const av = f === "md" ? a.md : f === "taskCount" ? a.taskCount : f === "phase" ? PHASES[a.wp.phase]?.order : a.wp[f];
+      const bv = f === "md" ? b.md : f === "taskCount" ? b.taskCount : f === "phase" ? PHASES[b.wp.phase]?.order : b.wp[f];
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+
+  document.getElementById("catMeta").textContent =
+    `${rows.length} of ${CATALOG.length} WPs · ${fmtMd(rows.reduce((s, r) => s + r.md, 0))} MD shown`;
+
+  const tbody = document.querySelector("#tblCatalog tbody");
+  tbody.innerHTML = rows.map(({ wp, md, taskCount, active }) => {
+    const expanded = CAT_EXPANDED.has(wp.code);
+    const tail = STATE.wps[wp.code];
+    const baselineSum = wpBaselineSum(wp.code);
+    const mult = STATE.project.multipliers[STATE.project.complexity] ?? 1.0;
+    const expectedNoOverride = baselineSum * mult;
+    const hasOverrides = Object.keys(tail?.taskOverrides || {}).length > 0;
+    const mdChanged = hasOverrides && active;
+
+    return `
+      <tr class="${active ? '' : 'inactive'} ${expanded ? 'expanded' : ''}" data-code="${wp.code}">
+        <td style="text-align:center;cursor:pointer;color:var(--ink-mute);" class="exp-toggle">${expanded ? '▼' : '▸'}</td>
+        <td class="code">${wp.code}</td>
+        <td>${wp.name}</td>
+        <td><span class="phase-pill">${PHASES[wp.phase]?.label || wp.phase}</span></td>
+        <td class="iso">${wp.isoRef || '—'}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);">${shortenRole(wp.ownerRole)}</td>
+        <td><div class="gates-cell">${renderGateReqs(wp.gateReqs)}</div></td>
+        <td class="num">${taskCount}</td>
+        <td class="md ${mdChanged ? 'changed' : ''} ${md === 0 ? 'zero' : ''} ${active ? '' : 'zero'}">${fmtMd(md)}${mdChanged ? '<span class="delta-mark">*</span>' : ''}</td>
+        <td style="text-align:center;">
+          <label class="toggle">
+            <input type="checkbox" ${active ? 'checked' : ''} onclick="onToggleActive(event, '${wp.code}')">
+            <span class="slider"></span>
+          </label>
+        </td>
+      </tr>
+      ${expanded ? `
+        <tr class="detail-row">
+          <td colspan="10">${renderTaskDetail(wp)}</td>
+        </tr>
+      ` : ''}
+    `;
+  }).join("");
+
+  // wire row clicks
+  tbody.querySelectorAll("tr[data-code]").forEach(tr => {
+    tr.querySelector(".exp-toggle").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const code = tr.dataset.code;
+      if (CAT_EXPANDED.has(code)) CAT_EXPANDED.delete(code); else CAT_EXPANDED.add(code);
+      renderCatalog();
+    });
+    tr.addEventListener("click", (e) => {
+      // Don't collapse on clicks inside any toggle (label, slider, checkbox)
+      if (e.target.closest("label.toggle")) return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "LABEL") return;
+      const code = tr.dataset.code;
+      if (CAT_EXPANDED.has(code)) CAT_EXPANDED.delete(code); else CAT_EXPANDED.add(code);
+      renderCatalog();
+    });
+  });
+}
+
+function renderGateReqs(reqs) {
+  const keys = Object.keys(reqs).map(Number).sort((a, b) => a - b);
+  if (keys.length === 0) return '<span style="color:var(--ink-mute);font-size:11px;">—</span>';
+  return keys.map(g => `<span class="gpill ${reqs[g]}"><span class="g">G${g}</span>${reqs[g]}</span>`).join("");
+}
+
+function renderTaskDetail(wp) {
+  const tail = STATE.wps[wp.code];
+  const complexityMult = STATE.project.multipliers[STATE.project.complexity] ?? 1.0;
+  const factor = capacityFactor();
+  const inflate = factor > 0 ? 1 / factor : 1.0;
+  const combined = complexityMult * inflate;
+  const totalEff = wpEffectiveMd(wp.code);
+  const totalBase = wpBaselineSum(wp.code);
+  const allTasks = tasksOf(wp.code);
+  const beaconCount = wp.tasks.length;
+  const customCount = (tail?.customTasks || []).length;
+
+  const depsHtml = wp.deps.length
+    ? `<span><b>Deps:</b> <span class="deps">${wp.deps.join(", ")}</span></span>`
+    : '<span><b>Deps:</b> none</span>';
+  const isoHtml = wp.isoRef ? `<span><b>ISO ref:</b> ${wp.isoRef}</span>` : '';
+  const customHint = customCount > 0
+    ? ` · <span style="color:var(--teal);">+${customCount} custom</span>`
+    : '';
+
+  return `
+    <div class="task-detail">
+      <h5>${wp.code} — Tasks <span class="hint">${beaconCount} BEACON task(s)${customHint} · baseline ${fmtMd(totalBase)} MD · effective ${fmtMd(totalEff)} MD</span></h5>
+      <div class="meta-row">
+        <span><b>Phase:</b> ${PHASES[wp.phase]?.label}</span>
+        <span><b>Owner:</b> ${wp.ownerRole}</span>
+        ${isoHtml}
+        ${depsHtml}
+        <span><b>Multiplier:</b> ${combined.toFixed(2)}× = cplx ${complexityMult.toFixed(2)} (${STATE.project.complexity}) × overhead ${inflate.toFixed(2)}</span>
+      </div>
+
+      <details class="task-types-legend">
+        <summary>Task type legend &nbsp; · &nbsp; <span class="tpill MW" style="margin-left:6px;">MW</span> <span class="tpill VR" style="margin-left:4px;">VR</span> <span class="tpill CR" style="margin-left:4px;">CR</span></summary>
+        <dl>
+          <dt><span class="tpill MW">MW</span></dt>
+          <dd>Main Work — the primary creation/authoring activity for the work product. <em>Drafting, designing, building.</em></dd>
+          <dt><span class="tpill VR">VR</span></dt>
+          <dd>Verification Review — internal peer / independent technical review per ISO/SAE 21434 §6.4.6. <em>Quality check before formal release.</em></dd>
+          <dt><span class="tpill CR">CR</span></dt>
+          <dd>Confirmation Review — formal sign-off / approval review per ISO/SAE 21434 §5.4.2. <em>Independent justification of cybersecurity goals.</em></dd>
+        </dl>
+      </details>
+
+      ${allTasks.length === 0 ? `
+        <div class="empty-state" style="padding:18px;">No tasks defined for this WP in BEACON catalog (tenant-specific or placeholder).</div>
+      ` : `
+        <table class="tasks">
+          <thead><tr>
+            <th class="idx">#</th>
+            <th class="tcol-type" style="width:54px">Type</th>
+            <th>Task</th>
+            <th>Role</th>
+            <th style="text-align:right;width:84px">Baseline</th>
+            <th style="text-align:right;width:108px">Edited</th>
+            <th style="text-align:right;width:80px">Effective</th>
+            <th style="width:64px"></th>
+          </tr></thead>
+          <tbody>
+            ${allTasks.map((t, i) => {
+              const baseline = t.isCustom ? t.md : taskBaselineMd(wp.code, t.key);
+              const current = taskCurrentMd(wp.code, t.key);
+              const eff = taskEffectiveMd(wp.code, t.key);
+              const changed = !t.isCustom && current !== baseline;
+              const idLabel = t.isCustom ? `C${(tail.customTasks.findIndex(c => c.id === t.key))+1}` : (i+1);
+              const onChangeAttr = t.isCustom
+                ? `onchange="onEditCustomMd(event, '${wp.code}', '${t.key}')"`
+                : `onchange="onEditTaskMd(event, '${wp.code}', ${t.key})"`;
+              const actionsHtml = t.isCustom ? `
+                <td class="task-actions" style="display:table-cell;"><div class="task-actions">
+                  <button class="ico-btn" title="Edit" onclick="openTaskEdit('${wp.code}', '${t.key}')">✎</button>
+                  <button class="ico-btn danger" title="Delete" onclick="onDeleteCustomTask('${wp.code}', '${t.key}')">×</button>
+                </div></td>
+              ` : `<td></td>`;
+              return `
+                <tr class="${t.isCustom ? 'custom-task' : ''}">
+                  <td class="idx">${idLabel}</td>
+                  <td class="tcol-type"><span class="tpill ${t.type}" title="${typeFullName(t.type)}">${t.type}</span></td>
+                  <td>${escapeHtml(t.name)}${t.isCustom ? ' <span style="color:var(--teal);font-size:10px;font-family:JetBrains Mono,monospace;letter-spacing:.1em;">CUSTOM</span>' : ''}</td>
+                  <td style="font-size:11.5px;color:var(--ink-soft);">${shortenRole(t.role)}</td>
+                  <td class="md zero">${fmtMd(baseline)}</td>
+                  <td class="md ${changed ? 'changed' : ''}">
+                    <input type="number" class="inline ${changed ? 'changed' : ''}"
+                      step="0.5" min="0" value="${current}"
+                      ${onChangeAttr}
+                      onfocus="this.dataset.before=this.value">
+                  </td>
+                  <td class="md bold">${fmtMd(eff)}</td>
+                  ${actionsHtml}
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      `}
+
+      <button class="add-task-btn" onclick="openTaskAdd('${wp.code}')">+ Add custom task</button>
+    </div>
+  `;
+}
+
+function typeFullName(t) {
+  return t === "MW" ? "Main Work" :
+         t === "VR" ? "Verification Review" :
+         t === "CR" ? "Confirmation Review" : t;
+}
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[ch]));
+}
+
+function shortenRole(r) {
+  if (!r) return "—";
+  return r
+    .replace("Cybersecurity ", "CS ")
+    .replace("Engineer for cybersecurity management", "CS Mgmt Engineer")
+    .replace("Cybersecurity Engineering Management", "CS Eng. Mgmt")
+    .replace("Analyst - ", "")
+    .replace("Architect ", "Arch. ");
+}
+
+// ------ Gates view ------
+function renderGates() {
+  const gates = gateCumulative();
+  const closest = closestPossibleGate();
+  const cap = totalCapacityPerQuarter();
+  const avail = availableQuarters();
+  const factor = capacityFactor();
+  const inflate = factor > 0 ? 1 / factor : 1.0;
+
+  // KPIs
+  const k = document.getElementById("gateKpis");
+  k.innerHTML = `
+    <div class="kpi">
+      <div class="label">Closest possible</div>
+      <div class="val ${closest.gate == null ? 'crit' : 'ok'}">${closest.gate ? 'GATE ' + closest.gate : '—'}</div>
+      <div class="delta">${
+        closest.reason === 'no-timeline' ? 'set timeline' :
+        closest.reason === 'insufficient-capacity' ? 'over capacity' :
+        closest.gate ? 'reached by ' + (dateAtGate(closest.gate) || '—') : ''
+      }</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Capacity / quarter</div>
+      <div class="val">${fmtMd(cap)}<span class="unit">MD</span></div>
+      <div class="delta">overhead inflate ${inflate.toFixed(2)}× applied on effort</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Available quarters</div>
+      <div class="val ${avail == null ? 'warn' : ''}">${avail == null ? '—' : avail.toFixed(1)}<span class="unit">${avail == null ? '' : 'Q'}</span></div>
+      <div class="delta">${avail == null ? 'set start &amp; end date' : STATE.project.startDate + ' → ' + STATE.project.endDate}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Total available effort</div>
+      <div class="val">${avail == null || cap === 0 ? '—' : fmtMd(avail * cap)}<span class="unit">${avail == null || cap === 0 ? '' : 'MD'}</span></div>
+      <div class="delta">cap × duration</div>
+    </div>
+  `;
+
+  // breakdown table
+  const tbody = document.querySelector("#tblGateBreakdown tbody");
+  let prev = 0;
+  tbody.innerHTML = GATES.map(g => {
+    const c = gates[g];
+    const delta = c.md - prev;
+    const q = quartersForGate(g);
+    const reachable = avail != null && q <= avail;
+    const isClosest = closest.gate === g;
+    const isEquivalent = closest.equivalentTo === g;   // a later gate that is equivalent to closest
+    const dateAt = dateAtGate(g);
+    const noNewEffort = prev > 0 && delta === 0;
+    prev = c.md;
+    let statusHtml;
+    if (c.md === 0) statusHtml = '<span style="color:var(--ink-mute);font-style:italic;">no effort touches this gate</span>';
+    else if (avail == null) statusHtml = '<span style="color:var(--ink-mute);font-style:italic;">no timeline</span>';
+    else if (isClosest) statusHtml = '<span style="color:var(--oxblood);font-weight:600;font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:.12em;">★ CLOSEST POSSIBLE</span>';
+    else if (isEquivalent) statusHtml = '<span style="color:var(--ink-mute);font-style:italic;font-size:11px;">equivalent to closest (no new effort)</span>';
+    else if (reachable) statusHtml = '<span style="color:var(--sage);font-weight:600;">reachable</span>';
+    else statusHtml = '<span style="color:var(--oxblood);">over capacity</span>';
+    const rowStyle = isClosest ? 'background:rgba(126,30,27,.06);' :
+                     noNewEffort ? 'opacity:.55;' : '';
+    return `
+      <tr style="${rowStyle}">
+        <td class="code" style="font-size:14px;">GATE ${g}</td>
+        <td class="num">${c.wps}</td>
+        <td class="md bold">${fmtMd(c.md)}</td>
+        <td class="md" style="color:${delta > 0 ? 'var(--oxblood)' : 'var(--ink-mute)'};">${delta > 0 ? '+' + fmtMd(delta) : (noNewEffort ? '— no new WPs' : '0')}</td>
+        <td class="num">${!isFinite(q) || cap === 0 ? 'no cap.' : q.toFixed(2) + ' Q'}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${dateAt || '<span style="color:var(--ink-mute);">—</span>'}</td>
+        <td>${statusHtml}</td>
+      </tr>
+    `;
+  }).join("");
+
+  // closest summary
+  const sum = document.getElementById("gateClosestSummary");
+  if (closest.gate) {
+    const requiredMd = gates[closest.gate].md;
+    const totalAvail = avail ? avail * cap : null;
+    const dateAt = dateAtGate(closest.gate);
+    const equivalentNote = closest.equivalentTo
+      ? ` <span style="color:var(--ink-mute);font-style:italic;">(also equivalent to GATE ${closest.equivalentTo} — same cumulative effort, no extra WPs after this)</span>`
+      : '';
+    sum.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="padding:14px 18px; background:var(--paper); border-left:3px solid var(--sage);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:6px;">Result</div>
+          <div style="font-family:'Fraunces',serif; font-size:32px; font-weight:600; line-height:1; color:var(--sage);">GATE ${closest.gate}</div>
+          <div style="font-family:'Spectral',serif; font-style:italic; font-size:13px; color:var(--ink-soft); margin-top:8px;">
+            ${fmtMd(requiredMd)} MD cumulative effort, requiring ${quartersForGate(closest.gate).toFixed(1)} quarters
+            ${dateAt ? `· reached by <b>${dateAt}</b> (${quarterLabelOf(dateAt)})` : ''}
+            ${equivalentNote}
+          </div>
+        </div>
+        <div style="padding:14px 18px; background:var(--paper); border-left:3px solid var(--ink);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:6px;">Headroom</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:18px; line-height:1.6;">
+            ${totalAvail ? fmtMd(totalAvail - requiredMd) + ' MD spare' : '—'}<br>
+            ${avail ? (avail - quartersForGate(closest.gate)).toFixed(1) + ' Q spare' : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    sum.innerHTML = `
+      <div style="padding:14px 18px; background:var(--paper); border-left:3px solid var(--oxblood); font-family:'Spectral',serif; font-size:14px; color:var(--ink-soft);">
+        ${closest.reason === "no-timeline"
+          ? "Set a project end date in Settings to compute the closest possible gate."
+          : "Insufficient capacity: even GATE 10 is not reachable within the available timeline. Add team capacity or extend the timeline."}
+      </div>
+    `;
+  }
+}
+
+// ------ Tailoring log ------
+function renderTailoringLog() {
+  const list = document.getElementById("tailoringList");
+
+  // Build a per-WP summary of CURRENT deviations (not event history)
+  const summaries = [];
+  for (const wp of CATALOG) {
+    const tail = STATE.wps[wp.code];
+    if (!tail) continue;
+    const items = [];
+    if (!tail.active) {
+      items.push({
+        kind: "inactive",
+        text: `WP marked inactive — saves ${fmtMd(wpBaselineSum(wp.code))} MD baseline`
+      });
+    }
+    // Per-task overrides (BEACON tasks deviated from baseline)
+    for (const idx in (tail.taskOverrides || {})) {
+      const ovr = tail.taskOverrides[idx];
+      const baseline = taskBaselineMd(wp.code, parseInt(idx, 10));
+      if (ovr === undefined || ovr === baseline) continue;
+      const taskNm = taskName(wp.code, parseInt(idx, 10));
+      const delta = ovr - baseline;
+      items.push({
+        kind: ovr < baseline ? "reduced" : "increased",
+        text: `Task #${parseInt(idx,10)+1} "${taskNm}": baseline ${fmtMd(baseline)} → current ${fmtMd(ovr)} MD (${delta > 0 ? '+' : ''}${fmtMd(delta)})`
+      });
+    }
+    // Custom tasks
+    for (const c of (tail.customTasks || [])) {
+      items.push({
+        kind: "custom",
+        text: `Custom task "${escHtml(c.name)}" (${c.type}, ${fmtMd(c.md)} MD, ${shortenRole(c.role)})`
+      });
+    }
+    if (items.length > 0) {
+      // Find the most recent history entry for this WP for context
+      const lastEntry = [...STATE.tailoringHistory].reverse().find(h => h.wpCode === wp.code);
+      const wpHistory = STATE.tailoringHistory.filter(h => h.wpCode === wp.code);
+      summaries.push({ wp, items, lastEntry, history: wpHistory });
+    }
+  }
+
+  if (summaries.length === 0) {
+    list.innerHTML = '<div class="empty-state">No active tailoring decisions. Toggle a WP off, override a task MD, or add a custom task to create an entry here.</div>';
+    return;
+  }
+
+  list.innerHTML = summaries.map((s, idx) => {
+    const itemHtml = s.items.map(it => `
+      <div class="tl-item tl-item-${it.kind}">${escHtml(it.text)}</div>
+    `).join("");
+    const lastTs = s.lastEntry ? new Date(s.lastEntry.ts).toLocaleString() : '—';
+    const lastJust = s.lastEntry?.justification && !s.lastEntry.justification.startsWith("(")
+      ? `<div class="tl-just"><span class="tl-just-label">Last justification:</span> ${escHtml(s.lastEntry.justification)}</div>`
+      : '';
+    const historyHtml = s.history.length > 1 ? `
+      <details class="tl-history">
+        <summary>Show full history (${s.history.length} change${s.history.length === 1 ? '' : 's'})</summary>
+        <div class="tl-history-list">
+          ${s.history.slice().reverse().map(h => `
+            <div class="tl-history-entry">
+              <div class="tl-history-meta">
+                <span class="tl-ts">${new Date(h.ts).toLocaleString()}</span>
+                <span class="tl-change">${escHtml(h.change)}</span>
+              </div>
+              <div class="tl-summary">${escHtml(h.summary)}</div>
+              ${h.justification ? `<div class="tl-just-line">${escHtml(h.justification)}</div>` : ''}
+            </div>
+          `).join("")}
+        </div>
+      </details>
+    ` : '';
+    return `
+      <div class="tailoring-log">
+        <div class="meta">
+          <span class="wp">${s.wp.code}</span>
+          <span style="color:var(--ink-soft);">${escHtml(s.wp.name)}</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--ink-mute);">last change: ${lastTs}</span>
+        </div>
+        <div class="tl-items">${itemHtml}</div>
+        ${lastJust}
+        ${historyHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+// ------ Capacity ------
+function renderCapacity() {
+  const list = document.getElementById("capacityList");
+  list.innerHTML = ROLES.map(r => `
+    <div class="role-bar" style="grid-template-columns: 280px 1fr 120px;">
+      <div class="name">${r}</div>
+      <div></div>
+      <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+        <input type="number" class="inline" min="0" step="5" value="${STATE.capacity[r] || 0}"
+          style="width:70px;text-align:right;"
+          onchange="onEditCapacity(event, '${r}')">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-mute);letter-spacing:.04em;">MD/Q</span>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("capacityTotal").textContent = fmtMd(totalCapacityPerQuarter()) + " MD/Q";
+}
+
+// ------ Settings ------
+function renderSettings() {
+  document.getElementById("setProjCode").value = STATE.project.code || "";
+  document.getElementById("setProjName").value = STATE.project.name || "";
+  document.getElementById("setComplexity").value = STATE.project.complexity;
+  document.getElementById("setStartDate").value = STATE.project.startDate || "";
+  document.getElementById("setEndDate").value = STATE.project.endDate || "";
+  document.getElementById("setMulSimple").value = STATE.project.multipliers.Simple;
+  document.getElementById("setMulNormal").value = STATE.project.multipliers.Normal;
+  document.getElementById("setMulComplex").value = STATE.project.multipliers.Complex;
+  document.getElementById("setEfficiency").value = Math.round((STATE.project.efficiency ?? 0.80) * 100);
+  document.getElementById("setMeetingLoad").value = Math.round((STATE.project.meetingLoad ?? 0.10) * 100);
+  document.getElementById("setBufferTime").value = Math.round((STATE.project.bufferTime ?? 0.15) * 100);
+  document.getElementById("setAutoSave").checked = STATE.autoSave;
+  document.getElementById("setDbMode").textContent = DB_MODE.toUpperCase();
+  document.getElementById("setDbFile").textContent = DB_FILENAME;
+}
+
+// --------------- 5. EVENT HANDLERS ---------------
+
+function recompute() {
+  // No-op: derived values are computed on demand. Recompute simply re-renders.
+  renderAll();
+}
+
+function onToggleActive(e, code) {
+  const checkbox = e.target;
+  const newActive = checkbox.checked;
+  const wasActive = STATE.wps[code]?.active;
+  if (newActive === wasActive) return;
+  if (!newActive) {
+    // tailoring out — needs justification
+    const wp = CAT_BY_CODE[code];
+    const md = wpEffectiveMd(code);
+    e.preventDefault();
+    checkbox.checked = true; // revert until confirmed
+    openJustifyModal({
+      title: "Tailoring out " + code,
+      summary: `Set ${code} (${wp.name}) to INACTIVE.\nThis removes ${fmtMd(md)} MD from the plan.`,
+      change: "wp_deactivated",
+      onConfirm: (justification) => {
+        STATE.wps[code].active = false;
+        recordTailoring(code, "wp_deactivated", `Deactivated ${code} (${wp.name}) — saved ${fmtMd(md)} MD`, justification);
+        recompute(); debouncedSave();
+      },
+      onCancel: () => { checkbox.checked = true; }
+    });
+  } else {
+    // re-activating — no justification needed (just record neutral activation)
+    STATE.wps[code].active = true;
+    const wp = CAT_BY_CODE[code];
+    recordTailoring(code, "wp_reactivated", `Reactivated ${code} (${wp.name})`, "(automatic re-activation, no justification required)");
+    recompute(); debouncedSave();
+  }
+}
+
+function onEditTaskMd(e, code, idx) {
+  const inp = e.target;
+  const newVal = parseFloat(inp.value);
+  const before = parseFloat(inp.dataset.before);
+  const baseline = taskBaselineMd(code, idx);
+  if (isNaN(newVal) || newVal < 0) {
+    inp.value = before;
+    return;
+  }
+  const wp = CAT_BY_CODE[code];
+  const t = wp.tasks[idx];
+  const previousVal = STATE.wps[code].taskOverrides[idx] !== undefined
+    ? STATE.wps[code].taskOverrides[idx]
+    : baseline;
+
+  // Justification ONLY when reducing further below baseline (true scope cut).
+  // Reductions toward baseline (from a previous over-spec) are silent.
+  if (newVal < baseline && newVal < previousVal) {
+    inp.value = before;
+    openJustifyModal({
+      title: "Reducing task effort below baseline",
+      summary:
+        `${code} · Task ${idx+1}: "${t.name}"\n` +
+        `Baseline: ${fmtMd(baseline)} MD · Current: ${fmtMd(previousVal)} MD\n` +
+        `New: ${fmtMd(newVal)} MD · Reduction: ${fmtMd(previousVal - newVal)} MD vs current, ${fmtMd(baseline - newVal)} MD vs baseline`,
+      change: "task_md_reduced",
+      onConfirm: (justification) => {
+        if (!STATE.wps[code].taskOverrides) STATE.wps[code].taskOverrides = {};
+        STATE.wps[code].taskOverrides[idx] = newVal;
+        recordTailoring(code, "task_md_reduced",
+          `Task "${t.name}" reduced ${fmtMd(previousVal)} → ${fmtMd(newVal)} MD (${fmtMd(baseline - newVal)} MD below baseline)`,
+          justification);
+        recompute(); debouncedSave();
+      },
+      onCancel: () => { recompute(); }
+    });
+    return;
+  }
+
+  // All other cases — log automatically without modal
+  if (newVal === baseline) {
+    if (STATE.wps[code].taskOverrides && STATE.wps[code].taskOverrides[idx] !== undefined) {
+      delete STATE.wps[code].taskOverrides[idx];
+      if (previousVal !== baseline) {
+        recordTailoring(code, "task_md_restored",
+          `Task "${t.name}" restored to baseline ${fmtMd(baseline)} MD (was ${fmtMd(previousVal)})`,
+          "(MD restored to baseline — no justification required)");
+      }
+    }
+  } else {
+    if (!STATE.wps[code].taskOverrides) STATE.wps[code].taskOverrides = {};
+    STATE.wps[code].taskOverrides[idx] = newVal;
+    if (newVal !== previousVal) {
+      let label, justNote;
+      if (newVal < baseline) {
+        // partial restoration of a previous reduction (newVal still below baseline but improving)
+        label = `partially restored ${fmtMd(previousVal)} → ${fmtMd(newVal)} MD (still ${fmtMd(baseline - newVal)} below baseline)`;
+        justNote = "(partial restoration — no justification required)";
+      } else if (newVal > previousVal) {
+        const direction = previousVal === baseline ? "increased above baseline" : "increased";
+        label = `${direction} ${fmtMd(previousVal)} → ${fmtMd(newVal)} MD (+${fmtMd(newVal - previousVal)} MD)`;
+        justNote = "(MD increase — no justification required)";
+      } else {
+        // newVal < previousVal but newVal >= baseline (reducing an over-spec back toward baseline)
+        label = `reduced toward baseline ${fmtMd(previousVal)} → ${fmtMd(newVal)} MD`;
+        justNote = "(reducing toward baseline — no justification required)";
+      }
+      recordTailoring(code, "task_md_changed", `Task "${t.name}" ${label}`, justNote);
+    }
+  }
+  recompute(); debouncedSave();
+}
+
+function onEditCapacity(e, role) {
+  const v = parseFloat(e.target.value);
+  if (isNaN(v) || v < 0) { e.target.value = STATE.capacity[role] || 0; return; }
+  STATE.capacity[role] = v;
+  recompute(); debouncedSave();
+}
+
+// ===================== CUSTOM TASK CRUD =====================
+function onEditCustomMd(e, code, customId) {
+  const inp = e.target;
+  const newVal = parseFloat(inp.value);
+  const before = parseFloat(inp.dataset.before);
+  if (isNaN(newVal) || newVal < 0) { inp.value = before; return; }
+  const c = getCustomTask(code, customId);
+  if (!c) return;
+  const oldVal = c.md;
+  if (oldVal === newVal) return;
+  c.md = newVal;
+  recordTailoring(code, "custom_task_md_changed",
+    `Custom task "${c.name}" MD ${fmtMd(oldVal)} → ${fmtMd(newVal)} (Δ${newVal > oldVal ? '+' : ''}${fmtMd(newVal - oldVal)})`,
+    "(custom task — no justification required)");
+  recompute(); debouncedSave();
+}
+
+function onDeleteCustomTask(code, customId) {
+  const c = getCustomTask(code, customId);
+  if (!c) return;
+  if (!confirm(`Delete custom task "${c.name}" (${fmtMd(c.md)} MD)?`)) return;
+  const tail = STATE.wps[code];
+  tail.customTasks = tail.customTasks.filter(t => t.id !== customId);
+  recordTailoring(code, "custom_task_deleted",
+    `Custom task "${c.name}" deleted (was ${fmtMd(c.md)} MD, ${c.type})`,
+    "(user-removed custom task — no justification required)");
+  recompute(); debouncedSave();
+}
+
+let TM_MODE = "add";   // "add" | "edit"
+let TM_CONTEXT = null; // { code, customId? }
+
+function openTaskAdd(code) {
+  TM_MODE = "add";
+  TM_CONTEXT = { code };
+  document.getElementById("tmLabel").textContent = "Task · Add custom";
+  document.getElementById("tmTitle").textContent = "Add custom task to " + code;
+  document.getElementById("tmHint").innerHTML =
+    "Custom tasks are added on top of the BEACON catalog and persist in your project file. " +
+    "They contribute to the WP&rsquo;s effective MD but are not part of the BEACON baseline.";
+  document.getElementById("tmName").value = "";
+  document.getElementById("tmType").value = "MW";
+  document.getElementById("tmMd").value = "1";
+  populateRoleSelect();
+  document.getElementById("tmRole").value = CAT_BY_CODE[code]?.ownerRole || "";
+  document.getElementById("tmErr").textContent = "";
+  document.getElementById("taskModal").classList.add("open");
+  setTimeout(() => document.getElementById("tmName").focus(), 50);
+}
+
+function openTaskEdit(code, customId) {
+  const c = getCustomTask(code, customId);
+  if (!c) return;
+  TM_MODE = "edit";
+  TM_CONTEXT = { code, customId };
+  document.getElementById("tmLabel").textContent = "Task · Edit custom";
+  document.getElementById("tmTitle").textContent = "Edit task in " + code;
+  document.getElementById("tmHint").innerHTML =
+    "Editing a custom task. Changes are logged in the Tailoring Log automatically.";
+  document.getElementById("tmName").value = c.name;
+  document.getElementById("tmType").value = c.type;
+  document.getElementById("tmMd").value = c.md;
+  populateRoleSelect();
+  document.getElementById("tmRole").value = c.role;
+  document.getElementById("tmErr").textContent = "";
+  document.getElementById("taskModal").classList.add("open");
+  setTimeout(() => document.getElementById("tmName").focus(), 50);
+}
+
+function populateRoleSelect() {
+  const sel = document.getElementById("tmRole");
+  sel.innerHTML = ROLES.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join("");
+}
+
+function closeTaskModal() {
+  document.getElementById("taskModal").classList.remove("open");
+  TM_CONTEXT = null;
+}
+
+function confirmTaskModal() {
+  const name = document.getElementById("tmName").value.trim();
+  const type = document.getElementById("tmType").value;
+  const md = parseFloat(document.getElementById("tmMd").value);
+  const role = document.getElementById("tmRole").value;
+  const err = document.getElementById("tmErr");
+  if (!name) { err.textContent = "Task name is required."; return; }
+  if (isNaN(md) || md < 0) { err.textContent = "MD must be a number ≥ 0."; return; }
+  if (!["MW","VR","CR"].includes(type)) { err.textContent = "Invalid type."; return; }
+
+  const code = TM_CONTEXT.code;
+  const tail = STATE.wps[code];
+  if (!tail.customTasks) tail.customTasks = [];
+
+  if (TM_MODE === "add") {
+    const id = "c" + Date.now().toString(36) + Math.floor(Math.random()*1000).toString(36);
+    tail.customTasks.push({ id, name, type, role, md });
+    recordTailoring(code, "custom_task_added",
+      `Custom task added: "${name}" (${type}, ${fmtMd(md)} MD, ${role})`,
+      "(user-added custom task — no justification required)");
+  } else {
+    const c = getCustomTask(code, TM_CONTEXT.customId);
+    if (!c) { closeTaskModal(); return; }
+    const oldDesc = `"${c.name}" ${c.type} ${fmtMd(c.md)}MD ${c.role}`;
+    c.name = name; c.type = type; c.md = md; c.role = role;
+    recordTailoring(code, "custom_task_edited",
+      `Custom task edited: ${oldDesc} → "${name}" ${type} ${fmtMd(md)}MD ${role}`,
+      "(custom task edit — no justification required)");
+  }
+  closeTaskModal();
+  recompute(); debouncedSave();
+}
+
+// ===================== END CUSTOM TASK CRUD =====================
+
+function recordTailoring(wpCode, change, summary, justification) {
+  STATE.tailoringHistory.push({
+    ts: new Date().toISOString(),
+    wpCode,
+    change,
+    summary,
+    justification,
+    user: navigator.userAgent.split(" ").slice(-1)[0] || "unknown"
+  });
+}
+
+// ------ Justification modal ------
+let JM_CALLBACKS = {};
+function openJustifyModal({ title, summary, change, onConfirm, onCancel }) {
+  document.getElementById("jmTitle").textContent = title;
+  document.getElementById("jmSummary").textContent = summary;
+  document.getElementById("jmText").value = "";
+  document.getElementById("jmErr").textContent = "";
+  JM_CALLBACKS = { onConfirm, onCancel };
+  document.getElementById("justifyModal").classList.add("open");
+  setTimeout(() => document.getElementById("jmText").focus(), 50);
+}
+function closeJustifyModal() {
+  document.getElementById("justifyModal").classList.remove("open");
+}
+document.getElementById("jmCancel").addEventListener("click", () => {
+  if (JM_CALLBACKS.onCancel) JM_CALLBACKS.onCancel();
+  closeJustifyModal();
+});
+document.getElementById("jmConfirm").addEventListener("click", () => {
+  const text = document.getElementById("jmText").value.trim();
+  if (text.length < 20) {
+    document.getElementById("jmErr").textContent = "Justification must be at least 20 characters.";
+    return;
+  }
+  if (JM_CALLBACKS.onConfirm) JM_CALLBACKS.onConfirm(text);
+  closeJustifyModal();
+});
+document.getElementById("justifyModal").addEventListener("click", (e) => {
+  if (e.target.id === "justifyModal") {
+    if (JM_CALLBACKS.onCancel) JM_CALLBACKS.onCancel();
+    closeJustifyModal();
+  }
+});
+// ESC closes the modal as cancel
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.getElementById("justifyModal").classList.contains("open")) {
+    if (JM_CALLBACKS.onCancel) JM_CALLBACKS.onCancel();
+    closeJustifyModal();
+  }
+  if (e.key === "Escape" && document.getElementById("taskModal").classList.contains("open")) {
+    closeTaskModal();
+  }
+});
+
+// Task add/edit modal
+document.getElementById("tmCancel").addEventListener("click", closeTaskModal);
+document.getElementById("tmConfirm").addEventListener("click", confirmTaskModal);
+document.getElementById("taskModal").addEventListener("click", (e) => {
+  if (e.target.id === "taskModal") closeTaskModal();
+});
+document.getElementById("tmName").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); confirmTaskModal(); }
+});
+
+// ------ Sidebar nav ------
+document.querySelectorAll(".sidebar nav a, [data-view]").forEach(a => {
+  a.addEventListener("click", (e) => {
+    // Always prevent default — anchors without href can still trigger
+    // browser security warnings on file:// origin in some Chromium versions.
+    e.preventDefault();
+    const v = a.dataset.view; if (!v) return;
+    document.querySelectorAll(".sidebar nav a").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".sidebar nav a[data-view='" + v + "']").forEach(x => x.classList.add("active"));
+    document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
+    document.getElementById("view-" + v)?.classList.add("active");
+    document.querySelector(".main").scrollTop = 0;
+  });
+});
+
+// ------ Top bar buttons ------
+document.getElementById("btnOpenFile").addEventListener("click", openFromFile);
+document.getElementById("btnSaveFile").addEventListener("click", saveToFile);
+document.getElementById("btnExport").addEventListener("click", exportJson);
+document.getElementById("btnImport").addEventListener("click", importJson);
+document.getElementById("btnRecompute").addEventListener("click", recompute);
+
+// ------ Settings inputs ------
+function bindSettingInput(id, fn) {
+  document.getElementById(id).addEventListener("change", (e) => {
+    fn(e.target.value);
+    recompute(); debouncedSave();
+  });
+}
+bindSettingInput("setProjCode", v => STATE.project.code = v);
+bindSettingInput("setProjName", v => STATE.project.name = v);
+bindSettingInput("setComplexity", v => STATE.project.complexity = v);
+bindSettingInput("setStartDate", v => STATE.project.startDate = v);
+bindSettingInput("setEndDate", v => STATE.project.endDate = v);
+function setMulSafe(key, v, fallback) {
+  const n = parseFloat(v);
+  STATE.project.multipliers[key] = (isNaN(n) || n < 0) ? fallback : n;
+}
+bindSettingInput("setMulSimple",  v => setMulSafe('Simple',  v, 0.75));
+bindSettingInput("setMulNormal",  v => setMulSafe('Normal',  v, 1.0));
+bindSettingInput("setMulComplex", v => setMulSafe('Complex', v, 1.25));
+
+function setPercentSafe(key, v, fallback, allowZero) {
+  const n = parseFloat(v);
+  if (isNaN(n)) { STATE.project[key] = fallback; return; }
+  // Inputs are in percent (0-100), state stores 0-1
+  let frac = n / 100;
+  if (frac < 0) frac = 0;
+  if (key === "efficiency") {
+    if (frac <= 0) frac = fallback; // efficiency must be >0 (else division by zero)
+    if (frac > 5) frac = 5;          // hard cap to avoid silly values
+  } else {
+    if (frac >= 1) frac = 0.99;      // meeting/buffer can't be >= 100% (would zero capacity)
+  }
+  STATE.project[key] = frac;
+}
+bindSettingInput("setEfficiency",  v => setPercentSafe('efficiency',  v, 0.80, false));
+bindSettingInput("setMeetingLoad", v => setPercentSafe('meetingLoad', v, 0.10, true));
+bindSettingInput("setBufferTime",  v => setPercentSafe('bufferTime',  v, 0.15, true));
+document.getElementById("setAutoSave").addEventListener("change", e => {
+  STATE.autoSave = e.target.checked;
+  if (STATE.autoSave) debouncedSave();
+});
+
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (!confirm("Reset everything to BEACON defaults? Tailoring history, project info, and capacity will all be lost.")) return;
+  STATE = initialState();
+  recompute(); debouncedSave();
+  toast("Reset to defaults", "success");
+});
+
+// ------ Catalog filters ------
+document.getElementById("catSearch").addEventListener("input", (e) => { CAT_FILTERS.search = e.target.value; renderCatalog(); });
+document.getElementById("catPhase").addEventListener("change", (e) => { CAT_FILTERS.phase = e.target.value; renderCatalog(); });
+document.getElementById("catStatus").addEventListener("change", (e) => { CAT_FILTERS.status = e.target.value; renderCatalog(); });
+document.querySelectorAll("#tblCatalog th.sortable").forEach(th => {
+  th.addEventListener("click", () => {
+    const f = th.dataset.sort;
+    if (CAT_SORT.field === f) CAT_SORT.dir = CAT_SORT.dir === "asc" ? "desc" : "asc";
+    else { CAT_SORT.field = f; CAT_SORT.dir = "asc"; }
+    document.querySelectorAll("#tblCatalog th").forEach(x => x.classList.remove("sorted"));
+    th.classList.add("sorted");
+    renderCatalog();
+  });
+});
+
+document.getElementById("btnAddWp").addEventListener("click", () => {
+  alert("Custom WP creation will be added in a follow-up. For now, the BEACON catalog is fixed; you can tailor WPs out or adjust task MDs.");
+});
+
+// --------------- 6. UTILS ---------------
+
+function fmtMd(v) {
+  if (v == null || isNaN(v)) return "—";
+  if (v === 0) return "0";
+  if (Number.isInteger(v)) return v.toString();
+  return v.toFixed(1);
+}
+
+function escHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+let TOAST_T = null;
+function toast(msg, kind = "") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast show " + kind;
+  clearTimeout(TOAST_T);
+  TOAST_T = setTimeout(() => el.classList.remove("show"), 2400);
+}
+
+// --------------- 7. BOOT ---------------
+
+async function boot() {
+  // Always init in localStorage mode so persistence "just works" from the start.
+  DB_MODE = "localstorage";
+  DB_FILENAME = "browser localStorage";
+  const lsExisting = localStorage.getItem(LS_KEY);
+  if (lsExisting) {
+    try {
+      STATE = deserializeState(JSON.parse(lsExisting));
+    } catch (e) {
+      console.warn("LS load failed", e);
+    }
+  } else {
+    // First launch — write the initial state so the slot is created.
+    try { localStorage.setItem(LS_KEY, JSON.stringify(serializeState())); }
+    catch (e) { console.warn("LS init save failed", e); }
+  }
+  updateDbStatus();
+  recompute();
+}
+
+boot();
+
+</script>
+
+</body>
+</html>

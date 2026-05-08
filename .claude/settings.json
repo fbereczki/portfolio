@@ -1,0 +1,58 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "/mnt/d/DEV/portfolio/.claude/beam-capture.sh",
+            "timeout": 5,
+            "type": "command"
+          },
+          {
+            "command": "/mnt/d/DEV/portfolio/.claude/nsm-hooks.sh post_tool",
+            "timeout": 30,
+            "type": "command"
+          },
+          {
+            "command": "/mnt/d/DEV/portfolio/.claude/nexus-hook.sh capture",
+            "timeout": 30,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit|NotebookEdit|Bash|Read|Glob|Grep|Agent|SendMessage|Skill|WebSearch|WebFetch|mcp__.*"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/mnt/d/DEV/portfolio/.claude/beam-enforce.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "/mnt/d/DEV/portfolio/.claude/nsm-hooks.sh pre_tool",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "/mnt/d/DEV/portfolio/.claude/nexus-hook.sh validate",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "/mnt/d/DEV/portfolio/.claude/nsm-hooks.sh session_start",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}

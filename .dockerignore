@@ -1,0 +1,17 @@
+node_modules
+.git
+.github
+.vscode
+.idea
+src
+public/magus-app/build/temp
+public/magus-app/native_assets
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+README.md
+DEPLOY.md
+deploy/DEPLOY.md
+.claude

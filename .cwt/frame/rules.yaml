@@ -1,0 +1,8 @@
+# CodeWitness FRAME rule catalog — seed.
+# Replace with your project's own catalog once you have one.
+version: 1
+rules:
+  - id: SEED-001
+    name: placeholder
+    description: seeded at onboard time; operators replace with real rules
+    severity: info

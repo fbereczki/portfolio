@@ -1,0 +1,8 @@
+# CodeWitness local files (never commit)
+active-task
+active-prism-session
+cache/
+credentials.json
+env
+pending-events.ndjson
+onboard-heartbeat.md

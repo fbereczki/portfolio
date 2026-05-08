@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visual Editor Test</title>
+    <script>
+        // Test drag & drop
+        window.addEventListener('load', function() {
+            console.log('=== VISUAL EDITOR DEBUG ===');
+            console.log('Page loaded');
+
+            // Check if React Flow is loaded
+            setTimeout(() => {
+                const reactFlowElement = document.querySelector('.react-flow');
+                console.log('ReactFlow element:', reactFlowElement);
+
+                const nodes = document.querySelectorAll('.react-flow__node');
+                console.log('Number of nodes:', nodes.length);
+
+                // Check node palette
+                const palette = document.querySelector('[draggable="true"]');
+                console.log('Draggable palette items:', palette);
+            }, 2000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Redirect to Visual Editor</h1>
+    <script>
+        window.location.href = '/visual-editor-old';
+    </script>
+</body>
+</html>

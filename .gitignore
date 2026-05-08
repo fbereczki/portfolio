@@ -1,0 +1,13 @@
+node_modules
+dist
+.vite
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local
+.claude/nexus-hook.sh.bak.*
+.claude/beam-capture.sh.bak.*
+.claude/beam-enforce.sh.bak.*
+.claude/nsm-hooks.sh.bak.*
+public/magus-app/build/

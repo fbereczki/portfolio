@@ -1,0 +1,226 @@
+You are starting a PRISM planning session. The user wants to plan a new feature using the PRISM methodology (Plan, Review, Instruct, Scrutinize, Measure).
+
+The user's input: $ARGUMENTS
+
+**FILESYSTEM ANCHOR (PROC-008).** All file writes by you and any
+reviewer/orchestrator agents you dispatch MUST stay under the active
+project root (`pwd`). Do NOT create sibling directories under
+`/mnt/d/DEV/` or anywhere outside the cwd. The pre-tool gate enforces
+this and will deny Write/Edit calls that escape the trusted root.
+
+**PROJECT-MODE ENDPOINTS.** Every PRISM API call below targets the
+project-token-authenticated route family `/api/v1/projects/me/prism/...`
+which auto-stamps `project_id` + `tenant_id` from the bearer. The
+slash command does NOT need a user JWT — the project's CW_API_TOKEN
+from `.nexus/credentials.json` (or `.nexus/env`) is sufficient.
+
+## Project credentials (run once)
+
+```bash
+# Resolve hub URL + api token from project's .nexus/ first, fall back to user-level if absent
+if [ -f .nexus/credentials.json ] && command -v jq >/dev/null 2>&1; then
+  CW_TOKEN=$(jq -r '.api_token' .nexus/credentials.json)
+  CW_HUB=$(jq -r '.hub_url'  .nexus/credentials.json)
+elif [ -f .nexus/env ]; then
+  . ./.nexus/env
+  CW_TOKEN="${CW_API_TOKEN:-}"
+  CW_HUB="${CODEWITNESS_HUB_URL:-http://localhost:9142}"
+else
+  CW_TOKEN=$(cat ~/.nexus/api-token 2>/dev/null)
+  CW_HUB="http://localhost:9142"
+fi
+```
+
+All curl commands below assume `$CW_TOKEN` + `$CW_HUB` are set.
+
+## What to do
+
+1. **Create the PRISM session** by running:
+```bash
+curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+  -d '{"name":"$ARGUMENTS","description":"PRISM planning session"}' \
+  "$CW_HUB/api/v1/projects/me/prism/session"
+```
+
+Save the returned `id` — you'll need it for all subsequent calls.
+
+2. **Set active PRISM session** so all events are tagged:
+```bash
+echo "SESSION_ID" > .nexus/active-prism-session
+```
+
+3. **PLAN phase** — Ask the user these questions one by one (naturally, in conversation):
+   - What is the high-level architecture? (API, data model, services)
+   - What is in scope / out of scope?
+   - Testing strategy? Security requirements? Performance targets?
+   - External dependencies? APIs, libraries?
+   - Known risks or constraints?
+
+   After the user answers, submit the plan:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"answers":{...user answers...}}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/plan"
+   ```
+
+4. **REFINE phase — Dispatch 3 parallel reviewer agents NOW.**
+
+   **MANDATORY DISPATCH (PROC-002).** Use the Agent tool to fan out THREE
+   reviewers in parallel — security, quality, compliance. Self-review is
+   NOT review. The hub server REJECTS the `/refine` advance with HTTP 422
+   if any of the three `reviewer_role` values is missing from the
+   `prism_review_findings` table for the current iteration.
+
+   ```
+   Agent(subagent_type="cybersecurity-pentester",
+         description="Security review of plan",
+         prompt="Review this PRISM plan for: input validation, authn/authz,
+                 crypto choices, secret handling, injection vectors, supply-chain
+                 risk, audit-chain integrity. For every issue, POST a finding to
+                 $CW_HUB/api/v1/projects/me/prism/session/<SESSION_ID>/review with
+                 reviewer_role='security', author_type='ai',
+                 author_id='ai:cybersecurity-pentester', and the appropriate
+                 severity (red/amber/yellow/green) + category.")
+
+   Agent(subagent_type="senior-developer",
+         description="Quality review of plan",
+         prompt="Review this PRISM plan for: architecture clarity, testability,
+                 module boundaries, error handling, observability, dead code,
+                 SWQ-006/007/008/010 compliance. POST findings to
+                 $CW_HUB/api/v1/projects/me/prism/session/<SESSION_ID>/review with
+                 reviewer_role='quality', author_type='ai',
+                 author_id='ai:senior-developer'.")
+
+   Agent(subagent_type="business-analyst",
+         description="Compliance review of plan",
+         prompt="Review this PRISM plan for: SOC 2, EU AI Act, ISO 42001,
+                 GDPR cascade, data-retention, audit trail completeness,
+                 acceptance-gate evidence. POST findings to
+                 $CW_HUB/api/v1/projects/me/prism/session/<SESSION_ID>/review with
+                 reviewer_role='compliance', author_type='ai',
+                 author_id='ai:business-analyst'.")
+   ```
+
+   **You MAY NOT proceed past Refine without all 3 reviewers having filed
+   at least one finding for the current iteration.** The server-side gate
+   on `POST /api/v1/projects/me/prism/session/{id}/refine` returns HTTP 422 with
+   `{"missing_reviewer_roles":[...]}` until every required role is
+   covered. After the 3 reviewers land you MAY add your own
+   orchestrator-level findings with `reviewer_role="orchestrator"` —
+   those do NOT substitute for the 3 mandatory roles.
+
+   Each finding POST MUST include `reviewer_role`:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"iteration":1,"reviewer_role":"security","author_type":"ai","author_id":"ai:cybersecurity-pentester","severity":"amber","category":"security","description":"Missing input validation on..."}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/review"
+   ```
+
+   Severities: `red` (critical/blocking), `amber` (major), `yellow` (minor), `green` (info/positive)
+   Categories: `security`, `architecture`, `testability`, `completeness`, `performance`
+   Reviewer roles: `security`, `quality`, `compliance` (mandatory), `orchestrator` (optional, not gate-counted)
+
+   Fix the findings in the plan. For each fix, resolve:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"finding_id":N,"resolution":"Added rate limiting..."}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/resolve-finding"
+   ```
+
+   Do a SECOND review iteration (minimum 2 required). Re-dispatch the
+   same 3 reviewer agents with `"iteration":2` — the gate is enforced
+   per-iteration, so iteration 2 also requires all 3 roles filed.
+
+   **MANDATORY: After each iteration, STOP and ask the user for their review.**
+   Present the findings and ask: "Do you agree with these findings? Any additions?"
+
+   Record their response:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"iteration":N,"reviewer_id":"human:USER_EMAIL","agrees":true,"comment":"USER_RESPONSE"}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/human-checkpoint"
+   ```
+
+   **You CANNOT advance without a human checkpoint for EACH iteration.** The system will reject advancement.
+
+   When all RED findings are resolved, 2+ iterations done, AND human checkpoints recorded, advance:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/refine"
+   ```
+
+   If the server returns `422 Unprocessable Entity` with
+   `missing_reviewer_roles`, dispatch the missing reviewer(s) — do NOT
+   self-fill. The gate is structural and cannot be bypassed.
+
+5. **INSTRUCT phase** — Decompose into tasks with Pseudocode++ exec prompts.
+
+   **MANDATORY: Before advancing, you MUST:**
+   a) Decompose the final plan into concrete tasks (Stories/Tasks)
+   b) For EACH task write a detailed Pseudocode++ description containing:
+      - File paths to create/modify
+      - Function signatures with types
+      - Struct/interface definitions
+      - Data flow description
+      - Acceptance criteria (testable checkboxes)
+   c) Save each task to the DB:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"rule_id":"TASK-KEY","name":"Task summary","level":"info","validator":"BehaviorCheck","description":"FULL PSEUDOCODE++ HERE","applies_to":"*","created_by":"ai:claude-opus-4.6"}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/instruct-task"
+   ```
+   d) Update the plan_data_json with the final plan (original_request, initial_plan, final_plan with changes_from_initial, files_to_create, acceptance_criteria, review_summary)
+
+   **Do NOT advance with empty tasks. REV-006 rule: every task MUST have Pseudocode++.**
+
+   Then advance:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/instruct"
+   ```
+
+6. **SCRUTINIZE phase** — Run multi-agent review (REV-001: security + quality + compliance agents).
+   Compute quality gate (REV-002: must reach 90%+):
+   ```bash
+   curl -s -H "Authorization: Bearer $CW_TOKEN" \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/gate"
+   ```
+   If PASS (90%+), advance. If FAIL, go back to refine and iterate.
+
+7. **EXPORT** — Create Jira issues from the tasks written in Instruct phase.
+   Ask user for project key:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"project_key":"PL"}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/export"
+   ```
+
+8. **ACCEPT** — Tell the user to accept on the frontend: http://localhost:5173/prism/SESSION_ID
+   Then WAIT for acceptance by polling the notification file:
+   ```bash
+   # Poll every 5 seconds until the user accepts on the frontend
+   while [ ! -f .nexus/prism-accepted ]; do
+     sleep 5
+   done
+   cat .nexus/prism-accepted
+   rm .nexus/prism-accepted
+   ```
+
+   Alternatively, the user can accept here in the conversation:
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $CW_TOKEN" -H "Content-Type: application/json" \
+     -d '{"accepted_by":"human:USER_EMAIL","comment":"USER_COMMENT"}' \
+     "$CW_HUB/api/v1/projects/me/prism/session/SESSION_ID/accept"
+   ```
+
+   When acceptance is detected (file exists or API called), read the notification:
+   Format: SESSION_ID|ACCEPTED_BY|TIMESTAMP|GATE_SCORE|COMMENT
+   Acknowledge: "PRISM session accepted by {ACCEPTED_BY} at {TIMESTAMP} with score {GATE_SCORE}."
+
+## Rules
+- NEVER skip the review phase — minimum 2 iterations
+- NEVER fake findings or scores — they are computed from real data
+- ALWAYS record findings with proper severity and category
+- ALWAYS ask the user before accepting — this is the human gate
+- The quality gate score is COMPUTED from findings — you cannot set it manually
+- All data is visible on the frontend at http://localhost:5173/prism/SESSION_ID

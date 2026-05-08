@@ -1,0 +1,1 @@
+import{a as e}from"./api-Bbpg7RUE.js";var t=t=>e.get(`/api/v1/kpi/tenant/${t}`).then(e=>e.data),n=()=>e.get(`/api/v1/kpi/personal`).then(e=>e.data);export{t as n,n as t};

@@ -1,0 +1,20 @@
+# Bereczki Ferenc — Portfolio · Hostinger VPS deployment
+# Paste this into Hostinger Docker Manager (https://hpanel.hostinger.com/vps/1253369/docker-manager)
+# OR run on the VPS via:  docker compose up -d
+
+services:
+  portfolio:
+    image: ghcr.io/fbereczki/portfolio:latest
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    labels:
+      - "site=imwy.ai"
+      - "owner=fbereczki"
