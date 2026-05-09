@@ -10,9 +10,20 @@ export function About() {
       <div className="grid gap-12 lg:grid-cols-12">
         {/* Main editorial column */}
         <div className="lg:col-span-8">
-          <p className="drop-cap prose-just font-serif text-[19px] leading-[1.8] text-ink sm:text-[20px]">
-            {profile.bio[lang]}
-          </p>
+          {profile.bio[lang]
+            .split(/\n{2,}/)
+            .map((para, i) => (
+              <p
+                key={i}
+                className={
+                  i === 0
+                    ? 'drop-cap prose-just font-serif text-[19px] leading-[1.8] text-ink sm:text-[20px]'
+                    : 'prose-just mt-5 font-serif text-[18px] leading-[1.75] text-ink sm:text-[19px]'
+                }
+              >
+                {para}
+              </p>
+            ))}
 
           <div className="mt-10 flex items-baseline gap-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">

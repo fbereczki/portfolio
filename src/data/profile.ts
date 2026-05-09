@@ -23,12 +23,76 @@ export const profile = {
     emailPersonal: 'mailto:fbereczki@gmail.com',
   },
   bio: {
-    hu:
-      'Pályám során az IT minden főbb területén szereztem tapasztalatot. A korai években hálózati és szerver-üzemeltető mérnök voltam a Pfizer Hungary Kft.-nél, később webprogramozóként és játékfejlesztőként is kipróbáltam magam. Megéltem a csapatvezetés és a projektmenedzsment kihívásait, és a vállalkozói lét minden oldalát. Hamar kiderült, hogy a kiberbiztonság és a legújabb technológiák azok, amik igazán érdekelnek — így kerültem a Belügyminisztériumba. Büszke vagyok rá, hogy a legnagyobb projektünkben létrehoztunk egy új IT-biztonsági réteget, amely garantálja Magyarország működőképességét és a kritikus adatok biztonságát természeti, mesterséges katasztrófa vagy háború esetén is. A projekt zárása után a Knorr-Bremse R&D Centerben kezdtem el dolgozni az automotive cybersecurity új területén — a munkánk az új generációs járművek megalkotásához és az autonóm közlekedéshez vezető úthoz járul hozzá.',
-    en:
-      'During my time in the profession, I gained experience in all major areas within the field of IT. In the early years, I was a network and server operations engineer at Pfizer Hungary Ltd. Later in my career, I tried myself as both a web programmer and a game developer. I have experienced the challenges of team leadership and project management, as well as all aspects of being an entrepreneur. It soon became clear to me that cybersecurity and cutting-edge technologies were what really attracted me — which is how I got into the Ministry of the Interior. I am very proud that in my biggest project to date, we have created a new layer of IT security for Hungary, capable of guaranteeing the country’s operability and the security of essential data, even in the event of a natural or artificial disaster or war. At the end of the project, I started working in the new field of cybersecurity at the R&D Center of Knorr-Bremse, one of the most important suppliers of the automotive industry. Our work here contributes to the creation of a new generation of vehicles and thus opens the way for autonomous vehicles.',
+    hu: `Pályám során az IT szinte minden fő területén megfordultam. Hálózati és szerver-üzemeltető mérnökként kezdtem a Pfizer Hungary Kft.-nél, ahol szilárd alapokat kaptam a vállalati infrastruktúra és üzemeltetés területén. Később webfejlesztéssel, játékprogramozással, csapatvezetéssel, projektmenedzsmenttel és vállalkozással is foglalkoztam.
+
+Idővel a kiberbiztonság és a legújabb technológiák lettek az igazi szenvedélyem, ami a Belügyminisztériumhoz vezetett. Ott életem egyik legfontosabb projektjéhez járulhattam hozzá: egy új nemzeti IT-biztonsági réteg megteremtéséhez, amely képes megvédeni a kritikus rendszereket és az alapvető adatokat katasztrófák, kibertámadások vagy háborús helyzet esetén is.
+
+E fejezet után csatlakoztam a Knorr-Bremse R&D Centeréhez — az autóipar egyik vezető beszállítójához —, ahol az automotive cybersecurity területén dolgozom. Munkánk az új generációs összekapcsolt és önvezető járművek megalkotásához járul hozzá.
+
+Ma a számítástechnika történetének egyik legizgalmasabb korszakát éljük. Az AI térnyerése alapjaiban változtatta meg, ahogyan dolgozom, és újra felélesztette a mérnöki munka iránti lelkesedésemet. Minden héten új képességek bukkannak fel, amelyek néhány éve még tudományos-fantasztikusnak tűntek volna.
+
+Ez a szenvedély vezetett a CodeWitness megalapításához — a saját válaszomhoz az AI-kor egyik meghatározó kérdésére: hogyan bizonyítjuk, mit hozott létre valójában az AI, és hogyan igazoljuk, hogy egy szakértő ember valóban ott állt mögötte?
+
+A CodeWitness egy tamper-evident audit- és compliance-platform az AI-asszisztált szoftverfejlesztéshez, vállalati szintű nyomon követhetőségre tervezve, és olyan keretrendszerekhez igazítva, mint a SOC 2 vagy az EU AI Act.
+
+Körülötte kísérletek és innovációk egész ökoszisztémája nőtt fel, amelyek többségét ezen a portfolió-oldalon és az IMWY.ai-n is megnézheted. MCP-szerverektől és a SIL módszertantól kezdve egészen a Civix, Aegis, Beacon, Magus projektekig és blokklánc-prototípusokig — mindegyik azt feszegeti, mi válik lehetővé, amikor több mint két évtizednyi mérnöki tapasztalat találkozik a modern AI-jal.
+
+Egyes projektek production-ready állapotban vannak, mások nagyra törő kísérletek — de mindegyik tanított valami értékeset.
+
+Ha ez az út egyvalamit megtanított: a mérnökök, akik virágzanak, nem azok, akik ellenállnak a változásnak — hanem azok, akik szembefutnak vele.
+
+Az AI nem helyettesíti a senior mérnököket. Felerősíti őket.
+
+És őszintén szólva: pályafutásom során soha nem élveztem ennyire a munkámat, mint most.`,
+    en: `During my career, I have worked across nearly every major area of IT. I started as a network and server operations engineer at Pfizer Hungary Ltd., building a strong foundation in enterprise infrastructure and operations. Later, I moved into web development, game programming, team leadership, project management, and entrepreneurship.
+
+Over time, cybersecurity and emerging technologies became my true passion, which led me to the Hungarian Ministry of the Interior. There, I contributed to one of the most important projects of my career: creating a new layer of national IT security infrastructure capable of protecting critical systems and essential data even during disasters, cyberattacks, or wartime scenarios.
+
+Later, I joined the R&D Center of Knorr-Bremse, one of the automotive industry's leading suppliers, where I work in automotive cybersecurity. Our work contributes to the next generation of connected and autonomous vehicles.
+
+Today, we are living through one of the most exciting periods in the history of computing. The rise of AI has completely transformed the way I work and reignited my passion for engineering. Every week introduces new capabilities that would have felt like science fiction only a few years ago.
+
+That passion evolved into CodeWitness — my answer to one of the defining challenges of the AI era: how do we prove what AI actually created, and how do we verify that a human expert truly stood behind it?
+
+CodeWitness is a tamper-evident audit and compliance platform for AI-assisted software development, designed around enterprise-grade traceability and aligned with frameworks such as SOC 2 and the EU AI Act.
+
+Around it, an entire ecosystem of experiments and innovations has grown, many of which are showcased throughout this portfolio and on IMWY.ai. From MCP servers and the SIL methodology to projects such as Civix, Aegis, Beacon, Magus, and blockchain prototypes, each project explores what becomes possible when more than two decades of engineering experience meet modern AI.
+
+Some projects are production-ready, others are ambitious experiments — but all of them taught me something valuable.
+
+If this journey has taught me one thing, it is this: the engineers who thrive are not the ones who resist change — they are the ones who run toward it.
+
+AI does not replace senior engineers. It amplifies them.
+
+And honestly, I have never enjoyed my career more than I do right now.`,
   },
   experience: [
+    {
+      role: { hu: 'Founder', en: 'Founder' },
+      company: 'CodeWitness',
+      employmentType: { hu: 'Önfoglalkoztatás · Hibrid', en: 'Self-employed · Hybrid' },
+      location: 'Budapest',
+      period: { hu: '2025 — jelenleg', en: '2025 — Present' },
+      duration: { hu: '1 év', en: '1 yr' },
+      bullets: {
+        hu: [
+          'Compliance-ready audit- és nyomon követhetőségi platform alapítása AI-asszisztált szoftverfejlesztéshez.',
+          'Misszió: bizonyíthatóvá tenni, mit írt valójában az AI, és hogy minden architektúra-döntés mögött szenior mérnök állt.',
+          'Capture → Attribute → Analyze → Comply pipeline — minden AI-generált kódsor mérhető, scoringolható és auditálható.',
+          'SOC 2 Type II és EU AI Act megfelelőségre tervezve: tamper-evident HMAC-SHA256 audit-lánc, Ed25519-cel aláírt riportok.',
+          'AI Maturity Score Engine — hatdimenziós scoring (complexity, prompt efficiency, parallel orchestration, agent delegation, quality outcome, learning velocity).',
+          'Saját MCP-szerver (9 production tool) integrálva Claude / Cursor / Git workflow-kba; Free / Pro / Enterprise feature-tier.',
+        ],
+        en: [
+          'Founded a compliance-ready audit and traceability platform for AI-assisted software development.',
+          'Mission: prove what AI actually wrote, and that a senior engineer truly stood behind every architectural decision.',
+          'Capture → Attribute → Analyze → Comply pipeline — every AI-generated line is measurable, scoreable, and audit-defensible.',
+          'Designed for SOC 2 Type II and EU AI Act readiness: tamper-evident HMAC-SHA256 audit chain with Ed25519-signed reports.',
+          'AI Maturity Score Engine — six-dimensional scoring (complexity, prompt efficiency, parallel orchestration, agent delegation, quality outcome, learning velocity).',
+          'Custom MCP server (9 production tools) integrated into Claude / Cursor / Git workflows; Free / Pro / Enterprise tiering.',
+        ],
+      },
+    },
     {
       role: { hu: 'Cybersecurity Project Manager', en: 'Cybersecurity Project Manager' },
       company: 'Knorr-Bremse R&D Center',
