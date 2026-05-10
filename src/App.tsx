@@ -6,6 +6,7 @@ import { Blockchain } from './components/Blockchain';
 import { CodeWitnessSpotlight } from './components/CodeWitnessSpotlight';
 import { Compliance } from './components/Compliance';
 import { Contact } from './components/Contact';
+import { CV } from './components/CV';
 import { Experience } from './components/Experience';
 import { Footer } from './components/Footer';
 import { Hero } from './components/Hero';
@@ -39,6 +40,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <CV />
     </>
   );
 }

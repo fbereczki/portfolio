@@ -1,4 +1,4 @@
-import { Github, Languages, Linkedin, Menu } from 'lucide-react';
+import { Download, Github, Languages, Linkedin, Menu } from 'lucide-react';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
 
@@ -98,6 +98,19 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         >
           <Linkedin size={16} />
         </a>
+        <button
+          onClick={() => window.print()}
+          className="ml-1 inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.08em] hover:bg-white/5"
+          style={{
+            border: '1px solid #2A2B33',
+            color: '#E8E2CC',
+          }}
+          aria-label={lang === 'hu' ? 'Önéletrajz letöltése' : 'Download CV'}
+          title={lang === 'hu' ? 'Önéletrajz letöltése (PDF)' : 'Download CV (PDF)'}
+        >
+          <Download size={12} />
+          {lang === 'hu' ? 'CV' : 'CV'}
+        </button>
         <button
           onClick={() => setLang(lang === 'hu' ? 'en' : 'hu')}
           className="ml-1 inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.08em] hover:bg-white/5"

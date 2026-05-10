@@ -328,3 +328,287 @@ body {
   flex: 1;
   background: var(--paper-rule);
 }
+
+/* =================================================================
+   PRINT — one-page CV
+   Hidden on screen, only shown in print. Editorial paper aesthetic
+   matching the portfolio (Fraunces serif, mono labels, oxblood
+   accent, paper-rule dividers).
+   ================================================================= */
+
+.cv-print-container {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Hide every screen UI element via visibility (preserves layout
+     of CV children that are visibility:visible). */
+  body * {
+    visibility: hidden !important;
+  }
+  .cv-print-container,
+  .cv-print-container * {
+    visibility: visible !important;
+  }
+
+  /* Force theme-coloured backgrounds & accents to actually print. */
+  .cv-print-container,
+  .cv-print-container * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .cv-print-container {
+    display: block !important;
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    min-height: 297mm;
+    box-sizing: border-box;
+    padding: 12mm 14mm 10mm 14mm;
+    background: var(--paper) !important;
+    color: var(--ink) !important;
+    font-family: var(--font-body);
+    font-size: 9.6pt;
+    line-height: 1.42;
+  }
+
+  .cv-print-container .cv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12mm;
+    margin-bottom: 4mm;
+  }
+
+  .cv-print-container .cv-name {
+    font-family: var(--font-display);
+    font-size: 26pt;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .cv-print-container .cv-headline {
+    margin-top: 1.5mm;
+    font-size: 10.5pt;
+    line-height: 1.25;
+    color: var(--ink-soft);
+    max-width: 100mm;
+  }
+
+  .cv-print-container .cv-header-meta {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 8.2pt;
+    line-height: 1.55;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+  }
+
+  .cv-print-container .cv-rule {
+    height: 1px;
+    background: var(--paper-rule);
+    margin: 2mm 0 4mm 0;
+  }
+
+  /* Section heading: NN — TITLE ───────────── */
+  .cv-print-container .cv-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 3mm;
+    margin: 3mm 0 2mm 0;
+  }
+  .cv-print-container .cv-section-num {
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    color: var(--oxblood-soft);
+    letter-spacing: 0.1em;
+  }
+  .cv-print-container .cv-section-label {
+    font-size: 8.5pt;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cv-print-container .cv-section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--paper-rule);
+    align-self: center;
+  }
+
+  /* Drop-cap summary */
+  .cv-print-container .cv-summary {
+    font-size: 9.8pt;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    text-align: justify;
+    hyphens: auto;
+    margin: 0;
+  }
+  .cv-print-container .cv-summary::first-letter {
+    font-family: var(--font-display);
+    float: left;
+    font-size: 28pt;
+    line-height: 0.85;
+    padding-right: 1.6mm;
+    padding-top: 0.6mm;
+    color: var(--oxblood);
+    font-weight: 600;
+  }
+
+  /* Two-column body */
+  .cv-print-container .cv-grid {
+    display: grid;
+    grid-template-columns: 1fr 62mm;
+    gap: 8mm;
+    margin-top: 2mm;
+  }
+
+  /* === Experience (left column) === */
+  .cv-print-container .cv-exp {
+    margin-top: 2.5mm;
+    padding-top: 2mm;
+    border-top: 0.5px solid var(--paper-rule);
+    page-break-inside: avoid;
+  }
+  .cv-print-container .cv-exp:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+  .cv-print-container .cv-exp-period {
+    font-size: 7.8pt;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 0.5mm;
+  }
+  .cv-print-container .cv-exp-role {
+    font-family: var(--font-display);
+    font-size: 12pt;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .cv-print-container .cv-exp-company {
+    font-size: 9.5pt;
+    color: var(--oxblood-soft);
+    margin-top: 0.4mm;
+  }
+  .cv-print-container .cv-exp-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 1.5mm 0 0 0;
+  }
+  .cv-print-container .cv-exp-bullets li {
+    display: flex;
+    gap: 2mm;
+    align-items: flex-start;
+    font-size: 9.4pt;
+    line-height: 1.42;
+    color: var(--ink-soft);
+    margin-bottom: 0.7mm;
+    page-break-inside: avoid;
+  }
+  .cv-print-container .cv-bullet-dot {
+    flex: 0 0 auto;
+    width: 1.4mm;
+    height: 1.4mm;
+    border-radius: 50%;
+    background: var(--oxblood-soft);
+    margin-top: 1.6mm;
+  }
+
+  /* === Sidebar (right column) === */
+  .cv-print-container .cv-side-section {
+    margin-bottom: 4mm;
+  }
+  .cv-print-container .cv-side-head {
+    font-size: 8pt;
+    letter-spacing: 0.22em;
+    color: var(--oxblood-soft);
+    font-weight: 600;
+    margin-bottom: 1.5mm;
+  }
+  .cv-print-container .cv-side-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .cv-print-container .cv-side-list > li {
+    padding-bottom: 1.5mm;
+    margin-bottom: 1.5mm;
+    border-bottom: 0.5px solid var(--paper-rule);
+    page-break-inside: avoid;
+  }
+  .cv-print-container .cv-side-list > li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .cv-print-container .cv-side-title {
+    font-family: var(--font-display);
+    font-size: 9.5pt;
+    line-height: 1.2;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cv-print-container .cv-side-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 2mm;
+    margin-top: 0.4mm;
+    font-style: italic;
+    font-size: 8.4pt;
+    color: var(--ink-mute);
+  }
+  .cv-print-container .cv-side-year {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 7.8pt;
+    color: var(--ink-faint);
+  }
+  .cv-print-container .cv-side-detail {
+    font-size: 8.6pt;
+    line-height: 1.35;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-top: 0.4mm;
+  }
+
+  /* Skill tags */
+  .cv-print-container .cv-skill-block {
+    margin-bottom: 2mm;
+  }
+  .cv-print-container .cv-skill-head {
+    font-family: var(--font-mono);
+    font-size: 7.4pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 1mm;
+  }
+  .cv-print-container .cv-skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1mm 1.2mm;
+  }
+  .cv-print-container .cv-skill-tag {
+    display: inline-block;
+    border: 0.5px solid var(--ink);
+    padding: 0.4mm 1.4mm;
+    font-family: var(--font-mono);
+    font-size: 7.2pt;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: rgba(234, 226, 207, 0.4);
+  }
+}
