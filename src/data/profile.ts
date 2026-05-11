@@ -11,7 +11,7 @@ export const profile = {
   phone: '+36 20 349 6421',
   email: 'ferenc.bereczki@codewitness.ai',
   emailPersonal: 'fbereczki@gmail.com',
-  portrait: '/portrait.jpg?v=2', // 600×682 LANCZOS-resized + JPEG q92, 66 KB. Version query busts CF edge cache when the underlying file changes.
+  portrait: '/portrait.jpg?v=3', // 600×662 LANCZOS-resized + JPEG q92, 66 KB. Version query busts CF edge cache when the underlying file changes.
   currentRole: {
     hu: 'Cybersecurity Project Manager — Knorr-Bremse R&D Center',
     en: 'Cybersecurity Project Manager — Knorr-Bremse R&D Center',
