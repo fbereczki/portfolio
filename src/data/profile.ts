@@ -4,8 +4,8 @@
 export const profile = {
   name: 'Bereczki Ferenc',
   headline: {
-    hu: 'Cybersecurity Project Manager · IT biztonság · AI builder',
-    en: 'Cybersecurity Project Manager · IT security · AI builder',
+    hu: 'Cybersecurity Project Manager · AI Builder & VibeCode Fixer',
+    en: 'Cybersecurity Project Manager · AI Builder & VibeCode Fixer',
   },
   location: 'Budapest, Magyarország',
   phone: '+36 20 349 6421',

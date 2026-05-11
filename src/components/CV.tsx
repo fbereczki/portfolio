@@ -15,8 +15,13 @@ const expertiseTags = {
 };
 
 const aiStack = {
-  hu: ['MCP-szerverek', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance'],
-  en: ['MCP servers', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance'],
+  hu: ['MCP-szerverek', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance', 'VibeCode Fixer'],
+  en: ['MCP servers', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance', 'VibeCode Fixer'],
+};
+
+const leadership = {
+  hu: ['Csapatvezetés', 'Stakeholder-menedzsment', 'Mentoring', 'Konferencia-előadás', 'Crisis management'],
+  en: ['Team leadership', 'Stakeholder management', 'Mentoring', 'Public speaking', 'Crisis management'],
 };
 
 const credentials = {
@@ -41,6 +46,7 @@ const labels = {
     contact: 'Elérhetőség',
     achievements: 'Eredmények',
     expertise: 'Szakterület',
+    leadership: 'Vezetés',
     aiStack: 'AI · Tech',
     credentials: 'Szabványok',
     experience: 'Munkatapasztalat',
@@ -50,6 +56,7 @@ const labels = {
     contact: 'Contact',
     achievements: 'Achievements',
     expertise: 'Expertise',
+    leadership: 'Leadership',
     aiStack: 'AI · Tech',
     credentials: 'Credentials',
     experience: 'Experience',
@@ -129,6 +136,14 @@ export function CV() {
         <div className="cv-pill">{L.expertise}</div>
         <div className="cv-tag-cloud">
           {expertiseTags[lang].map((t) => (
+            <span key={t} className="cv-tag">{t}</span>
+          ))}
+        </div>
+
+        {/* LEADERSHIP */}
+        <div className="cv-pill">{L.leadership}</div>
+        <div className="cv-tag-cloud">
+          {leadership[lang].map((t) => (
             <span key={t} className="cv-tag">{t}</span>
           ))}
         </div>
