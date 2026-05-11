@@ -11,7 +11,7 @@ export const profile = {
   phone: '+36 20 349 6421',
   email: 'ferenc.bereczki@codewitness.ai',
   emailPersonal: 'fbereczki@gmail.com',
-  portrait: '/portrait.jpg', // 600×662 LANCZOS-resized + JPEG q92, 66 KB — natív megjelenítés Hero-ban
+  portrait: '/portrait.jpg', // 600×682 LANCZOS-resized + JPEG q92, 66 KB — natív megjelenítés Hero-ban
   currentRole: {
     hu: 'Cybersecurity Project Manager — Knorr-Bremse R&D Center',
     en: 'Cybersecurity Project Manager — Knorr-Bremse R&D Center',
