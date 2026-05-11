@@ -152,7 +152,7 @@ export function CV() {
         <div className="cv-pill">{L.aiStack}</div>
         <div className="cv-tag-cloud">
           {aiStack[lang].map((t) => (
-            <span key={t} className="cv-tag cv-tag-ai">{t}</span>
+            <span key={t} className="cv-tag">{t}</span>
           ))}
         </div>
 

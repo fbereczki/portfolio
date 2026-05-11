@@ -427,13 +427,13 @@ body {
     background: rgba(168, 80, 73, 0.28) !important;
     color: var(--paper) !important;
     font-family: var(--font-mono);
-    font-size: 8.2pt;
-    letter-spacing: 0.22em;
+    font-size: 8pt;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     text-align: center;
-    padding: 1.2mm 3mm;
+    padding: 1mm 3mm;
     border-radius: 1.2mm;
-    margin: 4mm 0 2.2mm 0;
+    margin: 2.8mm 0 1.8mm 0;
     font-weight: 600;
   }
   .cv-print-container .cv-portrait-wrap + .cv-pill {
@@ -449,10 +449,10 @@ body {
   .cv-print-container .cv-contact-list li {
     display: flex;
     align-items: center;
-    gap: 2.4mm;
-    font-size: 8.2pt;
-    line-height: 1.3;
-    margin-bottom: 1.1mm;
+    gap: 2.2mm;
+    font-size: 8pt;
+    line-height: 1.25;
+    margin-bottom: 0.8mm;
     color: var(--paper-deep) !important;
     word-break: break-word;
   }
@@ -479,8 +479,8 @@ body {
     margin: 0;
   }
   .cv-print-container .cv-side-blocks > li {
-    padding-bottom: 2.2mm;
-    margin-bottom: 2.2mm;
+    padding-bottom: 1.5mm;
+    margin-bottom: 1.5mm;
     border-bottom: 0.5px solid rgba(234, 226, 207, 0.18) !important;
     page-break-inside: avoid;
   }
@@ -491,15 +491,15 @@ body {
   }
   .cv-print-container .cv-side-block-title {
     font-family: var(--font-display);
-    font-size: 9.2pt;
-    line-height: 1.2;
+    font-size: 8.8pt;
+    line-height: 1.15;
     color: var(--paper) !important;
     font-weight: 600;
-    margin-bottom: 0.6mm;
+    margin-bottom: 0.4mm;
   }
   .cv-print-container .cv-side-block-detail {
-    font-size: 8.3pt;
-    line-height: 1.35;
+    font-size: 7.8pt;
+    line-height: 1.28;
     color: rgba(232, 226, 204, 0.78) !important;
     font-style: italic;
   }
@@ -508,23 +508,19 @@ body {
   .cv-print-container .cv-tag-cloud {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.4mm 1.4mm;
+    gap: 1mm 1.2mm;
   }
   .cv-print-container .cv-tag {
     display: inline-block;
-    padding: 0.6mm 2mm;
+    padding: 0.5mm 1.6mm;
     font-family: var(--font-mono);
-    font-size: 7.4pt;
-    letter-spacing: 0.06em;
+    font-size: 7pt;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--paper) !important;
     background: rgba(234, 226, 207, 0.08) !important;
     border: 0.5px solid rgba(234, 226, 207, 0.35) !important;
     border-radius: 1mm;
-  }
-  .cv-print-container .cv-tag-ai {
-    background: rgba(168, 80, 73, 0.18) !important;
-    border-color: rgba(168, 80, 73, 0.55) !important;
   }
 
   /* Sidebar plain bullet list (credentials) */
@@ -535,19 +531,19 @@ body {
   }
   .cv-print-container .cv-bullet-list li {
     position: relative;
-    padding-left: 4mm;
-    font-size: 8.6pt;
-    line-height: 1.5;
+    padding-left: 3.6mm;
+    font-size: 8pt;
+    line-height: 1.35;
     color: var(--paper-deep) !important;
-    margin-bottom: 0.6mm;
+    margin-bottom: 0.4mm;
   }
   .cv-print-container .cv-bullet-list li::before {
     content: '';
     position: absolute;
-    left: 0.6mm;
-    top: 2.1mm;
-    width: 1.4mm;
-    height: 1.4mm;
+    left: 0.4mm;
+    top: 1.6mm;
+    width: 1.3mm;
+    height: 1.3mm;
     border-radius: 50%;
     background: var(--oxblood-soft) !important;
   }
