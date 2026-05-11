@@ -14,13 +14,17 @@ const expertiseTags = {
   en: ['Cybersecurity', 'AI', 'Project Management', 'Programming', 'Risk Management', 'Blockchain'],
 };
 
+const aiStack = {
+  hu: ['MCP-szerverek', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance'],
+  en: ['MCP servers', 'Agent orchestration', 'RAG · Vector DB', 'Prompt engineering', 'LLM evals', 'AI compliance'],
+};
+
 const credentials = {
   hu: [
     'Nemzetbiztonsági átvilágítás',
     'ISO/SAE 21434 · UN-ECE R155/R156',
     'EU AI Act · SOC 2 Type II',
     'IBTV · ISO 27001',
-    'GDPR · pszeudonymizáció',
     'B2 Angol',
   ],
   en: [
@@ -28,7 +32,6 @@ const credentials = {
     'ISO/SAE 21434 · UN-ECE R155/R156',
     'EU AI Act · SOC 2 Type II',
     'IBTV · ISO 27001',
-    'GDPR · pseudonymisation',
     'English B2',
   ],
 };
@@ -38,6 +41,7 @@ const labels = {
     contact: 'Elérhetőség',
     achievements: 'Eredmények',
     expertise: 'Szakterület',
+    aiStack: 'AI · Tech',
     credentials: 'Szabványok',
     experience: 'Munkatapasztalat',
     education: 'Oktatás',
@@ -46,6 +50,7 @@ const labels = {
     contact: 'Contact',
     achievements: 'Achievements',
     expertise: 'Expertise',
+    aiStack: 'AI · Tech',
     credentials: 'Credentials',
     experience: 'Experience',
     education: 'Education',
@@ -55,7 +60,7 @@ const labels = {
 const TOP_ACHIEVEMENTS_EN = [
   'Award of the Minister of Interior',
   '600-person training reach',
-  'Led a 62-person project team',
+  'SIL — original methodology',
 ];
 
 export function CV() {
@@ -92,6 +97,10 @@ export function CV() {
             <span>{profile.email}</span>
           </li>
           <li>
+            <span className="cv-icon-circle"><Mail size={9} strokeWidth={2.2} /></span>
+            <span>{profile.emailPersonal}</span>
+          </li>
+          <li>
             <span className="cv-icon-circle"><Linkedin size={9} strokeWidth={2.2} /></span>
             <span>linkedin.com/in/ferenc-bereczki</span>
           </li>
@@ -121,6 +130,14 @@ export function CV() {
         <div className="cv-tag-cloud">
           {expertiseTags[lang].map((t) => (
             <span key={t} className="cv-tag">{t}</span>
+          ))}
+        </div>
+
+        {/* AI · TECH */}
+        <div className="cv-pill">{L.aiStack}</div>
+        <div className="cv-tag-cloud">
+          {aiStack[lang].map((t) => (
+            <span key={t} className="cv-tag cv-tag-ai">{t}</span>
           ))}
         </div>
 
