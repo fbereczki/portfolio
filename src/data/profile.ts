@@ -136,16 +136,14 @@ And honestly, I have never enjoyed my career more than I do right now.`,
       bullets: {
         hu: [
           'Kiberbiztonsági feladatok — kockázat- és fenyegetésmenedzsment a Belügyminisztérium alá tartozó szervezeteknél.',
-          'Új IT-fejlesztések biztonsági követelményeinek meghatározása a várható fenyegetések alapján.',
+          'Customer-side projektvezetés egy 10,8 Mrd Ft-os (€27M+) kiberbiztonsági K+F programon — célok, követelménykatalógus, CapEx/OpEx tervezés; Magyarország új nemzeti IT-biztonsági rétegének létrehozása.',
           'Oktatási anyagok elkészítése és előadások tartása a Belügyminisztérium dolgozóinak.',
-          'K+F kiberbiztonsági projekt — 10,8 Mrd Ft költségvetés. Customer-side projektvezetés: ügyfélérdek-képviselet a teljes projekt során, projektcélok és követelménykatalógus definiálása, CapEx/OpEx tervezés.',
           'Customer-side kiberbiztonsági szakértői feladatok: funkcionális specifikáció, logikai rendszerterv, logikai adatmodell és HLD dokumentumok készítése; kiberbiztonsági követelmények meghatározása és teljesülésük igazolása.',
         ],
         en: [
           'Cybersecurity tasks — risk and threat management for organisations under the Ministry of the Interior.',
-          'Defining security requirements for new IT developments according to expected threats.',
+          'Customer-side project lead of a HUF 10.8 Bn (€27M+) cybersecurity R&D programme — defining goals, requirements catalogue, CapEx & OpEx; delivered Hungary\'s new national IT-security layer.',
           'Preparation of educational materials and presentations for Ministry of Interior employees.',
-          'R+D Cybersecurity project — HUF 10.8 billion budget. Customer-side PM: representing customer interests for the duration, defining goals and requirements catalogue, CapEx & OpEx design.',
           'Customer-side cybersecurity expert: functional spec, logical system design, logical data model and HLD documents; defining cybersecurity requirements and certifying their fulfilment.',
         ],
       },
