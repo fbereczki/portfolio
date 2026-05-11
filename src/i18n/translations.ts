@@ -65,7 +65,7 @@ export const translations = {
       ctaSecondary: 'LinkedIn',
       stats: [
         { value: '€25M+', label: 'BM K+F nagyprojekt költségvetés' },
-        { value: '62', label: 'Legnagyobb vezetett csapat' },
+        { value: '9', label: 'Saját MCP-eszköz éles használatban' },
         { value: '5', label: 'Lezárt automotive cybersec projekt' },
         { value: 'SIL', label: 'Saját módszertan · v1.1' },
         { value: '2026', label: 'CodeWitness — startup alapító' },
@@ -343,7 +343,7 @@ export const translations = {
       ctaSecondary: 'LinkedIn',
       stats: [
         { value: '€25M+', label: 'Ministry R&D programme budget' },
-        { value: '62', label: 'Largest team I led' },
+        { value: '9', label: 'Production MCP tools shipped' },
         { value: '5', label: 'Automotive cybersec projects delivered' },
         { value: 'SIL', label: 'Original methodology · v1.1' },
         { value: '2026', label: 'CodeWitness — startup founder' },
