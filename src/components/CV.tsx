@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Briefcase, GraduationCap, Linkedin, Mail, MapPin, Phone, Globe } from 'lucide-react';
 import { profile } from '../data/profile';
 import { useI18n } from '../i18n/I18nProvider';
@@ -59,6 +61,8 @@ const TOP_ACHIEVEMENTS_EN = [
 export function CV() {
   const { lang } = useI18n();
   const L = labels[lang];
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const topAchievements = TOP_ACHIEVEMENTS_EN
     .map((title) => profile.achievements.find((a) => a.title.en === title))
@@ -68,7 +72,7 @@ export function CV() {
   const surname = nameParts[0] ?? profile.name;
   const firstName = nameParts.slice(1).join(' ');
 
-  return (
+  const cvNode = (
     <div className="cv-print-container" aria-hidden>
       {/* ===================== SIDEBAR ===================== */}
       <aside className="cv-sidebar">
@@ -191,4 +195,7 @@ export function CV() {
       </main>
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(cvNode, document.body);
 }

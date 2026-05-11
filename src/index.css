@@ -347,12 +347,30 @@ body {
     margin: 0;
   }
 
-  body * {
-    visibility: hidden !important;
+  /* Lock the printable canvas to exactly one A4 page so nothing
+     leaks onto a second sheet, and remove any background imagery
+     that the rest of the site would otherwise carry over. */
+  html,
+  body {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: var(--paper) !important;
+    background-image: none !important;
   }
+
+  /* Hide every direct child of <body> except the CV (which we render
+     via portal so it IS a direct child). display:none — not visibility —
+     keeps the layout from contributing any page-break-causing height. */
+  body > *:not(.cv-print-container) {
+    display: none !important;
+  }
+
   .cv-print-container,
   .cv-print-container * {
-    visibility: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -364,14 +382,19 @@ body {
     left: 0;
     top: 0;
     width: 210mm;
-    min-height: 297mm;
+    height: 297mm;
+    max-height: 297mm;
     box-sizing: border-box;
     background: var(--paper) !important;
     color: var(--ink) !important;
     font-family: var(--font-body);
-    font-size: 9.5pt;
-    line-height: 1.42;
+    font-size: 9.3pt;
+    line-height: 1.4;
     overflow: hidden;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    break-after: avoid;
+    break-inside: avoid;
   }
 
   /* ==================== SIDEBAR ==================== */
