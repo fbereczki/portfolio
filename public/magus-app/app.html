@@ -24,6 +24,10 @@
   </style>
 </head>
 <body>
+  <!-- Iframe demo shim — silently suppresses Service Worker registration
+       (the same SW that Flutter installs causes weird cache behaviour
+       inside the sandboxed iframe used by the portfolio demo). -->
+  <script src="/iframe-demo-auth.js"></script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
