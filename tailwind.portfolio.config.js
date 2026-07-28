@@ -10,6 +10,15 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     ...landing.theme,
+    extend: {
+      ...landing.theme.extend,
+      // Skeleton shimmer for the iframed product demos (K5 loading state).
+      keyframes: {
+        ...landing.theme.extend?.keyframes,
+        shimmer: { from: { backgroundPosition: '100% 0' }, to: { backgroundPosition: '-100% 0' } },
+      },
+      animation: { ...landing.theme.extend?.animation, shimmer: 'shimmer 1.4s ease infinite' },
+    },
     colors: {
       ...defaultColors,
       ...landing.theme.colors,

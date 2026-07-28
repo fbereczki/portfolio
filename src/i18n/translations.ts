@@ -321,8 +321,8 @@ export const translations = {
           body: 'Két prototype JavaScript-ben — GamfCoin PoW (mining-puzzle, difficulty-target, longest-chain rule) és GamfCoin PoS (validator-pool, lot-selection, deterministic seeding). Cél: bizalom autoritás nélkül, sértetlenség matematikai garanciával.',
         },
         product: {
-          tag: 'Civix · 2026',
-          title: 'Termékben élesedett',
+          tag: 'Civix · 2027 H2 (cél)',
+          title: 'Termékké érlelve',
           subtitle: 'Civic Innovation Exchange — political participation platform',
           stats: [
             { label: 'Backend mikroszerviz', value: '7', tip: 'Identity, Party, Citizen, Communication, Voting, Transparency, Gateway.' },
@@ -330,7 +330,7 @@ export const translations = {
             { label: 'Chain', value: 'Substrate PoW', tip: 'Saját Substrate node ink! smart contractokkal.' },
             { label: 'Token', value: 'CRED', tip: 'A platform elszámoltathatósági tokenje a Civix Networkön.' },
           ],
-          body: 'A 2022-es PoC alapelvei élesedtek: ink! smart contractok belső szavazásokra és kötelezettségvállalásokra, geographic-based engagement, on-chain transzparencia. Ld. a Bizonyíték-indexet részletesen.',
+          body: 'A 2022-es PoC alapelvei valódi platformmá épülnek: ink! smart contractok belső szavazásokra és kötelezettségvállalásokra, geographic-based engagement, on-chain transzparencia. Aktív fejlesztés alatt, céldátum 2027 második fele — részletek a Bizonyíték-indexben.',
         },
       },
       hashchain: {
@@ -727,8 +727,8 @@ export const translations = {
           body: 'Two prototypes in JavaScript — GamfCoin PoW (mining puzzle, difficulty target, longest-chain rule) and GamfCoin PoS (validator pool, lot selection, deterministic seeding). Goal: trust without authority, integrity by mathematical guarantee.',
         },
         product: {
-          tag: 'Civix · 2026',
-          title: 'Realised in product',
+          tag: 'Civix · H2 2027 target',
+          title: 'Carried into product',
           subtitle: 'Civic Innovation Exchange — political participation platform',
           stats: [
             { label: 'Backend microservices', value: '7', tip: 'Identity, Party, Citizen, Communication, Voting, Transparency and Gateway services.' },
@@ -736,7 +736,7 @@ export const translations = {
             { label: 'Chain', value: 'Substrate PoW', tip: 'Custom Substrate node with ink! smart contracts for primaries and binding promises.' },
             { label: 'Token', value: 'CRED', tip: 'The platform’s accountability token, minted on the Civix Network.' },
           ],
-          body: 'The 2022 PoC principles graduated to production: ink! smart contracts for primaries and binding promises, geographic-based engagement, on-chain transparency. See the Index of evidence for full details.',
+          body: 'The 2022 PoC principles are being built into a real platform: ink! smart contracts for primaries and binding promises, geographic-based engagement, on-chain transparency. In active development, targeted for the second half of 2027 — see the Index of evidence for details.',
         },
       },
       hashchain: {
