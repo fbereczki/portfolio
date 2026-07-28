@@ -38,7 +38,7 @@ export function VerdictStat({
 }: {
   label: string;
   value: string;
-  verdict: string;
+  verdict: ReactNode;
   tone?: 'accent' | 'ok' | 'warn';
   hint?: string;
 }) {

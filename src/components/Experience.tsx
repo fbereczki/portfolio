@@ -1,4 +1,6 @@
-import { ArrowRight } from 'lucide-react';
+import { Fragment } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Badge, Card, Panel, Reveal } from '../landing/ui';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
 import { Section } from './Section';
@@ -13,163 +15,225 @@ export function Experience() {
       title={t.experience.title}
       lead={t.experience.lead}
     >
-      {/* Chain of custody — the career path as an unbroken hand-over chain */}
-      <div className="mb-10">
-        <div className="rule-double" />
-        <div className="px-1 py-5">
-          <div className="label-mono-ink mb-4 text-oxblood" title={t.experience.custody.note}>
-            — {t.experience.custody.title}
-          </div>
-          {/* Vertical chain below md; one row of five stations from md up — no orphan arrows. */}
-          <div className="grid grid-cols-1 gap-y-3 md:grid-cols-5 md:gap-x-3">
-            {t.experience.custody.stations.map((s, i) => (
-              <div key={s.org} className="flex items-center gap-x-3">
-                {i > 0 && <ArrowRight size={13} className="shrink-0 text-oxblood" />}
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-1.5">
-                    {s.year && (
-                      <span className="font-mono text-[11px] font-semibold tracking-[0.08em] text-oxblood">
-                        {s.year}
-                      </span>
-                    )}
-                    <span className="font-serif text-[14px] font-semibold leading-none text-ink">
-                      {s.org}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-ink-mute">
-                    {s.note}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rule-double" />
-      </div>
+      {/* Chain of custody — the career as an unbroken hand-over chain */}
+      <Reveal>
+        <ChainOfCustody
+          title={t.experience.custody.title}
+          note={t.experience.custody.note}
+          stations={t.experience.custody.stations}
+        />
+      </Reveal>
 
-      <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
-        {/* Editorial timeline */}
-        <ol className="space-y-10">
+      <div className="mt-10 grid grid-cols-12 gap-8 max-lg:gap-6">
+        {/* Timeline of roles */}
+        <div className="col-span-8 space-y-4 max-lg:col-span-12">
           {profile.experience.map((exp, idx) => {
             const co = typeof exp.company === 'string' ? exp.company : exp.company[lang];
             const isCurrent = idx === 0;
             return (
-              <li key={idx} className="relative">
-                <div className="grid grid-cols-12 gap-4">
-                  {/* date column */}
-                  <div className="col-span-12 sm:col-span-3">
-                    <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-mute">
+              <Reveal key={`${co}-${exp.period.en}`} delay={idx * 0.05}>
+                <Panel
+                  heading={exp.role[lang]}
+                  aside={
+                    <Badge
+                      tone={isCurrent ? 'accent' : 'neutral'}
+                      title={`${exp.period[lang]} · ${exp.duration?.[lang] ?? ''}`.trim()}
+                    >
                       {exp.period[lang]}
-                    </div>
-                    <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-                      {('duration' in exp && (exp as { duration?: { hu: string; en: string } }).duration?.[lang]) || ''}
-                    </div>
-                    {isCurrent && (
-                      <div className="mt-2">
-                        <span className="stamp">{t.experience.now}</span>
-                      </div>
+                    </Badge>
+                  }
+                >
+                  <div className="text-dense text-text-muted">
+                    <span className="font-emph text-accent">{co}</span>
+                    {'employmentType' in exp && exp.employmentType && (
+                      <span> · {exp.employmentType[lang]}</span>
                     )}
+                    <span> · {exp.location}</span>
                   </div>
-
-                  {/* body */}
-                  <div className="col-span-12 sm:col-span-9">
-                    <div className="rule-thin mb-4" />
-                    <h3 className="display-serif text-[22px] leading-tight text-ink sm:text-[26px]">
-                      {exp.role[lang]}
-                    </h3>
-                    <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                      <span className="accent-italic text-[16px]">{co}</span>
-                      {'employmentType' in exp && (exp as { employmentType?: { hu: string; en: string } }).employmentType && (
-                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-mute">
-                          ·{' '}
-                          {(exp as { employmentType: { hu: string; en: string } }).employmentType[lang]}
-                        </span>
-                      )}
-                    </div>
-                    <ul className="mt-4 space-y-2">
-                      {exp.bullets[lang].map((b) => (
-                        <li
-                          key={b}
-                          className="flex gap-3 font-serif text-[15px] leading-relaxed text-ink-soft"
-                        >
-                          <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-oxblood" />
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </li>
+                  <ul className="mt-3 space-y-2">
+                    {exp.bullets[lang].map((b) => (
+                      <li key={b} className="flex gap-2.5 text-dense leading-relaxed text-text">
+                        <span aria-hidden className="mt-[7px] size-1 shrink-0 rounded-full bg-accent" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Panel>
+              </Reveal>
             );
           })}
-        </ol>
+        </div>
 
-        {/* Sidebar — achievements + education + skills */}
-        <aside className="space-y-7">
-          <div className="paper-card p-6">
-            <div className="label-mono mb-4 text-oxblood">— {t.experience.achievementsTitle}</div>
-            <ul className="space-y-3">
-              {profile.achievements.map((a) => (
-                <li key={a.title.hu} className="border-b border-paper-rule pb-3 last:border-0 last:pb-0">
-                  <div className="font-serif text-[15px] font-semibold text-ink">{a.title[lang]}</div>
-                  <div className="mt-0.5 font-serif text-[13px] italic text-ink-mute">
-                    {a.detail[lang]}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="paper-card p-6">
-            <div className="label-mono mb-4 text-oxblood">— {t.experience.eduTitle}</div>
-            <ul className="space-y-3">
-              {profile.education.map((e) => (
-                <li key={e.year} className="border-b border-paper-rule pb-3 last:border-0 last:pb-0">
-                  <div className="font-serif text-[15px] font-semibold text-ink">{e.title[lang]}</div>
-                  <div className="mt-0.5 flex items-baseline justify-between font-serif text-[13px] italic text-ink-mute">
-                    <span>{e.school}</span>
-                    <span className="font-mono text-[11px] not-italic text-ink-faint">{e.year}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="paper-card p-6">
-            <div className="label-mono mb-4 text-oxblood">— {t.experience.extraTitle}</div>
-            <div className="space-y-4">
-              {(['industry', 'interpersonal', 'standards'] as const).map((groupKey) => {
-                const items = profile.skills[groupKey];
-                const heading = {
-                  industry: { hu: 'Szakterület', en: 'Industry' },
-                  interpersonal: { hu: 'Soft skill', en: 'Interpersonal' },
-                  standards: { hu: 'Szabványok / képesítések', en: 'Standards & credentials' },
-                }[groupKey];
-                return (
-                  <div key={groupKey}>
-                    <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
-                      {heading[lang]}
+        {/* Sidebar — achievements + education + LinkedIn-endorsed skills */}
+        <div className="col-span-4 space-y-4 max-lg:col-span-12">
+          <Reveal>
+            <Panel heading={t.experience.achievementsTitle}>
+              <ul className="space-y-3">
+                {profile.achievements.map((a) => (
+                  <li key={a.title.en} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                    <div className="text-dense font-emph text-text-strong">{a.title[lang]}</div>
+                    <div className="mt-0.5 text-dense leading-snug text-text-muted">{a.detail[lang]}</div>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <Panel heading={t.experience.eduTitle}>
+              <ul className="space-y-3">
+                {profile.education.map((e) => (
+                  <li key={e.year} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                    <div className="text-dense font-emph text-text-strong">{e.title[lang]}</div>
+                    <div className="mt-0.5 flex items-baseline justify-between gap-2 text-dense text-text-muted">
+                      <span>{e.school}</span>
+                      <span className="num shrink-0 text-meta text-text-faint">{e.year}</span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {items.map((s) => (
-                        <span
-                          key={s.en}
-                          className="inline-flex items-baseline gap-1.5 border border-ink/30 bg-paper-deep/40 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink"
-                        >
-                          {s[lang]}
-                          {s.n > 0 && (
-                            <span className="font-mono text-[9px] text-oxblood">·{s.n}</span>
-                          )}
-                        </span>
-                      ))}
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <Panel heading={t.experience.extraTitle}>
+              <div className="space-y-4">
+                {(['industry', 'interpersonal', 'standards'] as const).map((groupKey) => {
+                  const items = profile.skills[groupKey];
+                  const heading = {
+                    industry: 'Industry',
+                    interpersonal: 'Interpersonal',
+                    standards: 'Standards & credentials',
+                  }[groupKey];
+                  return (
+                    <div key={groupKey}>
+                      <div className="mb-2 text-meta font-emph uppercase tracking-[0.1em] text-text-faint">
+                        {heading}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {items.map((s) => (
+                          <span
+                            key={s.en}
+                            title={s.n > 0 ? `${s.n} LinkedIn endorsements` : undefined}
+                            className="inline-flex items-baseline gap-1 rounded-[5px] border border-border px-2 py-0.5 text-meta text-text-muted"
+                          >
+                            {s[lang]}
+                            {s.n > 0 && <span className="num text-accent">·{s.n}</span>}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </aside>
+                  );
+                })}
+              </div>
+            </Panel>
+          </Reveal>
+        </div>
       </div>
     </Section>
+  );
+}
+
+/* ── Chain of custody — 5 stations, animated dashed hand-over links ───────
+   Horizontal from md up (System.tsx FLOWS recipe: dashed stroke, drifting
+   dashoffset), vertical rail on mobile. */
+
+type Station = { year: string; org: string; note: string };
+
+function ChainOfCustody({
+  title,
+  note,
+  stations,
+}: {
+  title: string;
+  note: string;
+  stations: ReadonlyArray<Station>;
+}) {
+  const reduce = useReducedMotion();
+
+  return (
+    <Card className="p-6 max-md:p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-meta font-emph uppercase tracking-[0.2em] text-accent" title={note}>
+          {title}
+        </p>
+        <span className="text-meta text-text-faint">{note}</span>
+      </div>
+
+      {/* md+ : one row of five stations, links flowing left → right */}
+      <div className="mt-6 hidden grid-cols-5 md:grid">
+        {stations.map((s, i) => (
+          <div key={s.org} className="min-w-0">
+            <div className="flex items-center">
+              <span
+                aria-hidden
+                className="size-2.5 shrink-0 rounded-full bg-accent shadow-[0_0_10px_rgb(var(--accent-rgb)/0.7)]"
+              />
+              {i < stations.length - 1 && <LinkLine reduce={!!reduce} />}
+            </div>
+            <div className="mt-3 pr-4">
+              {s.year ? (
+                <div className="num text-meta font-emph text-accent">{s.year}</div>
+              ) : (
+                <div className="text-meta text-text-faint" title="Career origin — enterprise operations era">
+                  origin
+                </div>
+              )}
+              <div className="mt-1 text-dense font-emph leading-snug text-text-strong">{s.org}</div>
+              <div className="mt-0.5 text-meta uppercase tracking-[0.08em] text-text-muted">
+                {s.note}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* below md : vertical rail */}
+      <div className="mt-4 md:hidden">
+        {stations.map((s, i) => (
+          <Fragment key={s.org}>
+            {i > 0 && (
+              <div aria-hidden className="ml-[4px] h-6 w-px border-l border-dashed border-accent/50" />
+            )}
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden
+                className="mt-1 size-2.5 shrink-0 rounded-full bg-accent shadow-[0_0_10px_rgb(var(--accent-rgb)/0.7)]"
+              />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-2">
+                  {s.year && <span className="num text-meta font-emph text-accent">{s.year}</span>}
+                  <span className="text-dense font-emph text-text-strong">{s.org}</span>
+                </div>
+                <div className="mt-0.5 text-meta uppercase tracking-[0.08em] text-text-muted">
+                  {s.note}
+                </div>
+              </div>
+            </div>
+          </Fragment>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function LinkLine({ reduce }: { reduce: boolean }) {
+  return (
+    <svg className="mx-2 h-[2px] w-full min-w-0 flex-1" aria-hidden>
+      <motion.line
+        x1="0"
+        y1="1"
+        x2="100%"
+        y2="1"
+        stroke="rgb(var(--accent-rgb) / 0.55)"
+        strokeWidth="2"
+        strokeDasharray="5 5"
+        {...(!reduce
+          ? {
+              initial: { strokeDashoffset: 0 },
+              animate: { strokeDashoffset: -40 },
+              transition: { duration: 4, repeat: Infinity, ease: 'linear' },
+            }
+          : {})}
+      />
+    </svg>
   );
 }

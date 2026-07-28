@@ -1,16 +1,25 @@
 <!doctype html>
-<html lang="hu">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bereczki Ferenc — Cybersecurity, AI &amp; Project Leadership</title>
-    <meta name="description" content="Cybersecurity project lead, AI &amp; compliance engineering — automotive (ISO 21434, UN-ECE R155/156), critical infrastructure, blockchain, and AI-assisted developer tooling." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700;800;900&family=Inter+Tight:wght@500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <title>Ferenc Bereczki — Cybersecurity Expert &amp; PM · AI Builder · founder of imwy.ai</title>
+    <meta name="description" content="Witness file of Ferenc Bereczki, the engineer behind imwy.ai — cybersecurity project leadership (ISO 21434, UN-ECE R155/156), national-scale R&amp;D programmes, AI-assisted engineering under expert control, and the evidence to prove it." />
+    <meta name="theme-color" content="#0c0e12" />
+    <link rel="preload" href="/fonts/Sora.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Pre-hydration theme pick — same 'imwy_theme' key as imwy.ai, so the
+      // choice follows the visitor across the two sites without a flash.
+      try {
+        var t = localStorage.getItem('imwy_theme');
+        if (t === 'light' || (!t && matchMedia('(prefers-color-scheme: light)').matches)) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      } catch (e) { /* storage unavailable — stay dark */ }
+    </script>
   </head>
-  <body class="bg-paper text-ink antialiased font-serif">
+  <body class="bg-bg text-text antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -42,7 +42,7 @@ export const skills: Skill[] = [
   { name: 'UN R155 / R156', category: 'compliance', level: 3 },
   { name: 'EU AI Act', category: 'compliance', level: 2 },
   { name: 'SOC 2 reports', category: 'compliance', level: 2 },
-  { name: 'GDPR / pszeudonymizáció', category: 'compliance', level: 3 },
+  { name: 'GDPR / pseudonymisation', category: 'compliance', level: 3 },
 
   // Mobile
   { name: 'Flutter / Dart', category: 'mobile', level: 2 },

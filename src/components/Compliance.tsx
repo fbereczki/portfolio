@@ -1,4 +1,5 @@
 import { ExternalLink, Gavel, ShieldCheck } from 'lucide-react';
+import { Card, Reveal } from '../landing/ui';
 import { useI18n } from '../i18n/I18nProvider';
 import { Section } from './Section';
 
@@ -13,46 +14,51 @@ export function Compliance() {
       kicker={t.compliance.kicker}
       title={t.compliance.title}
       lead={t.compliance.lead}
+      tone="sunken"
     >
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <article className="paper-card border-2 border-paper-rule p-8">
-          <ShieldCheck size={28} className="mb-4 text-ink" />
-          <h3 className="display-serif text-[28px] leading-tight text-ink">
-            {t.compliance.cwTitle}
-          </h3>
-          <div className="rule-thin my-4" />
-          <p className="prose-just font-serif text-[15.5px] leading-relaxed text-ink-soft">
-            {t.compliance.cwBody}
-          </p>
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <Stat label="HMAC chain" value="SHA-256" tip={t.compliance.statTips.hmac} />
-            <Stat label="Sign" value="Ed25519" tip={t.compliance.statTips.sign} />
-            <Stat label="KDF" value="Argon2id" tip={t.compliance.statTips.kdf} />
-          </div>
-        </article>
+      <div className="grid grid-cols-12 gap-4">
+        <Reveal className="col-span-7 max-lg:col-span-12">
+          <Card className="h-full p-6 max-md:p-4">
+            <ShieldCheck size={22} className="text-accent" aria-hidden />
+            <h3 className="mt-3 text-title font-emph leading-tight text-text-strong">
+              {t.compliance.cwTitle}
+            </h3>
+            <p className="mt-3 border-t border-border pt-3 text-dense leading-relaxed text-text">
+              {t.compliance.cwBody}
+            </p>
+            <div className="mt-6 grid grid-cols-3 gap-3 max-sm:grid-cols-1">
+              <Stat label="HMAC chain" value="SHA-256" tip={t.compliance.statTips.hmac} />
+              <Stat label="Sign" value="Ed25519" tip={t.compliance.statTips.sign} />
+              <Stat label="KDF" value="Argon2id" tip={t.compliance.statTips.kdf} />
+            </div>
+          </Card>
+        </Reveal>
 
-        <article className="paper-card p-8">
-          <div className="mb-3 flex items-center gap-2 text-oxblood">
-            <Gavel size={14} />
-            <span className="label-mono-ink">— {t.compliance.legalLinkLabel}</span>
-          </div>
-          <h3 className="display-serif text-[22px] leading-tight text-ink">
-            {t.compliance.legalTitle}
-          </h3>
-          <div className="rule-thin my-4" />
-          <p className="prose-just font-serif text-[14.5px] leading-relaxed text-ink-soft">
-            {t.compliance.legalBody}
-          </p>
-          <a
-            href={LEGAL_LINK}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="mt-5 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-oxblood hover:underline"
-          >
-            {t.compliance.visit}
-            <ExternalLink size={12} />
-          </a>
-        </article>
+        <Reveal delay={0.08} className="col-span-5 max-lg:col-span-12">
+          <Card className="h-full p-6 max-md:p-4">
+            <div className="flex items-center gap-2 text-accent">
+              <Gavel size={14} aria-hidden />
+              <span className="text-meta font-emph uppercase tracking-[0.14em]">
+                {t.compliance.legalLinkLabel}
+              </span>
+            </div>
+            <h3 className="mt-3 text-title font-emph leading-tight text-text-strong">
+              {t.compliance.legalTitle}
+            </h3>
+            <p className="mt-3 border-t border-border pt-3 text-dense leading-relaxed text-text">
+              {t.compliance.legalBody}
+            </p>
+            <a
+              href={LEGAL_LINK}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-5 inline-flex items-center gap-1.5 text-dense font-emph text-accent underline-offset-2 transition-colors hover:text-accent-strong hover:underline"
+            >
+              {t.compliance.visit}
+              <ExternalLink size={12} />
+            </a>
+          </Card>
+        </Reveal>
       </div>
     </Section>
   );
@@ -60,9 +66,9 @@ export function Compliance() {
 
 function Stat({ label, value, tip }: { label: string; value: string; tip: string }) {
   return (
-    <div className="border border-paper-rule bg-paper-deep/30 p-3" title={tip}>
-      <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink-mute">{label}</div>
-      <div className="mt-1 font-mono text-[14px] font-bold text-ink">{value}</div>
+    <div className="rounded border border-border bg-surface-2 p-3" title={tip}>
+      <div className="text-meta uppercase tracking-[0.14em] text-text-muted">{label}</div>
+      <div className="num mt-1 font-mono text-dense font-strong text-text-strong">{value}</div>
     </div>
   );
 }

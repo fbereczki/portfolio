@@ -34,10 +34,10 @@ export const projects: Project[] = [
     spotlight: 'primary',
     stack: ['Go 1.23', 'CGo', 'PostgreSQL', 'Argon2id', 'HMAC-SHA256', 'Ed25519', 'TypeScript', 'React', 'Vite', 'Material-UI', 'Tailwind', 'VS Code API'],
     ai: [
-      'Saját MCP-szerver (9 működő tool, 4 tervezett) — Claude / Cursor / Git hookok hívják',
-      'AI Maturity Score Engine (6 dimenzió: complexity, prompt efficiency, parallel orchestration, agent delegation, quality outcome, learning velocity)',
-      'GUARD pattern detection — institutional knowledge megőrzése',
-      'BEAM workflow — több AI-agent párhuzamos orchestration-je',
+      'Custom MCP server (9 working tools, 4 planned) — invoked by Claude / Cursor / Git hooks',
+      'AI Maturity Score Engine (6 dimensions: complexity, prompt efficiency, parallel orchestration, agent delegation, quality outcome, learning velocity)',
+      'GUARD pattern detection — preserving institutional knowledge',
+      'BEAM workflow — parallel orchestration of multiple AI agents',
     ],
     highlights: {
       hu: [

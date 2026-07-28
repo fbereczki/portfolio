@@ -1,3 +1,4 @@
+import { Panel, Reveal } from '../landing/ui';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
 import { Section } from './Section';
@@ -7,58 +8,47 @@ export function About() {
 
   return (
     <Section id="about" kicker={t.about.kicker} title={t.about.title}>
-      <div className="grid gap-12 lg:grid-cols-12">
-        {/* Main editorial column */}
-        <div className="lg:col-span-8">
-          {profile.bio[lang]
-            .split(/\n{2,}/)
-            .map((para, i) => (
-              <p
-                key={i}
-                className={
-                  i === 0
-                    ? 'drop-cap prose-just font-serif text-[19px] leading-[1.8] text-ink sm:text-[20px]'
-                    : 'prose-just mt-5 font-serif text-[18px] leading-[1.75] text-ink sm:text-[19px]'
-                }
-              >
-                {para}
-              </p>
-            ))}
+      <div className="grid grid-cols-12 gap-8 max-lg:gap-6">
+        {/* Main narrative column */}
+        <Reveal className="col-span-8 max-lg:col-span-12">
+          {profile.bio[lang].split(/\n{2,}/).map((para, i) => (
+            <p
+              key={i}
+              className={
+                i === 0
+                  ? 'text-lead leading-relaxed text-text-strong'
+                  : 'mt-4 max-w-[680px] text-body leading-relaxed text-text'
+              }
+            >
+              {para}
+            </p>
+          ))}
+          <p className="mt-8 text-meta uppercase tracking-[0.22em] text-text-faint">
+            — {profile.name}, {profile.location[lang]}
+          </p>
+        </Reveal>
 
-          <div className="mt-10 flex items-baseline gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-              — {profile.name}, {profile.location[lang]}
-            </span>
-            <span className="h-px flex-1 bg-paper-rule" />
+        {/* Sidebar — current role + focus */}
+        <Reveal delay={0.08} className="col-span-4 max-lg:col-span-12">
+          <div className="space-y-4">
+            <Panel heading={t.about.currentRole}>
+              <div className="text-body font-emph text-text-strong">{profile.currentRole[lang]}</div>
+              <div className="mt-1 text-dense text-text-muted">{profile.location[lang]}</div>
+            </Panel>
+            <Panel heading={t.about.focus}>
+              <ul className="space-y-2.5">
+                {t.about.focusItems.map((item, i) => (
+                  <li key={item} className="flex gap-3 text-dense leading-relaxed text-text">
+                    <span className="num shrink-0 text-meta font-emph text-accent">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
           </div>
-        </div>
-
-        {/* Sidebar — Current role + Focus */}
-        <aside className="lg:col-span-4">
-          <div className="paper-card p-6">
-            <div className="label-mono mb-2">{t.about.currentRole}</div>
-            <div className="font-serif text-[18px] font-semibold leading-snug text-ink">
-              {profile.currentRole[lang]}
-            </div>
-            <div className="mt-1 font-serif text-sm italic text-ink-mute">
-              {profile.location[lang]}
-            </div>
-          </div>
-
-          <div className="paper-card mt-5 p-6">
-            <div className="label-mono mb-3">— {t.about.focus}</div>
-            <ul className="space-y-2.5">
-              {t.about.focusItems.map((item, i) => (
-                <li key={item} className="flex gap-3 font-serif text-[15px] leading-relaxed text-ink-soft">
-                  <span className="font-mono text-[11px] text-oxblood">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        </Reveal>
       </div>
     </Section>
   );

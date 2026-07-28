@@ -1,26 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { translations, type Lang, type Translations } from './translations';
+
+// English-only surface (K11): the HU branch stays in translations.ts as an
+// archive, but is not reachable — no toggle, no persistence.
+const LANG: Lang = 'en';
 
 type Ctx = {
   lang: Lang;
-  setLang: (l: Lang) => void;
   t: Translations;
 };
 
 const I18nContext = createContext<Ctx | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('lang') : null;
-    return (stored as Lang) || 'hu';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('lang', lang);
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  const value = useMemo<Ctx>(() => ({ lang, setLang, t: translations[lang] as Translations }), [lang]);
+  const value = useMemo<Ctx>(() => ({ lang: LANG, t: translations[LANG] as Translations }), []);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 

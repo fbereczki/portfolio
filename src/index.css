@@ -1,17 +1,131 @@
+@config "../tailwind.portfolio.config.js";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* portfolio.imwy.ai — WITNESS FILE: the dossier goes dark.
+   Same ecosystem design language as the imwy.ai landing (Beacon tokens,
+   K1–K13 codex). Dark is the default theme; light is a token override on
+   [data-theme='light']. The printable CV keeps its light paper look — see
+   the legacy token block + @media print at the bottom. */
+
+@font-face {
+  font-family: 'Sora';
+  src: url('/fonts/Sora.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* backgrounds — cool near-black, never pure #000 */
+  --bg-rgb: 12 14 18;
+  --bg-sunken-rgb: 9 10 13;
+  --surface-rgb: 20 23 28;
+  --surface-2-rgb: 26 30 37;
+  --surface-3-rgb: 33 38 47;
+  /* hairlines */
+  --border-rgb: 48 55 67;
+  --border-strong-rgb: 62 71 85;
+  /* text ladder */
+  --text-strong-rgb: 219 224 232;
+  --text-rgb: 183 190 201;
+  --text-muted-rgb: 140 148 163;
+  --text-faint-rgb: 104 111 125;
+  /* THE one accent — beacon beam cyan */
+  --accent-rgb: 55 194 220;
+  --accent-strong-rgb: 99 211 234;
+  --on-accent: #04171c;
+  /* semantics — meaning only, never decoration */
+  --bad-rgb: 240 97 107;
+  --warn-rgb: 231 169 60;
+  --ok-rgb: 67 192 138;
+  /* categorical neutrals for charts */
+  --seg-2-rgb: 78 124 140;
+  --seg-3-rgb: 90 100 114;
+  --seg-4-rgb: 58 66 80;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 20px 44px -26px rgb(0 0 0 / 0.72);
+}
+
+[data-theme='light'] {
+  --bg-rgb: 228 232 238;
+  --bg-sunken-rgb: 217 222 230;
+  --surface-rgb: 243 245 249;
+  --surface-2-rgb: 236 239 244;
+  --surface-3-rgb: 227 232 238;
+  --border-rgb: 214 220 229;
+  --border-strong-rgb: 195 203 214;
+  --text-strong-rgb: 16 20 26;
+  --text-rgb: 60 67 77;
+  --text-muted-rgb: 100 108 123;
+  --text-faint-rgb: 154 162 174;
+  --accent-rgb: 11 120 145;
+  --accent-strong-rgb: 9 100 121;
+  --on-accent: #ffffff;
+  --bad-rgb: 210 59 69;
+  --warn-rgb: 169 112 15;
+  --ok-rgb: 23 132 90;
+  --seg-2-rgb: 78 130 150;
+  --seg-3-rgb: 138 148 162;
+  --seg-4-rgb: 183 192 203;
+  --shadow: 0 1px 2px rgb(16 20 26 / 0.05), 0 14px 32px -22px rgb(16 20 26 / 0.20);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: rgb(var(--bg-rgb));
+  color: rgb(var(--text-rgb));
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'tnum' 1, 'cv01' 1;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: rgb(var(--accent-rgb) / 0.3);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-strong-rgb));
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* =================================================================
-   THEME TOKENS
-   Single theme: paper — warm editorial paper,
-   Fraunces + Spectral + JetBrains Mono.
+   LEGACY PAPER TOKENS — used ONLY by the printable CV document below.
+   The CV is a paper artefact: print is light, always, on both themes.
    ================================================================= */
 
 :root {
-  color-scheme: light;
-
-  /* Paper editorial */
   --paper: #F4EFE3;
   --paper-deep: #EAE2CF;
   --paper-rule: #C9BFA4;
@@ -26,221 +140,11 @@
   --oxblood-soft: #A85049;
   --oxblood-deep: #5C1614;
 
-  --sage: #3F6B47;
-  --sage-soft: #6E9070;
-  --amber: #9C6F1A;
-  --amber-soft: #C49447;
-  --teal: #1F5566;
-  --teal-soft: #4F7E8E;
-
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Spectral', Georgia, serif;
-  --font-mono: 'JetBrains Mono', Menlo, monospace;
-
-  --shadow-card: 0 1px 0 rgba(26, 27, 34, 0.04), 0 18px 40px -28px rgba(26, 27, 34, 0.25);
-  --shadow-card-hover: 0 1px 0 rgba(26, 27, 34, 0.06), 0 28px 60px -28px rgba(26, 27, 34, 0.35);
-
-  --bg-image:
-    radial-gradient(ellipse 1200px 600px at 12% 4%, rgba(201, 191, 164, 0.18), transparent 60%),
-    radial-gradient(ellipse 1000px 500px at 92% 92%, rgba(126, 30, 27, 0.05), transparent 65%),
-    repeating-linear-gradient(0deg, rgba(26, 27, 34, 0.012) 0, rgba(26, 27, 34, 0.012) 1px, transparent 1px, transparent 3px),
-    repeating-linear-gradient(90deg, rgba(26, 27, 34, 0.008) 0, rgba(26, 27, 34, 0.008) 1px, transparent 1px, transparent 5px);
-}
-
-/* =================================================================
-   BASE LAYOUT
-   ================================================================= */
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
-  background-color: var(--paper);
-  background-image: var(--bg-image);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  color: var(--ink);
-}
-
-::selection {
-  background: var(--oxblood);
-  color: var(--paper);
-}
-
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-::-webkit-scrollbar-track {
-  background: var(--paper-deep);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--paper-rule);
-  border: 3px solid var(--paper);
-  border-radius: 0;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ink-mute);
-}
-
-/* =================================================================
-   COMPONENT UTILITIES (shared, theme-aware)
-   ================================================================= */
-
-@layer components {
-  .label-mono {
-    @apply font-mono uppercase tracking-[0.18em] text-[11px] text-ink-mute;
-  }
-  .label-mono-ink {
-    @apply font-mono uppercase tracking-[0.18em] text-[11px] text-ink;
-  }
-
-  /* Display headline — Fraunces with optical sizing + WONK */
-  .display-serif {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    font-optical-sizing: auto;
-    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
-  }
-
-  /* Accent text — italic Fraunces oxblood */
-  .accent-italic {
-    font-family: var(--font-display);
-    color: var(--oxblood);
-    font-style: italic;
-    font-weight: 500;
-  }
-
-  .paper-card {
-    @apply bg-paper border border-paper-rule shadow-paper transition-shadow;
-  }
-  .paper-card-hover {
-    @apply hover:shadow-paper-hover;
-  }
-
-  .btn-ink {
-    @apply inline-flex items-center gap-2 bg-ink text-paper px-5 py-2.5 font-mono uppercase tracking-[0.16em] text-[12px] hover:bg-oxblood transition-colors;
-  }
-  .btn-oxblood {
-    @apply inline-flex items-center gap-2 bg-oxblood text-paper px-5 py-2.5 font-mono uppercase tracking-[0.16em] text-[12px] hover:bg-oxblood-deep transition-colors;
-  }
-  .btn-ghost-ink {
-    @apply inline-flex items-center gap-2 border border-ink text-ink px-5 py-2.5 font-mono uppercase tracking-[0.16em] text-[12px] hover:bg-ink hover:text-paper transition-colors;
-  }
-
-  .pill {
-    @apply inline-flex items-center gap-1.5 border border-current px-2.5 py-0.5 font-mono uppercase tracking-[0.14em] text-[10px];
-  }
-  .pill-sage {
-    @apply pill text-sage;
-  }
-  .pill-amber {
-    @apply pill text-amber;
-  }
-  .pill-oxblood {
-    @apply pill text-oxblood;
-  }
-  .pill-teal {
-    @apply pill text-teal;
-  }
-  .pill-ink {
-    @apply pill text-ink;
-  }
-}
-
-/* =================================================================
-   DECORATIVE PRIMITIVES
-   ================================================================= */
-
-/* Double-rule horizontal divider */
-.rule-double {
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-  height: 3px;
-}
-.rule-thin {
-  border-top: 1px solid var(--paper-rule);
-}
-
-/* Stamp — tilted dashed bordeaux */
-.stamp {
-  display: inline-block;
-  border: 1.5px dashed var(--oxblood);
-  color: var(--oxblood);
-  padding: 4px 10px;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 10px;
-  transform: rotate(-3deg);
-  background: var(--paper);
-}
-.stamp-sage {
-  border-color: var(--sage);
-  color: var(--sage);
-}
-.stamp-amber {
-  border-color: var(--amber);
-  color: var(--amber);
-}
-
-/* Drop cap — Fraunces oxblood huge */
-.drop-cap::first-letter {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 4.5rem;
-  line-height: 0.85;
-  float: left;
-  margin: 0.3rem 0.6rem 0 0;
-  color: var(--oxblood);
-  font-variation-settings: 'opsz' 144, 'WONK' 1;
-}
-
-/* Subtle paper grain overlay */
-.grain {
-  position: relative;
-}
-.grain::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(26, 27, 34, 0.04) 1px, transparent 1px);
-  background-size: 3px 3px;
-  opacity: 0.35;
-  mix-blend-mode: multiply;
-}
-
-/* Justified body text with hyphenation — same on both themes */
-.prose-just {
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphenate-limit-chars: 8 4 4;
-}
-
-/* Section ornament — three centered dots */
-.ornament {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--ink-mute);
-  font-size: 10px;
-  letter-spacing: 0.4em;
-}
-.ornament::before,
-.ornament::after {
-  content: '';
-  height: 1px;
-  flex: 1;
-  background: var(--paper-rule);
+  /* Web fonts of the paper era were dropped with the dark redesign; the
+     printable CV falls back to system serifs of the same voice. */
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 /* =================================================================
@@ -634,4 +538,3 @@ body {
     margin-top: 0.3mm;
   }
 }
-

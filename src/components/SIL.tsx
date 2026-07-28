@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Check, Copy, Layers, Scale, Workflow, Smartphone } from 'lucide-react';
+import { Badge, Card, Panel, Reveal } from '../landing/ui';
 import { useI18n } from '../i18n/I18nProvider';
 import { Section } from './Section';
 
@@ -73,155 +74,148 @@ export function SIL() {
   }
 
   return (
-    <Section id="sil" kicker={t.sil.kicker} title={t.sil.title}>
+    <Section id="sil" kicker={t.sil.kicker} title={t.sil.title} tone="sunken">
       {/* Tagline + lead */}
-      <div className="grid gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <p className="display-serif text-[24px] leading-tight text-ink sm:text-[28px]">
-            <span className="accent-italic">{t.sil.tagline}</span>
+      <div className="grid grid-cols-12 gap-8 max-lg:gap-6">
+        <Reveal className="col-span-7 max-lg:col-span-12">
+          <p className="text-hero font-hero leading-tight tracking-tight text-accent-strong">
+            {t.sil.tagline}
           </p>
-          <p className="prose-just mt-5 max-w-2xl font-serif text-[16px] leading-[1.75] text-ink-soft">
-            {t.sil.lead}
-          </p>
-        </div>
+          <p className="mt-4 max-w-[640px] text-body leading-relaxed text-text">{t.sil.lead}</p>
+        </Reveal>
 
         {/* Two-layer card */}
-        <div className="lg:col-span-5">
-          <div className="paper-card p-5">
-            <div className="mb-3 flex items-center gap-2 text-oxblood">
-              <Layers size={14} />
-              <span className="label-mono-ink">— {t.sil.layers.title}</span>
-            </div>
+        <Reveal delay={0.08} className="col-span-5 max-lg:col-span-12">
+          <Panel
+            heading={t.sil.layers.title}
+            aside={<Layers size={14} className="text-accent" aria-hidden />}
+          >
             <ul className="space-y-3">
               {t.sil.layers.items.map((it) => (
-                <li key={it.layer} className="border-l-2 border-oxblood pl-3">
+                <li key={it.layer} className="border-l-2 border-accent pl-3">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-2">
-                    <span className="display-serif text-[18px] text-ink">{it.layer}</span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-mute">
+                    <span className="text-title font-emph text-text-strong">{it.layer}</span>
+                    <span className="text-meta uppercase tracking-[0.1em] text-text-faint">
                       {it.who}
                     </span>
                   </div>
-                  <p className="mt-1 font-serif text-[13.5px] leading-relaxed text-ink-soft">
-                    {it.what}
-                  </p>
+                  <p className="mt-1 text-dense leading-relaxed text-text">{it.what}</p>
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
+          </Panel>
+        </Reveal>
       </div>
 
-      {/* Principles + Primitives + Scale — three editorial cards */}
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
-        <Card icon={<Smartphone size={14} />} title={t.sil.principles.title} accent="text-oxblood">
-          <ol className="space-y-2 font-serif text-[13px] leading-relaxed text-ink-soft">
-            {t.sil.principles.items.map((line, i) => (
-              <li key={line} className="flex gap-2">
-                <span className="font-mono text-[11px] text-oxblood">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span>{line}</span>
-              </li>
-            ))}
-          </ol>
-        </Card>
-        <Card icon={<Workflow size={14} />} title={t.sil.primitives.title} accent="text-oxblood">
-          <ul className="space-y-1.5 font-mono text-[12px] uppercase tracking-[0.1em] text-ink">
-            {t.sil.primitives.items.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </Card>
-        <Card icon={<Scale size={14} />} title={t.sil.scale.title} accent="text-oxblood">
-          <ul className="space-y-2.5">
-            {t.sil.scale.items.map((it) => (
-              <li key={it.type}>
-                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-oxblood">
-                  {it.type}
-                </span>
-                <p className="mt-0.5 font-serif text-[13.5px] leading-relaxed text-ink-soft">
-                  {it.body}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Card>
+      {/* Principles + Primitives + Scale */}
+      <div className="mt-8 grid grid-cols-3 gap-4 max-md:grid-cols-1">
+        <Reveal>
+          <IconCard icon={<Smartphone size={14} />} title={t.sil.principles.title}>
+            <ol className="space-y-2">
+              {t.sil.principles.items.map((line, i) => (
+                <li key={line} className="flex gap-2 text-dense leading-relaxed text-text">
+                  <span className="num shrink-0 text-meta font-emph text-accent">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ol>
+          </IconCard>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <IconCard icon={<Workflow size={14} />} title={t.sil.primitives.title}>
+            <ul className="space-y-1.5">
+              {t.sil.primitives.items.map((line) => (
+                <li key={line} className="font-mono text-dense uppercase tracking-[0.08em] text-text-strong">
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </IconCard>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <IconCard icon={<Scale size={14} />} title={t.sil.scale.title}>
+            <ul className="space-y-2.5">
+              {t.sil.scale.items.map((it) => (
+                <li key={it.type}>
+                  <span className="text-meta font-emph uppercase tracking-[0.14em] text-accent">
+                    {it.type}
+                  </span>
+                  <p className="mt-0.5 text-dense leading-relaxed text-text">{it.body}</p>
+                </li>
+              ))}
+            </ul>
+          </IconCard>
+        </Reveal>
       </div>
 
-      {/* Example block — both layers */}
-      <div className="mt-12">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-mute">
-            {t.sil.example}{' '}
-            <span className="ml-2 inline-block border border-oxblood px-1.5 py-0.5 text-[9px] font-bold text-oxblood">
+      {/* Example block — both layers, token colors on ecosystem CSS vars */}
+      <Reveal className="mt-10">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-meta uppercase tracking-[0.14em] text-text-muted">
+            {t.sil.example}
+            <Badge tone="accent" title="SIL specification v1.1 — file extension .sil">
               .sil · v1.1
-            </span>
+            </Badge>
           </div>
-          <div className="flex gap-0">
+          <div className="flex gap-2">
             <button
               onClick={() => setLineWrap((w) => !w)}
-              className="-mr-px border border-ink/40 bg-paper px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink hover:bg-paper-deep"
+              className="inline-flex h-7 items-center rounded border border-border bg-surface px-2.5 text-meta font-emph uppercase tracking-[0.1em] text-text-muted transition-colors hover:border-border-strong hover:text-text-strong"
+              title="Toggle line wrapping in the example"
             >
               {lineWrap ? t.common.noWrap : t.common.wrap}
             </button>
             <button
               onClick={copy}
-              className="border border-ink/40 bg-paper px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink hover:bg-ink hover:text-paper"
+              className="inline-flex h-7 items-center gap-1.5 rounded border border-border bg-surface px-2.5 text-meta font-emph uppercase tracking-[0.1em] text-text-muted transition-colors hover:border-border-strong hover:text-text-strong"
+              title="Copy the full example to the clipboard"
             >
-              {copied ? (
-                <>
-                  <Check size={11} className="mr-1 inline" /> {t.common.copied}
-                </>
-              ) : (
-                <>
-                  <Copy size={11} className="mr-1 inline" /> {t.common.copy}
-                </>
-              )}
+              {copied ? <Check size={11} /> : <Copy size={11} />}
+              {copied ? t.common.copied : t.common.copy}
             </button>
           </div>
         </div>
         <pre
-          className={`overflow-x-auto border border-ink bg-ink p-6 font-mono text-[12.5px] leading-[1.7] text-paper ${
+          className={`overflow-x-auto rounded-md border border-border bg-bg-sunken p-6 font-mono text-dense leading-[1.7] text-text max-md:p-4 ${
             lineWrap ? 'whitespace-pre-wrap' : 'whitespace-pre'
           }`}
         >
           {EXAMPLE.split('\n').map((line, i) => (
             <div key={i} className="flex">
-              <span className="mr-4 inline-block w-7 shrink-0 select-none text-right text-ink-faint">
+              <span className="num mr-4 inline-block w-7 shrink-0 select-none text-right text-text-faint">
                 {i + 1}
               </span>
               <span dangerouslySetInnerHTML={{ __html: highlight(line) }} />
             </div>
           ))}
         </pre>
-        <p className="prose-just mt-3 font-serif text-[13px] italic leading-relaxed text-ink-mute">
+        <p className="mt-3 max-w-[820px] text-dense leading-relaxed text-text-muted">
           {t.sil.reuseNote}
         </p>
-      </div>
+      </Reveal>
     </Section>
   );
 }
 
-function Card({
+function IconCard({
   icon,
   title,
-  accent,
   children,
 }: {
   icon: React.ReactNode;
   title: string;
-  accent: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="paper-card p-5">
-      <div className={`mb-3 flex items-center gap-2 ${accent}`}>
+    <Card className="h-full p-4">
+      <div className="mb-3 flex items-center gap-2 border-b border-border pb-3 text-accent">
         {icon}
-        <span className="label-mono-ink">— {title}</span>
+        <span className="text-meta font-emph uppercase tracking-[0.14em]">{title}</span>
       </div>
-      <div className="rule-thin mb-4" />
       {children}
-    </div>
+    </Card>
   );
 }
 
@@ -229,6 +223,20 @@ function Card({
 // raw line (comment | string | key: | arrow | keyword | number); each match is
 // colored on its own and escaped exactly once. Never chain .replace() rounds that
 // re-scan injected HTML — that is what previously mangled the style="..." quotes.
+//
+// Token colors are ecosystem CSS vars so both themes stay readable (K3: the one
+// accent for keywords; ok/warn only as categorical code-highlight hues here):
+//   keyword/primitive → accent · string → ok · field key → text-strong ·
+//   comment → text-faint · number → warn
+
+const C = {
+  keyword: 'rgb(var(--accent-rgb))',
+  string: 'rgb(var(--ok-rgb))',
+  fieldKey: 'rgb(var(--text-strong-rgb))',
+  comment: 'rgb(var(--text-faint-rgb))',
+  number: 'rgb(var(--warn-rgb))',
+  arrow: 'rgb(var(--accent-strong-rgb))',
+} as const;
 
 const SECTION_PRIMITIVES = new Set([
   'INTENT', 'SCENARIO', 'UI_FLOW', 'UI_SCREEN', 'FLOW', 'ENTITY', 'STATE',
@@ -248,7 +256,7 @@ function span(color: string, text: string, weight?: number): string {
 
 function highlight(line: string): string {
   const banner = BANNER_RE.exec(line);
-  if (banner) return banner[1] + span('#A85049', banner[2], 600);
+  if (banner) return banner[1] + span(C.keyword, banner[2], 600);
 
   let out = '';
   let last = 0;
@@ -257,21 +265,21 @@ function highlight(line: string): string {
     out += escape(line.slice(last, m.index));
     const [, comment, str, key, colon, arrow, keyword, num] = m;
     if (comment !== undefined) {
-      out += span('#8E8B7E', comment);
+      out += span(C.comment, comment);
     } else if (str !== undefined) {
-      out += span('#6E9070', str);
+      out += span(C.string, str);
     } else if (key !== undefined) {
       // UPPERCASE primitive at the start of a section vs. plain field key
       const isPrimitive =
         SECTION_PRIMITIVES.has(key) && /^\s*$/.test(line.slice(0, m.index));
-      out += isPrimitive ? span('#A85049', key, 700) : span('#C49447', key);
-      out += span('#8E8B7E', colon);
+      out += isPrimitive ? span(C.keyword, key, 700) : span(C.fieldKey, key, 500);
+      out += span(C.comment, colon);
     } else if (arrow !== undefined) {
-      out += span('#4F7E8E', arrow);
+      out += span(C.arrow, arrow);
     } else if (keyword !== undefined) {
-      out += span('#A85049', keyword, 600);
+      out += span(C.keyword, keyword, 600);
     } else if (num !== undefined) {
-      out += span('#A85049', num);
+      out += span(C.number, num);
     }
     last = m.index + m[0].length;
   }
