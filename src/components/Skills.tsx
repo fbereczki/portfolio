@@ -17,12 +17,12 @@ export function Skills() {
   const { t } = useI18n();
 
   return (
-    <Section id="skills" kicker={t.skills.kicker} title={t.skills.title} number="03">
+    <Section id="skills" kicker={t.skills.kicker} title={t.skills.title}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {order.map((cat) => {
           const items = skills.filter((s) => s.category === cat);
           return (
-            <div key={cat} className="paper-card paper-card-hover p-6">
+            <div key={cat} className="paper-card p-6">
               <div className={`label-mono-ink mb-4 ${accent[cat]}`}>
                 — {t.skills.categories[cat]}
               </div>
@@ -30,7 +30,7 @@ export function Skills() {
                 {items.map((s) => (
                   <li
                     key={s.name}
-                    className="flex items-baseline justify-between border-b border-paper-rule/60 pb-1.5 last:border-0 last:pb-0"
+                    className="flex items-baseline justify-between gap-3 border-b border-paper-rule/60 pb-1.5 last:border-0 last:pb-0"
                   >
                     <span
                       className={`font-serif text-[15px] ${
@@ -39,15 +39,13 @@ export function Skills() {
                     >
                       {s.name}
                     </span>
-                    <span className="ml-3 flex items-center gap-0.5">
-                      {[1, 2, 3].map((dot) => (
-                        <span
-                          key={dot}
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            dot <= s.level ? 'bg-oxblood' : 'bg-paper-rule'
-                          }`}
-                        />
-                      ))}
+                    <span
+                      className={`shrink-0 font-mono text-[9.5px] uppercase tracking-[0.1em] ${
+                        s.level === 3 ? 'text-oxblood' : 'text-ink-mute'
+                      }`}
+                      title={t.skills.levelsTip}
+                    >
+                      {t.skills.levels[s.level]}
                     </span>
                   </li>
                 ))}

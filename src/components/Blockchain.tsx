@@ -7,7 +7,7 @@ export function Blockchain() {
   const b = t.blockchain;
 
   return (
-    <Section id="blockchain" kicker={b.kicker} title={b.title} lead={b.lead} number="06">
+    <Section id="blockchain" kicker={b.kicker} title={b.title} lead={b.lead}>
       {/* Tagline accent line */}
       <p className="display-serif mb-12 max-w-3xl text-[24px] leading-tight text-ink sm:text-[28px]">
         <span className="accent-italic">{b.tagline}</span>
@@ -74,9 +74,9 @@ export function Blockchain() {
 
         {/* Bridge arrow between pillars */}
         <div className="mt-3 flex items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
-          <span>2022 academic seed</span>
+          <span>{b.bridge.from}</span>
           <ArrowRight size={12} className="text-oxblood" />
-          <span>2026 production</span>
+          <span>{b.bridge.to}</span>
         </div>
       </div>
 

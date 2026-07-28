@@ -73,7 +73,7 @@ export function SIL() {
   }
 
   return (
-    <Section id="sil" kicker={t.sil.kicker} title={t.sil.title} number="05">
+    <Section id="sil" kicker={t.sil.kicker} title={t.sil.title}>
       {/* Tagline + lead */}
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
@@ -125,18 +125,18 @@ export function SIL() {
             ))}
           </ol>
         </Card>
-        <Card icon={<Workflow size={14} />} title={t.sil.primitives.title} accent="text-teal">
+        <Card icon={<Workflow size={14} />} title={t.sil.primitives.title} accent="text-oxblood">
           <ul className="space-y-1.5 font-mono text-[12px] uppercase tracking-[0.1em] text-ink">
             {t.sil.primitives.items.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
         </Card>
-        <Card icon={<Scale size={14} />} title={t.sil.scale.title} accent="text-amber">
+        <Card icon={<Scale size={14} />} title={t.sil.scale.title} accent="text-oxblood">
           <ul className="space-y-2.5">
             {t.sil.scale.items.map((it) => (
               <li key={it.type}>
-                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-amber">
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-oxblood">
                   {it.type}
                 </span>
                 <p className="mt-0.5 font-serif text-[13.5px] leading-relaxed text-ink-soft">
@@ -162,7 +162,7 @@ export function SIL() {
               onClick={() => setLineWrap((w) => !w)}
               className="-mr-px border border-ink/40 bg-paper px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink hover:bg-paper-deep"
             >
-              {lineWrap ? 'No wrap' : 'Wrap'}
+              {lineWrap ? t.common.noWrap : t.common.wrap}
             </button>
             <button
               onClick={copy}
@@ -225,38 +225,57 @@ function Card({
   );
 }
 
-// SIL syntax highlighter — keys, strings, numbers, comments, primitive tokens, layer-banners
+// SIL syntax highlighter — single-pass tokenizer. One alternation regex walks the
+// raw line (comment | string | key: | arrow | keyword | number); each match is
+// colored on its own and escaped exactly once. Never chain .replace() rounds that
+// re-scan injected HTML — that is what previously mangled the style="..." quotes.
+
+const SECTION_PRIMITIVES = new Set([
+  'INTENT', 'SCENARIO', 'UI_FLOW', 'UI_SCREEN', 'FLOW', 'ENTITY', 'STATE',
+  'EVENT', 'RULE', 'INTERFACE', 'CHANGE', 'SYSTEM', 'ACTOR',
+]);
+
+// Layer banners (full-width comment) get their own line-level style.
+const BANNER_RE = /^(\s*)(#\s*─+\s*[A-Z]+\s+LAYER.*)$/;
+
+const TOKEN_RE =
+  /(#.*)|("[^"]*"|'[^']*')|([A-Za-z_][A-Za-z0-9_]*)(:)(?=\s|$)|(→|->)|((?:REQ|ISO)-[A-Z0-9][A-Z0-9.-]*|HMAC-SHA256|RFC5322|HTTPS|\b(?:MANDATORY|UNAUTHENTICATED|AUTHENTICATED|LOCKED|APPROVED|RESOLVED)\b)|\b(true|false|null|\d+(?:\.\d+)?)\b/g;
+
+function span(color: string, text: string, weight?: number): string {
+  const w = weight ? `;font-weight:${weight}` : '';
+  return `<span style="color:${color}${w}">${escape(text)}</span>`;
+}
+
 function highlight(line: string): string {
-  let s = escape(line);
-  // Layer banners (full-width comment)
-  s = s.replace(
-    /^(\s*)(#\s*─+\s*[A-Z]+\s+LAYER.*$)/,
-    '$1<span style="color:#A85049;font-weight:600">$2</span>'
-  );
-  // Other comments
-  s = s.replace(/(#.*)$/, '<span style="color:#8E8B7E">$1</span>');
-  // SIMPLE / STRICT primitives (UPPERCASE word at start of section)
-  s = s.replace(
-    /^(\s*)(INTENT|SCENARIO|UI_FLOW|UI_SCREEN|FLOW|ENTITY|STATE|EVENT|RULE|INTERFACE|CHANGE|SYSTEM|ACTOR)(:)/,
-    '$1<span style="color:#A85049;font-weight:700">$2</span><span style="color:#8E8B7E">$3</span>'
-  );
-  // Field keys (word followed by :)
-  s = s.replace(
-    /(^[\s-]*)([A-Za-z_][A-Za-z0-9_]*)(:)(?=\s|$)/,
-    '$1<span style="color:#C49447">$2</span><span style="color:#8E8B7E">$3</span>'
-  );
-  // Quoted strings
-  s = s.replace(/(\"[^\"]*\"|'[^']*')/g, '<span style="color:#6E9070">$1</span>');
-  // Numbers / booleans
-  s = s.replace(/\b(true|false|null|\d+(?:\.\d+)?)\b/g, '<span style="color:#A85049">$1</span>');
-  // SIL keywords / primitive tokens / states inside text
-  s = s.replace(
-    /\b(MANDATORY|UNAUTHENTICATED|AUTHENTICATED|LOCKED|APPROVED|RESOLVED|REQ-[A-Z0-9-]+|ISO-[A-Z0-9-.]+|HMAC-SHA256|RFC5322|HTTPS)\b/g,
-    '<span style="color:#A85049;font-weight:600">$1</span>'
-  );
-  // Arrows used in transitions/error_cases
-  s = s.replace(/(→|->)/g, '<span style="color:#4F7E8E">$1</span>');
-  return s;
+  const banner = BANNER_RE.exec(line);
+  if (banner) return banner[1] + span('#A85049', banner[2], 600);
+
+  let out = '';
+  let last = 0;
+  TOKEN_RE.lastIndex = 0;
+  for (let m = TOKEN_RE.exec(line); m !== null; m = TOKEN_RE.exec(line)) {
+    out += escape(line.slice(last, m.index));
+    const [, comment, str, key, colon, arrow, keyword, num] = m;
+    if (comment !== undefined) {
+      out += span('#8E8B7E', comment);
+    } else if (str !== undefined) {
+      out += span('#6E9070', str);
+    } else if (key !== undefined) {
+      // UPPERCASE primitive at the start of a section vs. plain field key
+      const isPrimitive =
+        SECTION_PRIMITIVES.has(key) && /^\s*$/.test(line.slice(0, m.index));
+      out += isPrimitive ? span('#A85049', key, 700) : span('#C49447', key);
+      out += span('#8E8B7E', colon);
+    } else if (arrow !== undefined) {
+      out += span('#4F7E8E', arrow);
+    } else if (keyword !== undefined) {
+      out += span('#A85049', keyword, 600);
+    } else if (num !== undefined) {
+      out += span('#A85049', num);
+    }
+    last = m.index + m[0].length;
+  }
+  return out + escape(line.slice(last));
 }
 
 function escape(s: string) {

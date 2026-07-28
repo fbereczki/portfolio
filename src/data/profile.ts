@@ -7,7 +7,7 @@ export const profile = {
     hu: 'Cybersecurity Expert & PM · AI Builder & VibeCode Fixer',
     en: 'Cybersecurity Expert & PM · AI Builder & VibeCode Fixer',
   },
-  location: 'Budapest, Magyarország',
+  location: { hu: 'Budapest, Magyarország', en: 'Budapest, Hungary' },
   phone: '+36 20 349 6421',
   email: 'ferenc.bereczki@codewitness.ai',
   emailPersonal: 'fbereczki@gmail.com',
@@ -35,13 +35,11 @@ Ez a szenvedély vezetett a CodeWitness megalapításához — a saját válaszo
 
 A CodeWitness egy tamper-evident audit- és compliance-platform az AI-asszisztált szoftverfejlesztéshez, vállalati szintű nyomon követhetőségre tervezve, és olyan keretrendszerekhez igazítva, mint a SOC 2 vagy az EU AI Act.
 
-Körülötte kísérletek és innovációk egész ökoszisztémája nőtt fel, amelyek többségét ezen a portfolió-oldalon és az IMWY.ai-n is megnézheted. MCP-szerverektől és a SIL módszertantól kezdve egészen a Civix, Aegis, Beacon, Magus projektekig és blokklánc-prototípusokig — mindegyik azt feszegeti, mi válik lehetővé, amikor több mint két évtizednyi mérnöki tapasztalat találkozik a modern AI-jal.
+Körülötte kísérletek és innovációk egész ökoszisztémája nőtt fel, amelyek többségét ezen a portfolió-oldalon és az IMWY.ai-n is megnézheted. MCP-szerverektől és a SIL módszertantól kezdve egészen a Civix, Beacon, Magus projektekig és blokklánc-prototípusokig — mindegyik azt feszegeti, mi válik lehetővé, amikor több mint két évtizednyi mérnöki tapasztalat találkozik a modern AI-jal.
 
 Egyes projektek production-ready állapotban vannak, mások nagyra törő kísérletek — de mindegyik tanított valami értékeset.
 
 Ha ez az út egyvalamit megtanított: a mérnökök, akik virágzanak, nem azok, akik ellenállnak a változásnak — hanem azok, akik szembefutnak vele.
-
-Az AI nem helyettesíti a senior mérnököket. Felerősíti őket.
 
 És őszintén szólva: pályafutásom során soha nem élveztem ennyire a munkámat, mint most.`,
     en: `During my career, I have worked across nearly every major area of IT. I started as a network and server operations engineer at Pfizer Hungary Ltd., building a strong foundation in enterprise infrastructure and operations. Later, I moved into web development, game programming, team leadership, project management, and entrepreneurship.
@@ -56,13 +54,11 @@ That passion evolved into CodeWitness — my answer to one of the defining chall
 
 CodeWitness is a tamper-evident audit and compliance platform for AI-assisted software development, designed around enterprise-grade traceability and aligned with frameworks such as SOC 2 and the EU AI Act.
 
-Around it, an entire ecosystem of experiments and innovations has grown, many of which are showcased throughout this portfolio and on IMWY.ai. From MCP servers and the SIL methodology to projects such as Civix, Aegis, Beacon, Magus, and blockchain prototypes, each project explores what becomes possible when more than two decades of engineering experience meet modern AI.
+Around it, an entire ecosystem of experiments and innovations has grown, many of which are showcased throughout this portfolio and on IMWY.ai. From MCP servers and the SIL methodology to projects such as Civix, Beacon, Magus, and blockchain prototypes, each project explores what becomes possible when more than two decades of engineering experience meet modern AI.
 
 Some projects are production-ready, others are ambitious experiments — but all of them taught me something valuable.
 
 If this journey has taught me one thing, it is this: the engineers who thrive are not the ones who resist change — they are the ones who run toward it.
-
-AI does not replace senior engineers. It amplifies them.
 
 And honestly, I have never enjoyed my career more than I do right now.`,
   },
@@ -128,7 +124,7 @@ And honestly, I have never enjoyed my career more than I do right now.`,
         hu: 'IT Biztonsági Szakértő és Projektmenedzser',
         en: 'Information Technology Security Specialist & Project Manager',
       },
-      company: 'Belügyminisztérium · Magyarország',
+      company: { hu: 'Belügyminisztérium · Magyarország', en: 'Ministry of the Interior · Hungary' },
       employmentType: { hu: 'Teljes munkaidős · Helyszíni', en: 'Full-time · On-site' },
       location: 'Budapest',
       period: { hu: '2017 június — 2022 szeptember', en: 'Jun 2017 — Sep 2022' },

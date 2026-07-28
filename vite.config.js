@@ -55,6 +55,16 @@ export default defineConfig({
         react(),
         rawStaticPlugin('/magus-app/', '/wp-planner-app/', '/codewitness-app/', '/beacon-app/', '/pgp-app/'),
     ],
+    build: {
+        rollupOptions: {
+            // Two SPAs from one build: index.html = portfolio (portfolio.imwy.ai),
+            // landing.html = imwy.ai company landing. Routed by Host in nginx.
+            input: {
+                main: resolve(process.cwd(), 'index.html'),
+                landing: resolve(process.cwd(), 'landing.html'),
+            },
+        },
+    },
     server: {
         port: 5173,
         open: true,

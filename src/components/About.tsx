@@ -6,7 +6,7 @@ export function About() {
   const { t, lang } = useI18n();
 
   return (
-    <Section id="about" kicker={t.about.kicker} title={t.about.title} number="01">
+    <Section id="about" kicker={t.about.kicker} title={t.about.title}>
       <div className="grid gap-12 lg:grid-cols-12">
         {/* Main editorial column */}
         <div className="lg:col-span-8">
@@ -27,7 +27,7 @@ export function About() {
 
           <div className="mt-10 flex items-baseline gap-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-              — {profile.name}, {profile.location}
+              — {profile.name}, {profile.location[lang]}
             </span>
             <span className="h-px flex-1 bg-paper-rule" />
           </div>
@@ -41,7 +41,7 @@ export function About() {
               {profile.currentRole[lang]}
             </div>
             <div className="mt-1 font-serif text-sm italic text-ink-mute">
-              {profile.location}
+              {profile.location[lang]}
             </div>
           </div>
 

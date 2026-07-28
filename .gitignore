@@ -11,3 +11,5 @@ dist
 .claude/beam-enforce.sh.bak.*
 .claude/nsm-hooks.sh.bak.*
 public/magus-app/build/
+.playwright-mcp/
+*.jpeg

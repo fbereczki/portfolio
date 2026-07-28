@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
 import { Section } from './Section';
@@ -11,8 +12,41 @@ export function Experience() {
       kicker={t.experience.kicker}
       title={t.experience.title}
       lead={t.experience.lead}
-      number="02"
     >
+      {/* Chain of custody — the career path as an unbroken hand-over chain */}
+      <div className="mb-10">
+        <div className="rule-double" />
+        <div className="px-1 py-5">
+          <div className="label-mono-ink mb-4 text-oxblood" title={t.experience.custody.note}>
+            — {t.experience.custody.title}
+          </div>
+          {/* Vertical chain below md; one row of five stations from md up — no orphan arrows. */}
+          <div className="grid grid-cols-1 gap-y-3 md:grid-cols-5 md:gap-x-3">
+            {t.experience.custody.stations.map((s, i) => (
+              <div key={s.org} className="flex items-center gap-x-3">
+                {i > 0 && <ArrowRight size={13} className="shrink-0 text-oxblood" />}
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-1.5">
+                    {s.year && (
+                      <span className="font-mono text-[11px] font-semibold tracking-[0.08em] text-oxblood">
+                        {s.year}
+                      </span>
+                    )}
+                    <span className="font-serif text-[14px] font-semibold leading-none text-ink">
+                      {s.org}
+                    </span>
+                  </div>
+                  <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-ink-mute">
+                    {s.note}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rule-double" />
+      </div>
+
       <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
         {/* Editorial timeline */}
         <ol className="space-y-10">

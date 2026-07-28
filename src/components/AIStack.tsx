@@ -4,19 +4,20 @@ import { Section } from './Section';
 
 export function AIStack() {
   const { t } = useI18n();
+  // K3: one accent for all four domains — no semaphore colours as decoration.
   const items = [
     { icon: <Cpu size={18} />, key: 'mcp' as const, accent: 'text-oxblood', n: '01' },
-    { icon: <Database size={18} />, key: 'rag' as const, accent: 'text-teal', n: '02' },
-    { icon: <FileSignature size={18} />, key: 'attribution' as const, accent: 'text-sage', n: '03' },
-    { icon: <Languages size={18} />, key: 'sil' as const, accent: 'text-amber', n: '04' },
+    { icon: <Database size={18} />, key: 'rag' as const, accent: 'text-oxblood', n: '02' },
+    { icon: <FileSignature size={18} />, key: 'attribution' as const, accent: 'text-oxblood', n: '03' },
+    { icon: <Languages size={18} />, key: 'sil' as const, accent: 'text-oxblood', n: '04' },
   ];
   return (
-    <Section id="ai" kicker={t.ai.kicker} title={t.ai.title} lead={t.ai.lead} number="04">
+    <Section id="ai" kicker={t.ai.kicker} title={t.ai.title} lead={t.ai.lead}>
       <div className="grid gap-6 md:grid-cols-2">
         {items.map((it) => {
           const block = t.ai.blocks[it.key];
           return (
-            <article key={it.key} className="paper-card paper-card-hover p-7">
+            <article key={it.key} className="paper-card p-7">
               <div className="flex items-baseline justify-between">
                 <div className={`flex items-center gap-2 ${it.accent}`}>
                   {it.icon}

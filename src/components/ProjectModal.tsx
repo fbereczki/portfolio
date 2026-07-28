@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
-import { X, Cpu, ListChecks, Sparkles, Wrench, PlayCircle } from 'lucide-react';
+import { X, Cpu, ListChecks, Target, PlayCircle } from 'lucide-react';
 import { useI18n } from '../i18n/I18nProvider';
 import type { Project } from '../data/projects';
-import { AegisDashboard } from './demos/AegisDashboard';
 import { BeaconCharts } from './demos/BeaconCharts';
 import { CodeWitnessFrontend } from './demos/CodeWitnessFrontend';
 import { CivixDemo } from './demos/CivixDemo';
@@ -12,10 +11,11 @@ import { RealtimeErrorsDemo } from './demos/RealtimeErrorsDemo';
 import { WpPlannerDemo } from './demos/WpPlannerDemo';
 import { BlockchainDemo } from './demos/BlockchainDemo';
 
+/* Stamp colours carry meaning: sage = live/closed, amber = in progress. */
 const phasePill: Record<Project['phase'], string> = {
   prod: 'pill-sage',
   test: 'pill-amber',
-  dev: 'pill-teal',
+  dev: 'pill-amber',
 };
 
 export function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
@@ -32,14 +32,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
   }, [onClose]);
 
   const Demo = renderDemo(project.demo);
-  const spotlightLabel =
-    project.spotlight === 'primary'
-      ? lang === 'hu' ? 'Fő fókusz' : 'Primary focus'
-      : project.spotlight === 'secondary'
-      ? lang === 'hu' ? 'Második' : 'Secondary'
-      : project.spotlight === 'tertiary'
-      ? lang === 'hu' ? 'Harmadik' : 'Tertiary'
-      : null;
+  const spotlightLabel = project.spotlight ? t.projects.spotlight[project.spotlight] : null;
+  const isKeyEvidence = project.spotlight === 'primary';
 
   return (
     <div
@@ -55,7 +49,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             <div className="flex min-w-0 items-start gap-4">
               <div className="min-w-0">
                 <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-mute">
-                  {lang === 'hu' ? 'Projekt-dosszié' : 'Project dossier'} · No. {project.id}
+                  {t.projects.dossier} · No. {project.id}
                 </div>
                 <h3 className="display-serif text-[28px] leading-tight text-ink sm:text-[34px]">
                   {project.name}
@@ -64,8 +58,18 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                   {project.tagline[lang]}
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className={phasePill[project.phase]}>{t.projects.phase[project.phase]}</span>
-                  {spotlightLabel && <span className="pill-oxblood">★ {spotlightLabel}</span>}
+                  {isKeyEvidence ? (
+                    <span className="pill-oxblood" title={t.projects.statusTip}>
+                      ★ {t.projects.status.key}
+                    </span>
+                  ) : (
+                    <span className={phasePill[project.phase]} title={t.projects.statusTip}>
+                      {t.projects.phase[project.phase]}
+                    </span>
+                  )}
+                  {!isKeyEvidence && spotlightLabel && (
+                    <span className="pill-ink">{spotlightLabel}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -83,7 +87,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
         <div className="grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-12 lg:gap-10">
           {/* main column */}
           <div className="lg:col-span-8 space-y-8">
-            <Block icon={<Sparkles size={14} />} title={t.projects.sections.purpose}>
+            <Block icon={<Target size={14} />} title={t.projects.sections.purpose}>
               <p className="prose-just font-serif text-[16px] leading-[1.8] text-ink">
                 {project.purpose[lang]}
               </p>
@@ -136,17 +140,6 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
               </div>
             </div>
 
-            <div className="paper-card p-5">
-              <div className="label-mono mb-3 text-oxblood">— Tags</div>
-              <div className="flex flex-wrap gap-1.5">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="pill-ink">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
             {Demo && (
               <div className="border border-oxblood bg-oxblood/[0.03] p-4">
                 <div className="flex items-center gap-2 text-oxblood">
@@ -157,8 +150,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 </div>
                 <p className="mt-2 font-serif text-[12.5px] italic text-ink-mute">
                   {lang === 'hu'
-                    ? 'Egy interaktív taster mock-adatokkal — ld. lent.'
-                    : 'An interactive taster with mock data — see below.'}
+                    ? 'Interaktív demó mock-adatokkal — ld. lent.'
+                    : 'An interactive demo with mock data — see below.'}
                 </p>
               </div>
             )}
@@ -174,7 +167,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 — {t.projects.runDemo} · {project.demo}
               </span>
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
-                Mock data
+                {t.projects.mock}
               </span>
             </div>
             <div className="rule-double mt-4" />
@@ -215,8 +208,6 @@ function renderDemo(kind: Project['demo']): React.FC | null {
       return CodeWitnessFrontend;
     case 'civix':
       return CivixDemo;
-    case 'aegis':
-      return AegisDashboard;
     case 'beacon':
       return BeaconCharts;
     case 'magus':

@@ -1,5 +1,5 @@
 export type Phase = 'dev' | 'test' | 'prod';
-export type DemoKind = 'codewitness-frontend' | 'civix' | 'aegis' | 'beacon' | 'magus' | 'realtime-errors' | 'pgp' | 'wp-planner' | 'blockchain' | null;
+export type DemoKind = 'codewitness-frontend' | 'civix' | 'beacon' | 'magus' | 'realtime-errors' | 'pgp' | 'wp-planner' | 'blockchain' | null;
 
 export type Project = {
   id: string;
@@ -23,8 +23,8 @@ export const projects: Project[] = [
     name: 'CodeWitness',
     logo: '/logos/codewitness.svg',
     tagline: {
-      hu: 'AI doesn’t replace seniors. It makes them unstoppable.',
-      en: 'AI doesn’t replace seniors. It makes them unstoppable.',
+      hu: 'Tamper-evident audit trail AI-asszisztált fejlesztéshez',
+      en: 'Tamper-evident audit trail for AI-assisted development',
     },
     purpose: {
       hu: 'Compliance-ready audit trail az AI-asszisztált fejlesztéshez. Bizonyíthatóvá teszi, hogy az AI által írt kód mögött szakértői review és architektúra-döntés áll. Capture → Attribute → Analyze → Comply pipeline; minden AI-generált sor mérhető, scoringolható, jogszabály elé tehető. A jelenlegi fő fókuszom.',
@@ -90,44 +90,6 @@ export const projects: Project[] = [
     },
     demo: 'civix',
     tags: ['blockchain', 'platform', 'web', 'mobile'],
-  },
-
-  // ===== KIEMELT 3: AEGIS =====
-  {
-    id: 'aegis',
-    name: 'AEGIS Automotive',
-    logo: '/logos/aegis.jpg',
-    tagline: {
-      hu: 'Enterprise automotive cybersecurity & functional safety platform',
-      en: 'Enterprise automotive cybersecurity & functional safety platform',
-    },
-    purpose: {
-      hu: 'Teljes körű ISO/SAE 21434, ISO 26262, UN R155/R156 compliance platform OEM-eknek és Tier-1 beszállítóknak. TARA, HARA, FMEA dokumentumgenerálás, supply-chain audit, SIL/HIL teszt-orchestration. Harmadik fókusz a CodeWitness és a Civix után.',
-      en: 'End-to-end ISO/SAE 21434, ISO 26262, UN R155/R156 compliance platform for OEMs and Tier-1 suppliers. TARA, HARA, FMEA document generation, supply-chain audit, SIL/HIL test orchestration. Third focus after CodeWitness and Civix.',
-    },
-    phase: 'dev',
-    spotlight: 'tertiary',
-    stack: ['Go 1.25', 'Gin/Fiber', 'PostgreSQL 16', 'TimescaleDB', 'GORM', 'JWT + Casbin', 'Asynq (Redis)', 'React 19', 'Vite 5', 'Material-UI 6', 'Redux Toolkit', 'TypeScript 5.6', 'Docker'],
-    ai: [
-      'llama.cpp submodul (function calling, SILU operátor)',
-      'Tervezett: TARA / HARA dokumentumgenerálás LLM-mel',
-    ],
-    highlights: {
-      hu: [
-        'ASIL A–D safety integrity scoping',
-        'Software- és Hardware-in-the-Loop teszt-integráció',
-        'Supply-chain risk + audit traceability',
-        'Real-time dashboard, dark theme, RBAC + ABAC',
-      ],
-      en: [
-        'ASIL A–D safety integrity scoping',
-        'Software- and Hardware-in-the-Loop test integration',
-        'Supply-chain risk + audit traceability',
-        'Real-time dashboard, dark theme, RBAC + ABAC',
-      ],
-    },
-    demo: 'aegis',
-    tags: ['platform', 'compliance', 'web', 'ai'],
   },
 
   // ===== GamfCoin — academic PoC (NOT a product) =====
@@ -245,20 +207,20 @@ export const projects: Project[] = [
       en: 'In-house PGP/GPG encryption helper for daily workflows: key management, file encryption, signature verification through a simple interface. Used daily at Knorr-Bremse for exchanging sensitive documents.',
     },
     phase: 'prod',
-    stack: ['— TODO: pontos stack —', 'OpenPGP / GnuPG', 'Desktop UI'],
+    stack: ['OpenPGP / GnuPG', 'Desktop UI'],
     ai: [],
     highlights: {
       hu: [
         'Élesben használt Knorr-Bremse-nél',
         'Kulcs-management egyszerű UI-jal',
         'Fájl titkosítás + aláírás',
-        'TODO: a pontos technológiai részletek beillesztése',
+        'Érzékeny dokumentumcsere napi munkafolyamatban',
       ],
       en: [
         'Used in production at Knorr-Bremse',
         'Key management with a simple UI',
         'File encryption + signing',
-        'TODO: paste in the exact technical details',
+        'Sensitive document exchange in the daily workflow',
       ],
     },
     demo: 'pgp',

@@ -1,6 +1,7 @@
 import { Download, Github, Languages, Linkedin, Menu } from 'lucide-react';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
+import { CASE_NO } from '../data/nav';
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const { t: _t, lang, setLang } = useI18n();
@@ -44,7 +45,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           className="hidden font-mono text-[10px] uppercase tracking-[0.12em] sm:inline"
           style={{ color: '#8A8676' }}
         >
-          v.2026 · paper edition
+          {lang === 'hu' ? 'Ügyirat' : 'Case'} № {CASE_NO}
         </span>
       </a>
 

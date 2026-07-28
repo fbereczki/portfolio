@@ -117,7 +117,7 @@ export function CV() {
           </li>
           <li>
             <span className="cv-icon-circle"><MapPin size={9} strokeWidth={2.2} /></span>
-            <span>{profile.location}</span>
+            <span>{profile.location[lang]}</span>
           </li>
         </ul>
 

@@ -4,13 +4,11 @@
 
 /* =================================================================
    THEME TOKENS
-   Two themes resolve via [data-theme] on <html>:
-   - paper  : warm editorial paper, Fraunces + Spectral + JetBrains Mono
-   - swiss  : Müller-Brockmann grid, white + black + bordeaux, Inter + IBM Plex
+   Single theme: paper — warm editorial paper,
+   Fraunces + Spectral + JetBrains Mono.
    ================================================================= */
 
-:root,
-:root[data-theme='paper'] {
+:root {
   color-scheme: light;
 
   /* Paper editorial */
@@ -47,41 +45,6 @@
     radial-gradient(ellipse 1000px 500px at 92% 92%, rgba(126, 30, 27, 0.05), transparent 65%),
     repeating-linear-gradient(0deg, rgba(26, 27, 34, 0.012) 0, rgba(26, 27, 34, 0.012) 1px, transparent 1px, transparent 3px),
     repeating-linear-gradient(90deg, rgba(26, 27, 34, 0.008) 0, rgba(26, 27, 34, 0.008) 1px, transparent 1px, transparent 5px);
-}
-
-:root[data-theme='swiss'] {
-  color-scheme: light;
-
-  /* Swiss / Bauhaus — clean grid */
-  --paper: #FFFFFF;
-  --paper-deep: #F5F5F5;
-  --paper-rule: #E0E0E0;
-  --paper-shadow: #ECECEC;
-
-  --ink: #0A0A0A;
-  --ink-soft: #2A2A2A;
-  --ink-mute: #6B6B6B;
-  --ink-faint: #A0A0A0;
-
-  --oxblood: #7E1E1B; /* bordeaux accent — single color */
-  --oxblood-soft: #A85049;
-  --oxblood-deep: #5C1614;
-
-  --sage: #2F5C36;
-  --sage-soft: #5C7E62;
-  --amber: #8B5A00;
-  --amber-soft: #B27F2C;
-  --teal: #144A5C;
-  --teal-soft: #3D6E80;
-
-  --font-display: 'Inter Tight', 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', Menlo, monospace;
-
-  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 4px 0 rgba(0, 0, 0, 0.06);
-
-  --bg-image: none;
 }
 
 /* =================================================================
@@ -135,17 +98,21 @@ body {
     @apply font-mono uppercase tracking-[0.18em] text-[11px] text-ink;
   }
 
-  /* Display headline — paper uses Fraunces opsz/WONK; swiss uses Inter Tight 800 */
+  /* Display headline — Fraunces with optical sizing + WONK */
   .display-serif {
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
   }
 
-  /* Accent text — paper: italic Fraunces oxblood; swiss: bold Inter Tight bordeaux */
+  /* Accent text — italic Fraunces oxblood */
   .accent-italic {
     font-family: var(--font-display);
     color: var(--oxblood);
+    font-style: italic;
+    font-weight: 500;
   }
 
   .paper-card {
@@ -185,48 +152,21 @@ body {
   }
 }
 
-/* Theme-specific applications of the typography accents */
-:root[data-theme='paper'] .display-serif {
-  font-optical-sizing: auto;
-  font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
-}
-:root[data-theme='paper'] .accent-italic {
-  font-style: italic;
-  font-weight: 500;
-}
-:root[data-theme='swiss'] .display-serif {
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-}
-:root[data-theme='swiss'] .accent-italic {
-  font-weight: 700;
-  font-style: normal;
-}
-
 /* =================================================================
-   DECORATIVE PRIMITIVES (theme-specific)
+   DECORATIVE PRIMITIVES
    ================================================================= */
 
-/* Double-rule horizontal divider — paper: 3px double; swiss: 2px solid */
+/* Double-rule horizontal divider */
 .rule-double {
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
   height: 3px;
 }
-:root[data-theme='swiss'] .rule-double {
-  border-top: 2px solid var(--ink);
-  border-bottom: 0;
-  height: 2px;
-}
 .rule-thin {
   border-top: 1px solid var(--paper-rule);
 }
-:root[data-theme='swiss'] .rule-thin {
-  border-top: 1px solid var(--paper-rule);
-}
 
-/* Stamp — paper: tilted dashed bordeaux. swiss: solid bordeaux block, no tilt */
+/* Stamp — tilted dashed bordeaux */
 .stamp {
   display: inline-block;
   border: 1.5px dashed var(--oxblood);
@@ -248,23 +188,8 @@ body {
   border-color: var(--amber);
   color: var(--amber);
 }
-:root[data-theme='swiss'] .stamp,
-:root[data-theme='swiss'] .stamp-sage,
-:root[data-theme='swiss'] .stamp-amber {
-  border: 0;
-  background: var(--oxblood);
-  color: var(--paper);
-  transform: none;
-  border-radius: 0;
-}
-:root[data-theme='swiss'] .stamp-sage {
-  background: var(--sage);
-}
-:root[data-theme='swiss'] .stamp-amber {
-  background: var(--amber);
-}
 
-/* Drop cap — paper: Fraunces oxblood huge. swiss: Inter Tight black huge */
+/* Drop cap — Fraunces oxblood huge */
 .drop-cap::first-letter {
   font-family: var(--font-display);
   font-weight: 700;
@@ -273,18 +198,10 @@ body {
   float: left;
   margin: 0.3rem 0.6rem 0 0;
   color: var(--oxblood);
-}
-:root[data-theme='paper'] .drop-cap::first-letter {
   font-variation-settings: 'opsz' 144, 'WONK' 1;
 }
-:root[data-theme='swiss'] .drop-cap::first-letter {
-  color: var(--ink);
-  font-weight: 900;
-  font-size: 5.5rem;
-  line-height: 0.8;
-}
 
-/* Subtle paper grain overlay — disabled in swiss */
+/* Subtle paper grain overlay */
 .grain {
   position: relative;
 }
@@ -297,9 +214,6 @@ body {
   background-size: 3px 3px;
   opacity: 0.35;
   mix-blend-mode: multiply;
-}
-:root[data-theme='swiss'] .grain::before {
-  display: none;
 }
 
 /* Justified body text with hyphenation — same on both themes */

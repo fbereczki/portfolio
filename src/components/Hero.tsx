@@ -1,39 +1,54 @@
 import { ArrowRight, Linkedin, Mail } from 'lucide-react';
 import { useI18n } from '../i18n/I18nProvider';
 import { profile } from '../data/profile';
+import { CASE_NO, navEntry } from '../data/nav';
+import { formatPressDate } from '../data/press';
 
 export function Hero() {
   const { t, lang } = useI18n();
-  const today = new Date().toLocaleDateString(lang === 'hu' ? 'hu-HU' : 'en-GB', {
-    year: 'numeric',
-    month: 'long',
-    day: '2-digit',
-  });
+  const nav = navEntry('top');
+  const pressDate = formatPressDate(lang);
 
   return (
     <header
       id="top"
-      className="mx-auto w-full max-w-6xl px-6 pt-10 pb-12 sm:px-10 sm:pt-14 lg:px-14"
+      className="mx-auto w-full max-w-6xl scroll-mt-14 px-6 pt-10 pb-12 sm:px-10 sm:pt-14 lg:px-14"
     >
-      {/* View head — wp-planner pattern */}
+      {/* Case-file masthead */}
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b-[3px] border-double border-ink pb-3.5">
         <span className="font-mono text-[12px] font-semibold uppercase tracking-[0.14em] text-oxblood">
-          §&nbsp;00
+          §&nbsp;{nav?.num ?? '00'}
         </span>
         <h1 className="display-serif m-0 text-[34px] leading-none text-ink sm:text-[42px]">
-          {lang === 'hu' ? 'Portfolio · ' : 'Portfolio · '}
-          <span className="accent-italic">2026</span>
+          {t.hero.caseLabel}{' '}
+          <span className="accent-italic">№&nbsp;{CASE_NO}</span>
         </h1>
         <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-mute">
           · {t.hero.eyebrow}
         </span>
         <span className="ml-auto font-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-mute">
-          {today}
+          {t.hero.pressLabel}: {pressDate}
+        </span>
+      </div>
+
+      {/* Claim strip — the statement this dossier proves */}
+      <div
+        className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-4 border border-ink bg-paper p-5 sm:p-6"
+        style={{ boxShadow: 'var(--shadow-card)' }}
+      >
+        <div className="min-w-[240px] flex-1">
+          <div className="label-mono mb-1.5 text-oxblood">— {t.hero.claimLabel}</div>
+          <p className="display-serif m-0 text-[21px] leading-snug text-ink sm:text-[24px]">
+            {t.hero.claim}
+          </p>
+        </div>
+        <span className="stamp shrink-0" title={t.hero.claimTip}>
+          {t.hero.claimStamp}
         </span>
       </div>
 
       {/* Lead — view-lead style */}
-      <p className="prose-just mb-9 mt-4 max-w-[820px] font-serif text-[16px] italic leading-[1.55] text-ink-soft">
+      <p className="prose-just mb-9 mt-6 max-w-[820px] font-serif text-[16px] italic leading-[1.55] text-ink-soft">
         {t.hero.lead}
       </p>
 
@@ -73,23 +88,23 @@ export function Hero() {
           <div className="mt-10 flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-mute">
             <span className="h-px w-10 bg-ink-mute" />
             <span>
-              {profile.name} · {profile.location}
+              {profile.name} · {profile.location[lang]}
             </span>
           </div>
         </div>
 
-        {/* Portrait — paper card with stamps */}
+        {/* Portrait — annex plate with case stamps */}
         <div className="lg:col-span-5">
           <figure className="relative mx-auto w-full max-w-[250px] lg:ml-auto lg:max-w-[312px]">
             <div className="absolute -top-3 -left-3 z-10 hidden lg:block">
-              <span className="stamp">No. 2026 / 05</span>
+              <span className="stamp">№ {CASE_NO}</span>
             </div>
             <div className="absolute -bottom-3 -right-3 z-10 hidden lg:block">
               <span
                 className="stamp stamp-sage"
                 style={{ transform: 'rotate(2deg)' }}
               >
-                Available
+                {t.hero.availableStamp}
               </span>
             </div>
             <div
@@ -104,11 +119,11 @@ export function Hero() {
                 loading="eager"
                 decoding="async"
               />
-              <figcaption className="mt-3 flex items-baseline justify-between border-t border-paper-rule pt-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-mute">
-                  Plate I
+              <figcaption className="mt-3 flex items-baseline justify-between gap-3 border-t border-paper-rule pt-3">
+                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-mute">
+                  {t.hero.annexLabel}
                 </span>
-                <span className="font-serif italic text-[13px] text-ink">
+                <span className="shrink-0 font-serif italic text-[13px] text-ink">
                   {profile.name}
                 </span>
               </figcaption>
@@ -117,23 +132,24 @@ export function Hero() {
         </div>
       </div>
 
-      {/* KPI strip — wp-planner kpis style */}
+      {/* KPI strip — 4 cells, each with a verdict line (K6) */}
       <div
-        className="mt-12 grid grid-cols-2 divide-x divide-paper-rule sm:grid-cols-3 lg:grid-cols-6"
+        className="mt-12 grid grid-cols-1 divide-y divide-paper-rule sm:grid-cols-2 sm:divide-y-0 sm:divide-x lg:grid-cols-4"
         style={{ border: '1px solid var(--ink)', background: 'var(--paper-shadow)' }}
       >
         {t.hero.stats.map((s) => (
           <div
             key={s.label}
-            className="flex min-h-[120px] flex-col items-center justify-start px-3 pt-8 pb-5 text-center sm:px-4"
+            title={s.tip}
+            className="flex min-h-[136px] flex-col items-center justify-start px-4 pt-7 pb-5 text-center"
           >
             <div
               className="display-serif text-oxblood"
               style={{
                 fontVariationSettings: '"opsz" 144',
-                fontSize: 32,
-                lineHeight: '40px',
-                height: 40,
+                fontSize: 30,
+                lineHeight: '38px',
+                height: 38,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -142,8 +158,11 @@ export function Hero() {
             >
               {s.value}
             </div>
-            <div className="mt-3 font-mono text-[10px] uppercase leading-snug tracking-[0.16em] text-ink-mute">
+            <div className="mt-2 font-mono text-[10px] uppercase leading-snug tracking-[0.14em] text-ink-mute">
               {s.label}
+            </div>
+            <div className="mt-2 font-serif text-[12.5px] italic leading-snug text-ink-soft">
+              {s.verdict}
             </div>
           </div>
         ))}

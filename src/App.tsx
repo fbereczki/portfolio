@@ -16,6 +16,7 @@ import { SIL } from './components/SIL';
 import { Skills } from './components/Skills';
 import { TopBar } from './components/TopBar';
 
+// Section order mirrors src/data/nav.ts — the single source of §-numbering.
 export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -30,10 +31,10 @@ export default function App() {
           <About />
           <Experience />
           <Skills />
-          <Projects />
           <CodeWitnessSpotlight />
-          <AIStack />
           <SIL />
+          <Projects />
+          <AIStack />
           <Blockchain />
           <Compliance />
           <Contact />

@@ -1,0 +1,114 @@
+@config "../../tailwind.landing.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* imwy.ai landing — ecosystem design language (Beacon tokens, K1–K13 codex).
+   Dark is the default theme; light is a token override on [data-theme='light']. */
+
+@font-face {
+  font-family: 'Sora';
+  src: url('/fonts/Sora.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* backgrounds — cool near-black, never pure #000 */
+  --bg-rgb: 12 14 18;
+  --bg-sunken-rgb: 9 10 13;
+  --surface-rgb: 20 23 28;
+  --surface-2-rgb: 26 30 37;
+  --surface-3-rgb: 33 38 47;
+  /* hairlines */
+  --border-rgb: 48 55 67;
+  --border-strong-rgb: 62 71 85;
+  /* text ladder */
+  --text-strong-rgb: 219 224 232;
+  --text-rgb: 183 190 201;
+  --text-muted-rgb: 140 148 163;
+  --text-faint-rgb: 104 111 125;
+  /* THE one accent — beacon beam cyan */
+  --accent-rgb: 55 194 220;
+  --accent-strong-rgb: 99 211 234;
+  --on-accent: #04171c;
+  /* semantics — meaning only, never decoration */
+  --bad-rgb: 240 97 107;
+  --warn-rgb: 231 169 60;
+  --ok-rgb: 67 192 138;
+  /* categorical neutrals for charts */
+  --seg-2-rgb: 78 124 140;
+  --seg-3-rgb: 90 100 114;
+  --seg-4-rgb: 58 66 80;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 20px 44px -26px rgb(0 0 0 / 0.72);
+}
+
+[data-theme='light'] {
+  --bg-rgb: 228 232 238;
+  --bg-sunken-rgb: 217 222 230;
+  --surface-rgb: 243 245 249;
+  --surface-2-rgb: 236 239 244;
+  --surface-3-rgb: 227 232 238;
+  --border-rgb: 214 220 229;
+  --border-strong-rgb: 195 203 214;
+  --text-strong-rgb: 16 20 26;
+  --text-rgb: 60 67 77;
+  --text-muted-rgb: 100 108 123;
+  --text-faint-rgb: 154 162 174;
+  --accent-rgb: 11 120 145;
+  --accent-strong-rgb: 9 100 121;
+  --on-accent: #ffffff;
+  --bad-rgb: 210 59 69;
+  --warn-rgb: 169 112 15;
+  --ok-rgb: 23 132 90;
+  --seg-2-rgb: 78 130 150;
+  --seg-3-rgb: 138 148 162;
+  --seg-4-rgb: 183 192 203;
+  --shadow: 0 1px 2px rgb(16 20 26 / 0.05), 0 14px 32px -22px rgb(16 20 26 / 0.20);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: rgb(var(--bg-rgb));
+  color: rgb(var(--text-rgb));
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'tnum' 1, 'cv01' 1;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-strong-rgb));
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
