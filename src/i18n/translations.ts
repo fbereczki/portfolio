@@ -212,6 +212,7 @@ export const translations = {
       table: { no: '№', project: 'Projekt', status: 'Státusz', stack: 'Stack', demo: 'Demó' },
       status: { key: 'Fő bizonyíték', prod: 'Éles', wip: 'Folyamatban' },
       statusTip: 'Pecsét-jelentés: zöld = éles/lezárt · borostyán = folyamatban · bordó = fő bizonyíték.',
+      platformTip: 'Az imwy.ai platform egyik terméke — CodeWitness, Mimir és Beacon egy összekapcsolt rendszer.',
       countTip: '{n} a {m} projektből látszik a szűrővel.',
       showAll: 'Mutasd mind',
       showLess: 'Csak a top 6',
@@ -224,7 +225,7 @@ export const translations = {
       readMore: 'Részletek',
       runDemo: 'Élő demó',
       mock: 'Mock-adatok',
-      spotlight: { primary: 'Fő bizonyíték', secondary: 'Második fókusz', tertiary: 'Harmadik fókusz' },
+      spotlight: { primary: 'Fő bizonyíték', secondary: 'imwy.ai platform', tertiary: 'Következő fókusz' },
       sections: {
         purpose: 'Cél',
         stack: 'Tech stack',
@@ -618,6 +619,7 @@ export const translations = {
       table: { no: '№', project: 'Project', status: 'Status', stack: 'Stack', demo: 'Demo' },
       status: { key: 'Key evidence', prod: 'Production', wip: 'In progress' },
       statusTip: 'Badge legend: accent = key evidence · green = live production · neutral = in progress.',
+      platformTip: 'One of the imwy.ai platform products — CodeWitness, Mimir and Beacon form one connected system.',
       countTip: '{n} of {m} projects match the filter.',
       showAll: 'Show all',
       showLess: 'Top 6 only',
@@ -630,7 +632,7 @@ export const translations = {
       readMore: 'Details',
       runDemo: 'Live demo',
       mock: 'Mock data',
-      spotlight: { primary: 'Key evidence', secondary: 'Second focus', tertiary: 'Third focus' },
+      spotlight: { primary: 'Key evidence', secondary: 'imwy.ai platform', tertiary: 'Next focus' },
       sections: {
         purpose: 'Purpose',
         stack: 'Tech stack',

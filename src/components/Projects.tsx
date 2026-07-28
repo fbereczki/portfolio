@@ -171,8 +171,16 @@ export function Projects() {
                             {String(orderById.get(p.id) ?? 0).padStart(2, '0')}
                           </td>
                           <td className="px-3 py-3.5 align-top">
-                            <div className="text-dense font-emph leading-tight text-text-strong">
-                              {p.name}
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-dense font-emph leading-tight text-text-strong">
+                                {p.name}
+                              </span>
+                              {/* The three products that make up the platform read as a family */}
+                              {p.spotlight === 'secondary' && (
+                                <Badge tone="accent" title={t.projects.platformTip}>
+                                  {t.projects.spotlight.secondary}
+                                </Badge>
+                              )}
                             </div>
                             <div className="mt-0.5 hidden text-dense leading-snug text-text-muted sm:block">
                               {p.tagline[lang]}

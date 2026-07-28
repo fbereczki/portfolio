@@ -1,0 +1,22 @@
+<svg viewBox="130 30 420 380" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>MIMIR — Mimir's Eye / Data Amulet</title>
+  <desc>Stylized geometric eye with an isometric data cube pupil, layered protective arcs, beacon-beam cyan on near-black.</desc>
+  <rect x="130" y="30" width="420" height="380" rx="26" fill="#0C1519"/>
+  <rect x="130.5" y="30.5" width="419" height="379" rx="25.5" fill="none" stroke="#303743" stroke-width="1"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M236 158 Q280 116 340 116 Q400 116 444 158" stroke="#1E6B7C" stroke-width="2" opacity="0.55"/>
+    <path d="M236 202 Q280 244 340 244 Q400 244 444 202" stroke="#1E6B7C" stroke-width="2" opacity="0.55"/>
+    <path d="M218 152 Q270 100 340 100 Q410 100 462 152" stroke="#37C2DC" stroke-width="2.5"/>
+    <path d="M218 208 Q270 260 340 260 Q410 260 462 208" stroke="#37C2DC" stroke-width="2.5"/>
+  </g>
+  <g fill="none" stroke="#63D3EA" stroke-width="3.5">
+    <path d="M250 180 Q295 138 340 138 Q385 138 430 180"/>
+    <path d="M250 180 Q295 222 340 222 Q385 222 430 180"/>
+  </g>
+  <polygon points="340,150 366,165 366,193 340,208 314,193 314,165" fill="#0C1519" stroke="#37C2DC" stroke-width="2"/>
+  <polygon points="340,150 366,165 340,180 314,165" fill="#63D3EA"/>
+  <polygon points="340,180 366,165 366,193 340,208" fill="#2496AC"/>
+  <polygon points="340,180 314,165 314,193 340,208" fill="#1E6B7C"/>
+  <text x="340" y="322" text-anchor="middle" font-family="Sora, system-ui, sans-serif" font-weight="300" font-size="42" letter-spacing="13" fill="#DBE0E8">MIMIR</text>
+  <text x="343" y="352" text-anchor="middle" font-family="Sora, system-ui, sans-serif" font-weight="400" font-size="12" letter-spacing="4" fill="#8C94A3">SELF-HOSTED · AUDITABLE · SECURE</text>
+</svg>

@@ -1,0 +1,1 @@
+import{X as t}from"./index-DtZzvT24.js";const r="00000000-0000-0000-0000-000000000001";function c(){return/\/p\/([^/]+)/.exec(typeof window<"u"?window.location.pathname:"")?.[1]??""}function i(n,e){const o=n??c();return{Accept:"application/json","X-Correlation-Id":t(),"X-CW-Tenant":r,...o?{"X-CW-Project":o}:{},...e??{}}}export{c,i as s};

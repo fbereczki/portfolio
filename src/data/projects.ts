@@ -1,5 +1,5 @@
 export type Phase = 'dev' | 'test' | 'prod';
-export type DemoKind = 'codewitness-frontend' | 'civix' | 'beacon' | 'magus' | 'realtime-errors' | 'pgp' | 'wp-planner' | 'blockchain' | null;
+export type DemoKind = 'codewitness-frontend' | 'civix' | 'beacon' | 'mimir' | 'magus' | 'realtime-errors' | 'pgp' | 'wp-planner' | 'blockchain' | null;
 
 export type Project = {
   id: string;
@@ -57,6 +57,46 @@ export const projects: Project[] = [
     tags: ['ai', 'mcp', 'compliance', 'platform', 'web'],
   },
 
+  // ===== imwy.ai platform · Mimir =====
+  {
+    id: 'mimir',
+    name: 'Mimir',
+    logo: '/logos/mimir.svg',
+    tagline: {
+      hu: 'Perzisztens AI-memória minden felületen — és a ledger, ami méri a munkát',
+      en: 'Persistent AI memory across every surface — and the ledger that measures the work',
+    },
+    purpose: {
+      hu: 'Az imwy.ai platform memória-rétege: egyetlen logikai memória a Claude Code, Desktop és web felületeknek, plusz bármely MCP-képes kliensnek. Determinisztikus capture-hook viszi be 1:1-ben a teljes fejlesztési rekordot — promptok, gondolatmenet, tool-hívások, fájl-diffek, tokenek — egy hash-láncolt ledgerbe. Ebből lesz déjà-vu (mikor találkoztam ezzel utoljára?) és heti coach-riport a saját teljesítményemről. A ×156-os leverage-szám ebből a ledgerből jön.',
+      en: 'The memory layer of the imwy.ai platform: one logical memory for Claude Code, Desktop and web, plus any MCP-capable client. A deterministic capture hook ingests the full engineering record 1:1 — prompts, reasoning, tool calls, file diffs, tokens — into a hash-chained ledger. That becomes déjà-vu recall (when did I last hit this?) and weekly coach reports on my own performance. The ×156 leverage figure comes from this ledger.',
+    },
+    phase: 'prod',
+    spotlight: 'secondary',
+    stack: ['Go', 'PostgreSQL 16 + pgvector', 'MCP (JSON-RPC + SSE)', 'ONNX embeddings (local)', 'React 19', 'Vite', 'Tailwind', 'Docker Compose'],
+    ai: [
+      'MCP server — recall, search, routing, checkpoint/handoff/resume, scheduling',
+      'Hybrid retrieval: Postgres full-text ⊕ pgvector cosine, fused with Reciprocal Rank Fusion',
+      'Local embedding sidecar (multilingual MiniLM, 384-dim) — no third-party AI API in the loop',
+      'Capability registry + routing that corrects for each helper’s actual track record',
+    ],
+    highlights: {
+      hu: [
+        '~97 500 esemény a referencia-installon, kizárólag automatikus capture-ből',
+        'Coach-riportok: ×10 → ×156 heti leverage hat hét alatt, re-prompt 21,7% → 2,7%',
+        'Hash-láncolt activity ledger + append-only audit log — a mérés maga is auditálható',
+        'Déjà-vu recall és verbatim resume: fiók- vagy gépváltás után is folytatható a munka',
+      ],
+      en: [
+        '~97,500 events on the reference install, all from automatic capture',
+        'Coach reports: ×10 → ×156 weekly leverage in six weeks, re-prompts 21.7% → 2.7%',
+        'Hash-chained activity ledger + append-only audit log — the measurement is auditable too',
+        'Déjà-vu recall and verbatim resume: work survives an account, machine or surface switch',
+      ],
+    },
+    demo: 'mimir',
+    tags: ['ai', 'mcp', 'rag', 'platform', 'web'],
+  },
+
   // ===== KIEMELT 2: Civix Platform =====
   {
     id: 'civix',
@@ -71,7 +111,7 @@ export const projects: Project[] = [
       en: 'Polyglot microservice platform to democratise political participation: low-cost party creation, transparent primaries, direct citizen-politician communication, blockchain-backed accountability. Custom Civix Network (Substrate) and CRED token. My next major focus after CodeWitness.',
     },
     phase: 'dev',
-    spotlight: 'secondary',
+    spotlight: 'tertiary',
     stack: ['Rust (Axum)', 'Go (Fiber)', 'Substrate (PoW)', 'ink! smart contracts', 'SvelteKit', 'Flutter', 'NATS JetStream', 'PostgreSQL HA (Patroni)', 'Redis Cluster', 'Kubernetes'],
     ai: [],
     highlights: {
@@ -168,32 +208,38 @@ export const projects: Project[] = [
     name: 'Beacon',
     logo: '/logos/beacon.png',
     tagline: {
-      hu: 'Cybersecurity project cost & efficiency analytics — Knorr-Bremse napi használatban',
-      en: 'Cybersecurity project cost & efficiency analytics — in daily use at Knorr-Bremse',
+      hu: 'AI-first projektkontroll ISO/SAE 21434 cybersecurity programokra',
+      en: 'AI-first project control for ISO/SAE 21434 cybersecurity programmes',
     },
     purpose: {
-      hu: 'Cybersecurity projektek költség-, kapacitás- és profitabilitás-elemzése. A Knorr-Bremse-nél én magam is napi szinten használom a jelenlegi munkámban: 23-feature toggle, bottleneck analysis, customer profitability scoring, real-time dashboard.',
-      en: 'Cost, capacity and profitability analytics for cybersecurity projects. I use it myself daily at Knorr-Bremse: 23-feature toggle system, bottleneck analysis, customer profitability scoring, real-time dashboard.',
+      hu: 'Az imwy.ai platform tervező-rétege: egyetlen motorból számolja, mennyibe kerül egy cybersecurity program, mikor készül el, ki csinálja és hol áll a kapukhoz képest — és ugyanabból generálja az ügyfélnek menő dokumentumot. Munkacsomag-katalógus tailoringgal, erőforrás-korlátos CPM ütemezés, gate scorecard, JIRA-szinkron, státusz-deck. Ez teszi a CodeWitness által kormányzott munkát emberi szemmel tervezhetővé és prezentálhatóvá.',
+      en: 'The planning layer of the imwy.ai platform: one engine computes what a cybersecurity programme costs, when it lands, who does it and where it stands against its gates — and generates the customer-facing document from that same calculation. Work-package catalogue with tailoring, resource-levelled CPM scheduling, gate scorecards, JIRA sync, status decks. This is what makes CodeWitness-governed work plannable and presentable for humans.',
     },
     phase: 'prod',
-    stack: ['Go 1.23', 'Gin', 'PostgreSQL 16', 'React 19', 'TypeScript', 'Material-UI 7', 'Recharts', 'React Query', 'Docker Compose'],
-    ai: [],
+    spotlight: 'secondary',
+    stack: ['Go', 'Gin', 'PostgreSQL 16', 'React 19', 'Vite', 'TypeScript', 'Tailwind', 'MCP server (Go)', 'python-pptx', 'Docker Compose'],
+    ai: [
+      'Optional by design — every mechanical feature works with no AI key at all',
+      'MCP server (10 tools) so an agent session can query plans, costs and schedules',
+      'Reference-class forecasting: your plan checked against comparable finished projects',
+      'Draft-first outbound: every generated message waits for human approval',
+    ],
     highlights: {
       hu: [
-        'Élesben használt Knorr-Bremse cybersecurity portfólió-menedzsmentre',
-        '23 feature-toggle, 3 preset',
-        'Bottleneck analysis + resource heatmap',
-        'PDF / Excel export, customer profitability scoring',
+        'Élesben fut — ISO/SAE 21434 munkacsomag-katalógus: 43 aktív work product, 156 task, 369,5 mérnöknap',
+        'Erőforrás-korlátos CPM: az FTE párhuzamosságot vesz, nem sebességet — egy full-time task nem lesz gyorsabb több embertől',
+        'Egy motor, egy igazság: a képernyő, a DOCX, az XLSX és a PPTX ugyanabból a számításból olvas',
+        'Őszinteség beépítve: üres cella „—”, valódi nulla „0”, a ráta soha nem összegződik, a dátum hét-pontosságú, ha a terv nem tud napot',
       ],
       en: [
-        'Used in production at Knorr-Bremse for cybersecurity portfolio management',
-        '23 feature toggles, 3 presets',
-        'Bottleneck analysis + resource heatmap',
-        'PDF / Excel export, customer profitability scoring',
+        'Running in production — ISO/SAE 21434 work-package catalogue: 43 active work products, 156 tasks, 369.5 engineering days',
+        'Resource-levelled CPM: FTE buys parallelism, not speed — a full-time task never gets faster by adding people',
+        'One engine, one truth: screen, DOCX, XLSX and PPTX all read the same calculation',
+        'Honest by construction: empty is “—”, zero is “0”, rates are never summed, and dates stay week-precise when the plan has no day',
       ],
     },
     demo: 'beacon',
-    tags: ['platform', 'web'],
+    tags: ['platform', 'web', 'compliance'],
   },
   {
     id: 'pgp-tool',

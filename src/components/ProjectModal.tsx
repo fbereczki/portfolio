@@ -3,8 +3,9 @@ import { X, Cpu, ListChecks, Target, PlayCircle } from 'lucide-react';
 import { Badge, Card } from '../landing/ui';
 import { useI18n } from '../i18n/I18nProvider';
 import type { Project } from '../data/projects';
-import { BeaconCharts } from './demos/BeaconCharts';
-import { CodeWitnessFrontend } from './demos/CodeWitnessFrontend';
+import { BeaconDemo } from './demos/BeaconDemo';
+import { MimirDemo } from './demos/MimirDemo';
+import { CodeWitnessCockpit } from './demos/CodeWitnessCockpit';
 import { CivixDemo } from './demos/CivixDemo';
 import { MagusDemo } from './demos/MagusDemo';
 import { PgpDemo } from './demos/PgpDemo';
@@ -194,11 +195,13 @@ function Block({
 function renderDemo(kind: Project['demo']): React.FC | null {
   switch (kind) {
     case 'codewitness-frontend':
-      return CodeWitnessFrontend;
+      return CodeWitnessCockpit;
     case 'civix':
       return CivixDemo;
     case 'beacon':
-      return BeaconCharts;
+      return BeaconDemo;
+    case 'mimir':
+      return MimirDemo;
     case 'magus':
       return MagusDemo;
     case 'pgp':

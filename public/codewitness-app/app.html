@@ -2,64 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/codewitness-app/favicon.svg" />
+    <link rel="icon" type="image/png" href="/codewitness-app/logo-cwt.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeWitness — Cockpit</title>
     <!--
-      PL-365 — Content-Security-Policy (defense-in-depth meta header).
-      Production deployments MUST also send the same CSP via a server
-      response header so the directives apply to non-document responses
-      (XHR, beacon). Meta CSP only covers the SPA shell loaded from this
-      HTML file but is sufficient for SPA-served paths.
-
-      Notes on each directive:
-      - default-src 'self': everything not enumerated must be same-origin.
-      - script-src 'self': no inline scripts, no eval, no CDNs. Vite
-        emits all JS as same-origin chunks under /assets/, so this works
-        out of the box.
-      - style-src 'self' 'unsafe-inline': MUI / emotion inject runtime
-        styles via <style> tags; until we ship hashed styles this stays.
-        (Not a hard XSS vector on its own without script-src 'unsafe-inline'.)
-      - connect-src: backend API + WS. The protocol/host pair is static
-        per-deployment but we keep both http(s) + ws(s) for the dev
-        bootstrap script which writes a custom hub URL.
-      - img-src: data: for embedded SVG icons + blob: for screenshot uploads.
-      - object-src 'none': blocks <object>/<embed> (Flash relics, PDF
-        inline plugins).
-      - base-uri 'self': prevents <base href="evil.com"> rebasing.
-      - frame-ancestors 'none': clickjacking guard — same as
-        X-Frame-Options: DENY but with the modern directive.
-      - form-action 'self': forms must POST to same-origin only.
-      - upgrade-insecure-requests: any http:// resource referenced is
-        upgraded to https:// at request-time.
+      Cockpit UI face — Hanken Grotesk (the ONE UI/heading family; fancy-but-
+      readable, full Hungarian coverage). SELF-HOSTED, NO runtime CDN /
+      Google-Fonts fetch: the @font-face rules live in src/fonts.css (imported
+      from main.tsx so Vite BUNDLES them) and point at LOCAL woff2 under /fonts/
+      (served from public/fonts, copied into the build). Both the `latin` and
+      `latin-ext` subsets ship (unicode-range-split) so ő ű Ő Ű render; the
+      family is single-sourced from @cw/design-system UI_FONT_STACK and degrades
+      cleanly to the system UI sans if a binary is absent. See public/fonts/README.md.
     -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http: https: ws: wss:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-    />
-    <!--
-      Referrer-Policy hardening — strip Referer on cross-origin nav so
-      tokens that still travel via ?token= URLs (verify-email, invite/
-      accept) do not leak into third-party analytics. The backend also
-      sets Referrer-Policy in its response headers; this meta tag is a
-      belt-and-braces guard for the SPA shell.
-    -->
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <title>CodeWitness.ai</title>
-    <script src="/iframe-demo-auth.js"></script>
-    <script type="module" crossorigin src="/codewitness-app/assets/index-CIScRkE1.js"></script>
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/rolldown-runtime-Dw2cE7zH.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-flow-Cp5Fj48q.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/chunk-LFPYN7LY-DJ59zUHB.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-mui-Bww7KKTa.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-query-CFBISzv4.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-icons-DDNOEImp.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-react-c3lhLJ2V.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/vendor-state-BJgVW1h2.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/api-Bbpg7RUE.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/design-system-Bhf8b1CM.js">
-    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/colors-BKj5sies.js">
-    <link rel="stylesheet" crossorigin href="/codewitness-app/assets/vendor-flow-CHpVij2M.css">
-    <link rel="stylesheet" crossorigin href="/codewitness-app/assets/index-D52N2OaT.css">
+    <script src="/codewitness-app/cw-demo-api.js"></script>
+    <script type="module" crossorigin src="/codewitness-app/assets/index-DtZzvT24.js"></script>
+    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/tanstack-CqnobFvs.js">
+    <link rel="modulepreload" crossorigin href="/codewitness-app/assets/mui-XbDDk2GQ.js">
+    <link rel="stylesheet" crossorigin href="/codewitness-app/assets/index-DNByWf0Z.css">
   </head>
   <body>
     <div id="root"></div>
