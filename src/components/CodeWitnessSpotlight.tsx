@@ -5,6 +5,19 @@ import { Section, SubHead } from './Section';
 
 const PIPELINE_ICONS = [Database, FileSignature, Cpu, ShieldCheck];
 
+/* Risk semaphore for the maturity table (K3: colour == verdict). Keyed by the
+   rendered label so the table stays correct in either language. */
+const RISK_TONE: Record<string, 'ok' | 'warn' | 'bad'> = {
+  low: 'ok',
+  alacsony: 'ok',
+  medium: 'warn',
+  közepes: 'warn',
+  high: 'bad',
+  magas: 'bad',
+  critical: 'bad',
+  kritikus: 'bad',
+};
+
 export function CodeWitnessSpotlight() {
   const { t } = useI18n();
   const cw = t.cwSpotlight;
@@ -89,34 +102,42 @@ export function CodeWitnessSpotlight() {
                 </tr>
               </thead>
               <tbody>
-                {cw.maturityLevels.map((m, i) => {
-                  const isCritical = (m.risk as string).toLowerCase() === 'critical';
-                  const isStandard = i === 3;
+                {cw.maturityLevels.map((m) => {
+                  const tone = RISK_TONE[m.risk.toLowerCase()] ?? 'warn';
+                  const isGolden = m.mark === 'golden';
+                  const isStandard = m.mark === 'standard';
                   return (
                     <tr
                       key={m.level}
-                      className={`border-t border-border ${isStandard ? 'bg-accent-quiet' : ''}`}
+                      className={`border-t border-border ${
+                        isGolden ? 'bg-accent-quiet' : isStandard ? 'bg-surface-2' : ''
+                      }`}
                     >
-                      <td className="px-4 py-3 text-dense font-emph text-text-strong">{m.level}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 align-top text-dense font-emph text-text-strong">
+                        {m.level}
+                      </td>
+                      <td className="px-4 py-3 align-top">
                         <Badge
-                          tone={isCritical ? 'bad' : isStandard ? 'accent' : 'neutral'}
+                          tone={isGolden ? 'accent' : tone === 'bad' ? 'bad' : 'neutral'}
                           title={
-                            isCritical
-                              ? 'Red = critical risk profile'
+                            isGolden
+                              ? 'The profile CodeWitness exists to move engineers into'
                               : isStandard
-                                ? 'Accent = the profile CodeWitness is built for'
-                                : 'Neutral profile'
+                                ? 'Where good teams are today — and where the bottleneck appears'
+                                : undefined
                           }
                         >
                           {m.tag}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-dense leading-snug text-text">{m.value}</td>
-                      {/* K3: red only where risk IS critical */}
+                      <td className="px-4 py-3 align-top text-dense leading-snug text-text">
+                        {m.value}
+                      </td>
+                      {/* K3: the risk column is a semaphore — tone always matches the verdict */}
                       <td
-                        className={`px-4 py-3 text-meta font-emph uppercase tracking-[0.1em] ${
-                          isCritical ? 'text-bad' : 'text-ok'
+                        title={m.riskWhy}
+                        className={`px-4 py-3 align-top text-meta font-emph uppercase tracking-[0.1em] ${
+                          tone === 'ok' ? 'text-ok' : tone === 'warn' ? 'text-warn' : 'text-bad'
                         }`}
                       >
                         {m.risk}
@@ -126,6 +147,13 @@ export function CodeWitnessSpotlight() {
                 })}
               </tbody>
             </table>
+          </div>
+          {/* K6 — the table's verdict line */}
+          <div className="border-t border-border px-4 py-3.5">
+            <p className="max-w-4xl text-dense leading-relaxed text-text">
+              <span className="font-emph text-accent">{cw.maturityVerdict.slice(0, 1)}</span>
+              {cw.maturityVerdict.slice(1)}
+            </p>
           </div>
         </Card>
       </Reveal>
