@@ -13,3 +13,4 @@ dist
 public/magus-app/build/
 .playwright-mcp/
 *.jpeg
+/*.png
